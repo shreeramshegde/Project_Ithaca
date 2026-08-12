@@ -17,14 +17,8 @@ Stores the state and progress of the 10 participating teams.
 - `end_time` (Timestamp) - Set when Island 4 is completed
 - `is_completed` (Boolean) - Default: false
 
-### 2.2 `team_members` Table
-Stores individual participants for Witch's Island sit-out mechanic.
-- `id` (UUID, Primary Key)
-- `team_id` (UUID, Foreign Key)
-- `name` (String)
-- `is_sitting_out` (Boolean) - Default: false
 
-### 2.3 `questions` Table
+### 2.2 `questions` Table
 Stores island-specific and pre-round questions.
 - `id` (UUID, Primary Key)
 - `island_id` (Int)
@@ -38,7 +32,7 @@ Stores island-specific and pre-round questions.
 - `penalty_years` (Float) - Positive value to add to journey
 - `difficulty_level` (Int)
 
-### 2.4 `team_progress` Table
+### 2.3 `team_progress` Table
 Tracks exactly which questions the team has answered, mostly for non-sequential islands and audit logs.
 - `id` (UUID, Primary Key)
 - `team_id` (UUID, Foreign Key)
@@ -46,7 +40,7 @@ Tracks exactly which questions the team has answered, mostly for non-sequential 
 - `status` (Enum: 'CORRECT', 'INCORRECT')
 - `attempted_at` (Timestamp)
 
-### 2.5 `team_inventory` Table
+### 2.4 `team_inventory` Table
 Stores active pre-round rewards for a team.
 - `id` (UUID, Primary Key)
 - `team_id` (UUID, Foreign Key)
@@ -73,7 +67,7 @@ Stores active pre-round rewards for a team.
   - Logic: 
     - Validates answer (case-insensitive for non-MCQ).
     - If correct: Deduct `reward_years`.
-    - If incorrect: Add `penalty_years`. Apply Island 1 specific penalty (skip question), or Island 4 penalty (flag a team member to sit out).
+    - If incorrect: Add `penalty_years`. Apply Island 1 specific penalty (skip question). For Island 4 (Witch's Island), the digital penalty is just years; the sit-out mechanic is enforced physically by volunteers.
     - Checks completion of the island and progresses the team to the next island if criteria are met.
 
 ### 3.4 Utilities & Items
@@ -81,7 +75,7 @@ Stores active pre-round rewards for a team.
   - Deducts 1 from `standard_hints_left` (if > 0) and returns a pre-defined hint for the requested question.
 - `POST /api/game/use-reward`
   - Input: `reward_type`, `target_question_id`
-  - Logic: Applies Cyclops Eye (returns 1 wrong option) or The Blessing (bypasses sit-out or deducts 3 years depending on team choice).
+  - Logic: Applies Cyclops Eye (returns 1 wrong option) or The Blessing (bypasses physical sit-out or deducts 3 years depending on team choice).
 
 ### 3.5 Admin & Leaderboard
 - `GET /api/admin/leaderboard`
@@ -92,5 +86,8 @@ Stores active pre-round rewards for a team.
 - `POST /api/admin/adjust-years`
   - Manual override for judges to add/deduct years in case of disputes.
 
-## 4. Race Conditions & Concurrency
-- Implement database transactions using Supabase/PostgreSQL row-level locking for answer submissions to ensure `remaining_years` is calculated accurately without partiality or data loss, especially during rapid consecutive submissions.
+## 4. Security, Concurrency & JWT Tokens
+- **JWT Integrity**: Since the JWT token is cryptographically signed and linked to the specific team, teams cannot spoof or modify the payload to affect other teams' scores. If they attempt to modify the token, validation will fail.
+- **Handling Multiple Tabs/Parallel Submissions**: While a team with technical knowledge might try to open multiple tabs to solve non-sequential questions in parallel, all score and progression updates are handled on the backend via transactional DB row-level locks.
+  - E.g., if multiple answers are submitted simultaneously, the database transaction locks the `teams` row, processes the penalty/reward sequentially, and prevents race conditions (preventing multiple rewards for the same question).
+- **Physical Enforcement**: For Island 4, since one laptop is used per team and volunteers are physically present, the "Witch Sit-Out Mechanic" doesn't need to be digitally tracked. The UI simply alerts the team to physically exclude a member, enforced by the volunteer.

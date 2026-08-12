@@ -46,7 +46,7 @@ The UI adapts based on the current island the team is on:
 
 #### Island 4: Witch's Island
 - **Layout**: Darker, higher-stakes visual theme.
-- **Witch Mechanic UI**: If an answer is wrong, a modal forces the team to select (via a dropdown of team member names) who will "sit out" the next question. That member's name is crossed out visually on the HUD until they return.
+- **Witch Mechanic UI**: If an answer is wrong, a modal appears alerting the team that a member must sit out the next question. Since the event is supervised, this is handled physically by the volunteers rather than digitally tracked.
 
 ### 3.4 Live Leaderboard
 - Used primarily by organizers on a projector, but accessible via a specific route (e.g., `/leaderboard`).
