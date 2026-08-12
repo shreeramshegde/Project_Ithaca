@@ -49,9 +49,11 @@ Stores active pre-round rewards for a team.
 
 ## 3. Core API Endpoints
 
-### 3.1 Authentication
+### 3.1 Authentication & Registration
+- `POST /api/auth/register`
+  - Registers a new team. Validates the incoming payload (e.g. `team_name`, `auth_code`) using **Zod** schema (DTO equivalent) to ensure correct formats before database insertion.
 - `POST /api/auth/login`
-  - Validates `auth_code` and returns a JWT token for the team session.
+  - Validates `auth_code` via Zod DTO and returns a JWT token for the team session.
 
 ### 3.2 Game State Fetching
 - `GET /api/game/state`
@@ -91,3 +93,36 @@ Stores active pre-round rewards for a team.
 - **Handling Multiple Tabs/Parallel Submissions**: While a team with technical knowledge might try to open multiple tabs to solve non-sequential questions in parallel, all score and progression updates are handled on the backend via transactional DB row-level locks.
   - E.g., if multiple answers are submitted simultaneously, the database transaction locks the `teams` row, processes the penalty/reward sequentially, and prevents race conditions (preventing multiple rewards for the same question).
 - **Physical Enforcement**: For Island 4, since one laptop is used per team and volunteers are physically present, the "Witch Sit-Out Mechanic" doesn't need to be digitally tracked. The UI simply alerts the team to physically exclude a member, enforced by the volunteer.
+
+## 5. Developer Setup & Testing (Docker & Swagger)
+To mimic the deployment environment locally and make API testing seamless for all developers:
+- **Docker & PostgreSQL**: The repository will include a `docker-compose.yml` to effortlessly spin up a local PostgreSQL container. This ensures everyone's local database behaves exactly like the production environment.
+- **Swagger UI**: All API endpoints will be documented and testable via a Swagger UI endpoint (`/api-docs`). This allows frontend developers to see exactly what parameters and DTO formats are expected and interact with the backend APIs directly from the browser.
+
+## 6. Project Folder Structure & Architecture
+To maintain a clean and scalable codebase, the Node.js backend follows an MVC-like pattern. Here is the visual layout of our backend folder:
+
+```text
+backend/
+├── src/
+│   ├── config/          # DB connection, Swagger, environment config
+│   ├── controllers/     # Core business logic (req, res handling)
+│   ├── dto/             # Zod validation schemas
+│   ├── middlewares/     # JWT auth, error handlers, logging
+│   ├── models/          # Database schema and Postgres client queries
+│   ├── routes/          # Express router (URL paths to controllers)
+│   ├── utils/           # Helper functions (hashing, formatting)
+│   ├── app.js           # Express app setup and middleware registration
+│   └── server.js        # Network listener (app.listen)
+├── .env                 # Environment variables (secret keys, DB url)
+├── docker-compose.yml   # Docker setup for local PostgreSQL
+├── Dockerfile           # Backend containerization rules
+└── package.json         # Project dependencies and scripts
+```
+
+**Folder Responsibilities (Spring Boot Equivalencies):**
+- **`routes/` & `controllers/`**: Equivalent to `@RestController` and `@RequestMapping`. Routes handle the paths; controllers handle the logic.
+- **`models/`**: Equivalent to `@Entity` / Repositories. Where we define our data interaction.
+- **`dto/`**: Equivalent to Java Records or POJOs with `@Valid`. Validates incoming JSON payloads.
+- **`middlewares/`**: Equivalent to Spring Security filters or `HandlerInterceptor`. Runs before the controller to check tokens or handle errors.
+- **`config/`**: Equivalent to `application.yml` or `@Configuration` classes.
