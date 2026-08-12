@@ -1,0 +1,34 @@
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Table for storing the teams
+CREATE TABLE IF NOT EXISTS teams (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    team_name VARCHAR(100) UNIQUE NOT NULL,
+    auth_code VARCHAR(100) UNIQUE NOT NULL,
+    remaining_years DECIMAL(10, 2) DEFAULT 20.0,
+    standard_hints_left INT DEFAULT 3,
+    current_island INT DEFAULT 1,
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
+    is_completed BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table for tracking answered questions (mostly for non-sequential logic and audit)
+CREATE TABLE IF NOT EXISTS team_progress (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    team_id UUID REFERENCES teams(id) ON DELETE CASCADE,
+    question_id UUID NOT NULL, -- References a questions table later
+    status VARCHAR(50) NOT NULL CHECK (status IN ('CORRECT', 'INCORRECT')),
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table for team inventory (active pre-round rewards)
+CREATE TABLE IF NOT EXISTS team_inventory (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    team_id UUID REFERENCES teams(id) ON DELETE CASCADE,
+    reward_type VARCHAR(50) NOT NULL CHECK (reward_type IN ('ATHENAS_SCROLL', 'CYCLOPS_EYE', 'HERMES_SANDALS', 'THE_BLESSING')),
+    is_used BOOLEAN DEFAULT false,
+    acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
