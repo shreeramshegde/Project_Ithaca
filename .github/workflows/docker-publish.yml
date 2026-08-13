@@ -1,0 +1,65 @@
+name: Publish Docker image to DockerHub
+# Cache buster comment to force GitHub to recognize the recreated workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'feature/*'
+      - feature/backend-db-schemas
+  release:
+    types: [published]
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Normalize Docker Hub credentials
+        id: docker_creds
+        shell: bash
+        env:
+          RAW_DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          RAW_DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          sanitize() {
+            local value="$1"
+            value="${value#"${value%%[![:space:]]*}"}"
+            value="${value%"${value##*[![:space:]]}"}"
+            printf '%s' "$value"
+          }
+
+          username="$(sanitize "$RAW_DOCKER_USERNAME")"
+          docker_token="$(sanitize "$RAW_DOCKER_PASSWORD")"
+
+          if [ -z "$username" ] || [ -z "$docker_token" ]; then
+            echo "Docker Hub credentials are empty after trimming whitespace. Check DOCKER_USERNAME and DOCKER_PASSWORD secrets." >&2
+            exit 1
+          fi
+
+          echo "username=$username" >> "$GITHUB_OUTPUT"
+          echo "token=$docker_token" >> "$GITHUB_OUTPUT"
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ steps.docker_creds.outputs.username }}
+          password: ${{ steps.docker_creds.outputs.token }}
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/project-ithaca-backend
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
