@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const jwt = require('jsonwebtoken');
 
 const registerTeam = async (req, res) => {
   const { team_name, auth_code } = req.body;
@@ -25,10 +26,18 @@ const registerTeam = async (req, res) => {
       [team_name, auth_code]
     );
 
+    const team = newTeam.rows[0];
+    const token = jwt.sign(
+      { id: team.id, team_name: team.team_name },
+      process.env.JWT_SECRET || 'supersecretjwtkey_change_in_production',
+      { expiresIn: '6h' }
+    );
+
     return res.status(201).json({
       status: 'success',
       message: 'Team registered successfully',
-      data: newTeam.rows[0]
+      token,
+      data: team
     });
   } catch (err) {
     console.error('Error during registration:', err);
