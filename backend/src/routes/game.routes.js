@@ -111,4 +111,18 @@ router.post('/use-hint', gameController.useHint);
  */
 router.post('/use-reward', validate(useRewardSchema), gameController.useReward);
 
+/**
+ * @swagger
+ * /api/game/next-island:
+ *   post:
+ *     summary: Progress team to the next island
+ *     tags: [Game]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Sailed to next island or finished game
+ */
+router.post('/next-island', gameController.nextIsland);
+
 module.exports = router;
