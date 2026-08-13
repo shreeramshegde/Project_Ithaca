@@ -1,4 +1,5 @@
 name: Publish Docker image to DockerHub
+# Cache buster comment to force GitHub to recognize the recreated workflow
 
 on:
   workflow_dispatch:
@@ -6,6 +7,7 @@ on:
     branches:
       - main
       - feature/backend
+      - db-schemas
   release:
     types: [published]
 
