@@ -29,6 +29,16 @@ const getRewardForIsland = (island_id) => {
   }
 };
 
+const getIslandForReward = (reward_type) => {
+  switch (reward_type) {
+    case 'ATHENAS_SCROLL': return 1;
+    case 'CYCLOPS_EYE': return 2;
+    case 'HERMES_SANDALS': return 3;
+    case 'THE_BLESSING': return 4;
+    default: return 0;
+  }
+};
+
 const submitPreRound = async (req, res) => {
   const teamId = req.team.id;
   const { question_id, selected_option } = req.body;
@@ -227,6 +237,20 @@ const useReward = async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Reward not available or already used' });
     }
     const inventoryId = invRes.rows[0].id;
+
+    // 1.5 Check if the reward is valid for the current island
+    const teamRes = await client.query('SELECT current_island FROM teams WHERE id = $1', [teamId]);
+    const currentIsland = teamRes.rows[0].current_island;
+    const requiredIsland = getIslandForReward(reward_type);
+    
+    if (currentIsland !== requiredIsland) {
+      // Mark it as used/expired implicitly or just reject the request. Rejecting is safer.
+      await client.query('ROLLBACK');
+      return res.status(400).json({ 
+        status: 'error', 
+        message: `Rewards expire! ${reward_type} is only valid during Island ${requiredIsland}, but you are on Island ${currentIsland}.` 
+      });
+    }
 
     // 2. Fetch target question if provided
     let question = null;
