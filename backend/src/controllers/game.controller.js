@@ -295,10 +295,55 @@ const useReward = async (req, res) => {
   }
 };
 
+const nextIsland = async (req, res) => {
+  const teamId = req.team.id;
+  const client = await pool.connect();
+  
+  try {
+    await client.query('BEGIN');
+    
+    const teamRes = await client.query('SELECT current_island, is_completed FROM teams WHERE id = $1 FOR UPDATE', [teamId]);
+    const team = teamRes.rows[0];
+    
+    if (team.is_completed) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ status: 'error', message: 'Journey is already completed' });
+    }
+    
+    let newIsland = team.current_island + 1;
+    let isCompleted = false;
+    let endTimeQuery = '';
+    
+    if (newIsland > 4) {
+      newIsland = 4;
+      isCompleted = true;
+      endTimeQuery = ', end_time = CURRENT_TIMESTAMP, is_completed = true';
+    }
+    
+    const updateQuery = `UPDATE teams SET current_island = $1 ${endTimeQuery} WHERE id = $2 RETURNING current_island, is_completed`;
+    const updateRes = await client.query(updateQuery, [newIsland, teamId]);
+    
+    await client.query('COMMIT');
+    
+    return res.status(200).json({
+      status: 'success',
+      message: isCompleted ? 'Congratulations! You have returned to Ithaca.' : `Sailed to Island ${newIsland}`,
+      data: updateRes.rows[0]
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Error in nextIsland:', err);
+    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   getState,
   submitPreRound,
   submitAnswer,
   useHint,
-  useReward
+  useReward,
+  nextIsland
 };
