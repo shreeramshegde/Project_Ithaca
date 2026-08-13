@@ -1,6 +1,6 @@
 services:
   app:
-    image: shreeramshegde/project-ithaca-backend:feature-backend-db-schemas
+    image: shreeramshegde/project-ithaca-backend:latest
     build: .
     container_name: ithaca_backend
     ports:
