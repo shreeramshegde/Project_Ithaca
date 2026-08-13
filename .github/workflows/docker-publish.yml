@@ -30,6 +30,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/project-ithaca-backend
+          tags: |
+            type=raw,value=latest
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
