@@ -44,6 +44,7 @@ Use this endpoint when a team types in their Team Name and Auth Code at the regi
 {
   "status": "success",
   "message": "Team registered successfully",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5c...",
   "data": {
     "id": "123e4567-e89b-12d3-a456-426614174000",
     "team_name": "The Argonauts",
@@ -53,6 +54,9 @@ Use this endpoint when a team types in their Team Name and Auth Code at the regi
   }
 }
 ```
+
+**⚠️ CRITICAL:** You will receive a `token` (JWT). **Store this token** in `localStorage` or `sessionStorage` immediately. Teams cannot "log in" again later due to multi-tab security rules. For all subsequent game requests, you must include this token in the header:
+`Authorization: Bearer <your_token_here>`
 
 ### What happens on an Error (400 or 409):
 If the team name or auth code is already taken, you will get a 409 Conflict:
@@ -66,8 +70,59 @@ If they forget to type something or the code is too short, you will get a 400 Ba
 
 ---
 
-## What's Next?
-As we build out more endpoints for answering questions and using items (like Cyclops Eye), we will add them to this document! 
 
-**Pro-tip for React:** 
-Use `fetch` or `axios` to make this POST request. When you get the `data` back, store the `remaining_years` and `current_island` in your React Context or Redux store so you can show it on the Heads-Up Display!
+
+## 3. Fetching Game State
+Use this endpoint to refresh the UI on load.
+
+- **URL:** `/api/game/state`
+- **Method:** `GET`
+- **Headers:** `Authorization: Bearer <token>`
+
+---
+
+## 4. Submitting an Answer
+When a team answers a main question.
+
+- **URL:** `/api/game/submit-answer`
+- **Method:** `POST`
+- **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+
+### JSON Body:
+```json
+{
+  "question_id": "uuid-here",
+  "answer_string": "Odysseus"
+}
+```
+
+---
+
+## 5. Using a Reward Item
+- **URL:** `/api/game/use-reward`
+- **Method:** `POST`
+- **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+
+### JSON Body:
+```json
+{
+  "reward_type": "CYCLOPS_EYE",
+  "target_question_id": "uuid-here"
+}
+```
+
+---
+
+## 6. Admin Leaderboard
+For the final display on the projector.
+
+- **URL:** `/api/admin/leaderboard`
+- **Method:** `GET`
+- **Headers:** `Authorization: Basic <base64_encoded_credentials>`
+
+*(Note: The admin credentials will be defined in our `.env` file.)*
+
+---
+
+## What's Next?
+Test these out in Swagger UI! When you get the `data` back, store the `remaining_years` and `current_island` in your React Context or Redux store so you can show it on the Heads-Up Display!
