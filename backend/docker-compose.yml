@@ -1,0 +1,41 @@
+services:
+  app:
+    build: .
+    container_name: ithaca_backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_NAME=ithaca_db
+      - JWT_SECRET=supersecretjwtkey_change_in_production
+      - PORT=3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: ithaca_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ithaca_db
+    ports:
+      - "5433:5432" # Mapped to 5433 on your laptop to avoid conflict with makemycv
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./src/models/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ithaca_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
