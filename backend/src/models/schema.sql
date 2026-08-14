@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS questions (
     reward_years DECIMAL(10, 2) DEFAULT 0.0,
     penalty_years DECIMAL(10, 2) DEFAULT 0.0,
     difficulty_level INT DEFAULT 1,
+    sequence_number INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
