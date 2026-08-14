@@ -19,6 +19,30 @@ const getState = async (req, res) => {
   }
 };
 
+const getQuestions = async (req, res) => {
+  const teamId = req.team.id;
+  try {
+    const teamRes = await pool.query('SELECT current_island FROM teams WHERE id = $1', [teamId]);
+    const currentIsland = teamRes.rows[0].current_island;
+
+    const qRes = await pool.query(
+      'SELECT id, type, format, question_text, options, reward_years, penalty_years, difficulty_level FROM questions WHERE island_id = $1 ORDER BY type DESC, id ASC', 
+      [currentIsland]
+    );
+
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        island: currentIsland,
+        questions: qRes.rows
+      }
+    });
+  } catch (err) {
+    console.error('Error in getQuestions:', err);
+    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+};
+
 const getRewardForIsland = (island_id) => {
   switch (island_id) {
     case 1: return 'ATHENAS_SCROLL';
@@ -120,13 +144,17 @@ const submitAnswer = async (req, res) => {
     }
 
     // 3. Verify answer
+    const normalizeString = (str) => {
+      return str ? str.replace(/\s+/g, ' ').trim().toLowerCase() : '';
+    };
+
     const isCorrect = (question.format === 'NON_MCQ') 
-      ? (answer_string.trim().toLowerCase() === question.correct_answer.toLowerCase())
+      ? (normalizeString(answer_string) === normalizeString(question.correct_answer))
       : (answer_string === question.correct_answer);
 
     const isHiddenWrong = question.hidden_wrong_answer && 
       (question.format === 'NON_MCQ' 
-        ? (answer_string.trim().toLowerCase() === question.hidden_wrong_answer.toLowerCase()) 
+        ? (normalizeString(answer_string) === normalizeString(question.hidden_wrong_answer)) 
         : (answer_string === question.hidden_wrong_answer));
 
     let yearsChange = 0;
@@ -341,6 +369,7 @@ const nextIsland = async (req, res) => {
 
 module.exports = {
   getState,
+  getQuestions,
   submitPreRound,
   submitAnswer,
   useHint,
