@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom';
 import JourneyYears from './JourneyYears.jsx';
 
-function MapHud({ teamName, state, previousYears, onLogout }) {
+function MapHud({ teamName, state, previousYears }) {
   const currentIslandName = state?.team?.current_island 
     ? `Island ${state.team.current_island}` 
     : 'Awaiting route';
@@ -36,10 +35,6 @@ function MapHud({ teamName, state, previousYears, onLogout }) {
           </div>
         </div>
         
-        <div className="map-hud-actions">
-          <Link className="map-hud-link" to="/leaderboard">Leaderboard</Link>
-          <button className="map-hud-link ghost" onClick={onLogout}>Leave</button>
-        </div>
       </div>
     </div>
   );

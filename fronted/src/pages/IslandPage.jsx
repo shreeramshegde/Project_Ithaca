@@ -56,12 +56,14 @@ function IslandPage() {
 
   const hintMutation = useMutation({
     mutationFn: () => useHint(token),
-    onSuccess: (payload) =>
+    onSuccess: (payload) => {
       setFeedback({
         kind: 'info',
         title: 'Hint received',
         message: payload?.hint || payload?.message || 'A hint was returned by the backend.',
-      }),
+      });
+      refreshState();
+    },
     onError: (error) => setFeedback({ kind: 'error', title: 'Hint unavailable', message: error.message }),
   });
 
@@ -72,6 +74,7 @@ function IslandPage() {
   });
 
   const loading = preRoundMutation.isPending || answerMutation.isPending || hintMutation.isPending || rewardMutation.isPending;
+  const inventory = stateQuery.data?.data?.inventory || [];
 
   const currentIsland = stateQuery.data?.data?.team?.current_island;
   const isLocked = useMemo(() => {
@@ -85,6 +88,12 @@ function IslandPage() {
     animateIslandEntry();
   }, []);
 
+  useEffect(() => {
+    if (stateQuery.error?.message === 'Invalid or expired token') {
+      clearSession();
+    }
+  }, [clearSession, stateQuery.error?.message]);
+
   if (!island || isLocked) {
     return <Navigate to="/journey" replace />;
   }
@@ -96,7 +105,6 @@ function IslandPage() {
           teamName={team?.team_name}
           state={stateQuery.data?.data}
           previousYears={team?.remaining_years}
-          onLogout={clearSession}
         />
 
         <section className="journey-main">
@@ -131,7 +139,7 @@ function IslandPage() {
               <CyclopsIslandUI 
                 onSelectQuestion={setSelectedQuestionId} 
                 selectedId={selectedQuestionId}
-                hasCyclopsEye={stateQuery.data?.data?.inventory?.includes('Cyclops Eye')}
+                hasCyclopsEye={inventory.some((item) => item.reward_type === 'CYCLOPS_EYE')}
               />
             )}
             {island.slug === 'sirens' && (
@@ -164,7 +172,7 @@ function IslandPage() {
           )}
 
           <RewardPanel
-            inventory={stateQuery.data?.data?.inventory}
+            inventory={inventory}
             loading={loading}
             onUseHint={() => hintMutation.mutate()}
             onUseReward={(payload) => rewardMutation.mutate(payload)}

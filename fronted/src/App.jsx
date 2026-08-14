@@ -4,7 +4,6 @@ import AdminPage from './pages/AdminPage.jsx';
 import IslandPage from './pages/IslandPage.jsx';
 import JourneyPage from './pages/JourneyPage.jsx';
 import LandingPage from './pages/LandingPage.jsx';
-import LeaderboardPage from './pages/LeaderboardPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
@@ -29,8 +28,8 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/leaderboard" element={<LeaderboardPage />} />
       <Route path="/admin" element={<AdminPage />} />
+      <Route path="/leaderboard" element={<Navigate to="/journey" replace />} />
       <Route path="/lobby" element={<Navigate to="/journey" replace />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

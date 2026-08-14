@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { REWARD_LABELS } from '../data/islands.js';
 
 function RewardPanel({ inventory, onUseHint, onUseReward, loading }) {
@@ -15,6 +15,12 @@ function RewardPanel({ inventory, onUseHint, onUseReward, loading }) {
       label: REWARD_LABELS[item.reward_type] || item.reward_type,
     }));
   }, [inventory]);
+
+  useEffect(() => {
+    if (!options.some((option) => option.value === rewardType)) {
+      setRewardType(options[0]?.value || 'ATHENAS_SCROLL');
+    }
+  }, [options, rewardType]);
 
   return (
     <section className="surface-panel reward-panel cinematic-panel">

@@ -47,7 +47,6 @@ function JourneyPage() {
         teamName={team?.team_name}
         state={stateQuery.data?.data}
         previousYears={previousYears}
-        onLogout={clearSession}
       />
       
       {stateQuery.isError && (

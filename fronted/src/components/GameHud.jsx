@@ -1,8 +1,7 @@
-import { Link } from 'react-router-dom';
 import { ISLANDS, REWARD_LABELS } from '../data/islands.js';
 import JourneyYears from './JourneyYears.jsx';
 
-function GameHud({ teamName, state, previousYears, flashValue, onLogout }) {
+function GameHud({ teamName, state, previousYears, flashValue }) {
   const currentIsland = ISLANDS.find((island) => island.id === state?.team?.current_island);
 
   return (
@@ -57,16 +56,6 @@ function GameHud({ teamName, state, previousYears, flashValue, onLogout }) {
         </div>
       </section>
 
-      <section className="hud-panel hud-card">
-        <div className="hud-links">
-          <Link className="secondary-button" to="/leaderboard">
-            Leaderboard
-          </Link>
-          <button type="button" className="ghost-button" onClick={onLogout}>
-            Leave Session
-          </button>
-        </div>
-      </section>
     </aside>
   );
 }
