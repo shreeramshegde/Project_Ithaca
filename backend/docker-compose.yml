@@ -31,7 +31,8 @@ services:
       - "5433:5432" # Mapped to 5433 on your laptop to avoid conflict with makemycv
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./src/models/schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./src/models/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./src/models/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d ithaca_db"]
       interval: 5s
