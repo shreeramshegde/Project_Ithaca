@@ -24,6 +24,20 @@ router.get('/state', gameController.getState);
 
 /**
  * @swagger
+ * /api/game/questions:
+ *   get:
+ *     summary: Get all questions for the team's current island
+ *     tags: [Game]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of questions for the current island
+ */
+router.get('/questions', gameController.getQuestions);
+
+/**
+ * @swagger
  * /api/game/submit-pre-round:
  *   post:
  *     summary: Submit pre-round GK MCQ
