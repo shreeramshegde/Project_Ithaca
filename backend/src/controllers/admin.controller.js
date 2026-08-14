@@ -49,7 +49,7 @@ const adjustYears = async (req, res) => {
 
 const getQuestions = async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM questions ORDER BY island_id ASC, created_at ASC');
+    const result = await pool.query('SELECT * FROM questions ORDER BY island_id ASC, sequence_number ASC');
     return res.status(200).json({ status: 'success', data: result.rows });
   } catch (err) {
     console.error('Error fetching questions:', err);
@@ -61,17 +61,17 @@ const addQuestion = async (req, res) => {
   const { 
     island_id, type, format, question_text, hint_text, 
     options, correct_answer, hidden_wrong_answer, 
-    reward_years, penalty_years, difficulty_level 
+    reward_years, penalty_years, difficulty_level, sequence_number
   } = req.body;
 
   try {
     const result = await pool.query(
       `INSERT INTO questions (
         island_id, type, format, question_text, hint_text, options, 
-        correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+        correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
       [island_id, type, format, question_text, hint_text, options ? JSON.stringify(options) : null, 
-       correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level]
+       correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number || 0]
     );
 
     return res.status(201).json({

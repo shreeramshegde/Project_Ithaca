@@ -100,7 +100,11 @@ Use this endpoint whenever a team loads a new island to get the questions dynami
   }
 }
 ```
-*Note: The correct answers are safely hidden from this payload.*
+### How to use the Questions Array:
+The backend intelligently sorts the questions before sending them to you so you can easily map over them! 
+1. **Index `[0]`** will ALWAYS be the `PRE_ROUND` question for that island.
+2. **Island 1 (Candy Crush Map)**: The next 4 elements (Indices `[1]` to `[4]`) are the Base Questions. You can display these as clickable nodes on a map. Indices `[5]` to `[10]` are the Extra Penalty questions. Keep these hidden! If a team answers a base node incorrectly, unlock one of the penalty nodes for them to answer.
+3. **Island 2, 3, and 4 (Sequential Flow)**: These islands are strictly sequential. After the pre-round, just show the team the question at Index `[1]`. Only after they answer it correctly (the backend returns `is_correct: true`), advance your local state to show them the question at Index `[2]`, and so on!
 
 ---
 
