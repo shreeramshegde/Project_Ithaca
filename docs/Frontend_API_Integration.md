@@ -72,8 +72,40 @@ If they forget to type something or the code is too short, you will get a 400 Ba
 
 
 
+## 2. Fetching Questions for the Current Island
+Use this endpoint whenever a team loads a new island to get the questions dynamically without hardcoding UUIDs.
+
+- **URL:** `/api/game/questions`
+- **Method:** `GET`
+- **Headers:** `Authorization: Bearer <token>`
+
+### What you will receive:
+```json
+{
+  "status": "success",
+  "data": {
+    "island": 1,
+    "questions": [
+      {
+        "id": "f5e73764-e30f-4c79-b049-745feec2ba32",
+        "type": "MAIN",
+        "format": "MCQ",
+        "question_text": "What is the boiling point of water in Celsius?",
+        "options": ["50", "90", "100", "120"],
+        "reward_years": "0.50",
+        "penalty_years": "2.00",
+        "difficulty_level": 1
+      }
+    ]
+  }
+}
+```
+*Note: The correct answers are safely hidden from this payload.*
+
+---
+
 ## 3. Fetching Game State
-Use this endpoint to refresh the UI on load.
+Use this endpoint to refresh the UI on load to see their current years, island, and unused inventory.
 
 - **URL:** `/api/game/state`
 - **Method:** `GET`
@@ -81,8 +113,26 @@ Use this endpoint to refresh the UI on load.
 
 ---
 
-## 4. Submitting an Answer
-When a team answers a main question.
+## 4. Submitting a Pre-Round Answer
+Use this to submit the special GK MCQ at the start of each island.
+
+- **URL:** `/api/game/submit-pre-round`
+- **Method:** `POST`
+- **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+
+### JSON Body:
+```json
+{
+  "question_id": "uuid-here",
+  "selected_option": "Athens"
+}
+```
+
+---
+
+## 5. Submitting a Main Answer
+When a team answers a main question. The backend handles penalties/rewards automatically.
+*Note: For non-MCQ answers, the backend automatically trims spaces and ignores uppercase/lowercase, and collapses accidental double-spaces into single spaces.*
 
 - **URL:** `/api/game/submit-answer`
 - **Method:** `POST`
@@ -98,7 +148,9 @@ When a team answers a main question.
 
 ---
 
-## 5. Using a Reward Item
+## 6. Using a Reward Item
+Use an item from the inventory. It automatically verifies if the item is valid for the current island.
+
 - **URL:** `/api/game/use-reward`
 - **Method:** `POST`
 - **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
@@ -113,7 +165,18 @@ When a team answers a main question.
 
 ---
 
-## 6. Admin Leaderboard
+## 7. Moving to the Next Island
+Call this endpoint when the team successfully completes their required questions for the island and clicks "Sail to next island".
+
+- **URL:** `/api/game/next-island`
+- **Method:** `POST`
+- **Headers:** `Authorization: Bearer <token>`
+
+*Note: If they use this after Island 4, it automatically stops their timer and marks the game as completed!*
+
+---
+
+## 8. Admin Leaderboard
 For the final display on the projector.
 
 - **URL:** `/api/admin/leaderboard`
