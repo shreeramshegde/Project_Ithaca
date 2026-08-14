@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { getGameState, submitAnswer, submitPreRound, useHint, useReward } from '../api/game.js';
+import { getGameState, submitAnswer, submitPreRound, useHint, useReward, nextIsland, getQuestions } from '../api/game.js';
 import FeedbackBanner from '../components/FeedbackBanner.jsx';
 import GameHud from '../components/GameHud.jsx';
 import QuestionConsole from '../components/QuestionConsole.jsx';
@@ -31,6 +31,14 @@ function IslandPage() {
     refetchInterval: 10000,
   });
 
+  const currentIsland = stateQuery.data?.data?.team?.current_island;
+
+  const questionsQuery = useQuery({
+    queryKey: ['game-questions', token, currentIsland],
+    queryFn: () => getQuestions(token),
+    enabled: !!currentIsland,
+  });
+
   const refreshState = () => queryClient.invalidateQueries({ queryKey: ['game-state', token] });
 
   const onMutationSuccess = (title, payload) => {
@@ -54,6 +62,18 @@ function IslandPage() {
     onError: (error) => setFeedback({ kind: 'error', title: 'Submission failed', message: error.message }),
   });
 
+  const nextIslandMutation = useMutation({
+    mutationFn: () => nextIsland(token),
+    onSuccess: (payload) => {
+      onMutationSuccess('Journey Continues', payload);
+      // Wait a moment before redirecting to allow the success message to show
+      setTimeout(() => {
+        window.location.href = '/journey'; // Force full unmount to trigger map entry animations fresh
+      }, 1500);
+    },
+    onError: (error) => setFeedback({ kind: 'error', title: 'Failed to progress', message: error.message }),
+  });
+
   const hintMutation = useMutation({
     mutationFn: () => useHint(token),
     onSuccess: (payload) => {
@@ -73,10 +93,9 @@ function IslandPage() {
     onError: (error) => setFeedback({ kind: 'error', title: 'Reward unavailable', message: error.message }),
   });
 
-  const loading = preRoundMutation.isPending || answerMutation.isPending || hintMutation.isPending || rewardMutation.isPending;
+  const loading = preRoundMutation.isPending || answerMutation.isPending || hintMutation.isPending || rewardMutation.isPending || nextIslandMutation.isPending;
   const inventory = stateQuery.data?.data?.inventory || [];
 
-  const currentIsland = stateQuery.data?.data?.team?.current_island;
   const isLocked = useMemo(() => {
     if (!island || !currentIsland) {
       return false;
@@ -98,6 +117,33 @@ function IslandPage() {
     return <Navigate to="/journey" replace />;
   }
 
+  const questions = questionsQuery.data?.data?.questions || [];
+  const preRoundQuestion = questions.find(q => q.type === 'PRE_ROUND');
+  const isPreRoundComplete = preRoundQuestion?.status === 'CORRECT';
+
+  const mainQuestions = questions.filter(q => q.type === 'MAIN');
+  const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
+  const penaltyQuestions = mainQuestions.filter(q => q.sequence_number >= 10);
+
+  const incorrectBaseCount = baseQuestions.filter(q => q.status === 'INCORRECT').length;
+  const correctPenaltyCount = penaltyQuestions.filter(q => q.status === 'CORRECT').length;
+  const hasOutstandingPenalty = incorrectBaseCount > correctPenaltyCount;
+
+  let activeMainQuestion = null;
+  let isIslandCompleted = false;
+
+  if (baseQuestions.length > 0) {
+    if (hasOutstandingPenalty) {
+      activeMainQuestion = penaltyQuestions.find(q => q.status !== 'CORRECT');
+    } else {
+      activeMainQuestion = baseQuestions.find(q => !q.status);
+    }
+    isIslandCompleted = baseQuestions.every(q => q.status) && !hasOutstandingPenalty;
+  }
+
+  // Override the local state if the user correctly answers the final question before the query refetches
+  const isCurrentlyCompleted = isIslandCompleted || (answerMutation.data?.is_correct && !activeMainQuestion);
+
   return (
     <main className={`page-shell island-page ${island.themeClass}`}>
       <div className="page-content journey-layout">
@@ -105,51 +151,41 @@ function IslandPage() {
           teamName={team?.team_name}
           state={stateQuery.data?.data}
           previousYears={team?.remaining_years}
+          onLogout={clearSession}
         />
 
         <section className="journey-main">
-          <div className="surface-panel island-hero">
+          <header className="island-hero">
             <div>
-              <p className="eyebrow">Island {island.id}</p>
-              <h1 className="display-title">{island.name}</h1>
-              <p>{island.title}</p>
+              <h1 className="display-title">{island.title}</h1>
+              <p className="eyebrow">Island {island.id} of 5</p>
             </div>
-            <Link className="ghost-button" to="/journey">
-              Back to Map
+            <Link to="/journey" className="ghost-button cinematic-button">
+              ← View Map
             </Link>
-          </div>
-
-          {isLocked ? (
-            <FeedbackBanner
-              result={{
-                kind: 'error',
-                title: 'Island locked',
-                message: 'The backend state does not currently allow this island to be entered.',
-              }}
-            />
-          ) : null}
+          </header>
 
           <FeedbackBanner result={feedback} />
 
           <div style={{ display: 'flex', justifyContent: 'center', margin: '40px 0' }}>
             {island.slug === 'lotus' && (
-              <LotusIslandUI onSelectQuestion={setSelectedQuestionId} selectedId={selectedQuestionId} />
+              <LotusIslandUI mainQuestions={mainQuestions} activeMainQuestion={activeMainQuestion} />
             )}
             {island.slug === 'cyclops' && (
-              <CyclopsIslandUI 
-                onSelectQuestion={setSelectedQuestionId} 
-                selectedId={selectedQuestionId}
-                hasCyclopsEye={inventory.some((item) => item.reward_type === 'CYCLOPS_EYE')}
+              <CyclopsIslandUI
+                mainQuestions={mainQuestions}
+                activeMainQuestion={activeMainQuestion}
+                hasCyclopsEye={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'CYCLOPS_EYE')}
               />
             )}
             {island.slug === 'sirens' && (
-              <SirensIslandUI onSelectQuestion={setSelectedQuestionId} selectedId={selectedQuestionId} />
+              <SirensIslandUI mainQuestions={mainQuestions} activeMainQuestion={activeMainQuestion} />
             )}
             {island.slug === 'witch' && (
-              <WitchIslandUI 
-                onSelectQuestion={setSelectedQuestionId} 
-                selectedId={selectedQuestionId}
-                hasSitOutPenalty={true} // In a real implementation, this comes from backend state
+              <WitchIslandUI
+                mainQuestions={mainQuestions}
+                activeMainQuestion={activeMainQuestion}
+                hasSitOutPenalty={hasOutstandingPenalty}
               />
             )}
             {island.slug === 'ithaca' && (
@@ -160,19 +196,23 @@ function IslandPage() {
             )}
           </div>
 
-          {selectedQuestionId && island.slug !== 'ithaca' && (
+          {island.slug !== 'ithaca' && (
             <div id="question-console-area">
-            <QuestionConsole
-              island={island}
-              loading={loading}
-              onSubmitPreRound={(payload) => preRoundMutation.mutate(payload)}
-              onSubmitAnswer={(payload) => answerMutation.mutate(payload)}
-            />
+              <QuestionConsole
+                island={island}
+                loading={loading}
+                preRoundQuestion={!isPreRoundComplete ? preRoundQuestion : null}
+                mainQuestion={isPreRoundComplete ? activeMainQuestion : null}
+                onSubmitPreRound={(payload) => preRoundMutation.mutate(payload)}
+                onSubmitAnswer={(payload) => answerMutation.mutate(payload)}
+                isCompleted={isCurrentlyCompleted}
+                onNextIsland={() => nextIslandMutation.mutate()}
+              />
             </div>
           )}
 
           <RewardPanel
-            inventory={inventory}
+            inventory={stateQuery.data?.data?.inventory}
             loading={loading}
             onUseHint={() => hintMutation.mutate()}
             onUseReward={(payload) => rewardMutation.mutate(payload)}

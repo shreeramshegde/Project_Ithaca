@@ -10,93 +10,131 @@ const INITIAL_MAIN = {
   answer_string: '',
 };
 
-function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading }) {
-  const [preRound, setPreRound] = useState(INITIAL_PRE_ROUND);
-  const [mainAnswer, setMainAnswer] = useState(INITIAL_MAIN);
+function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, isCompleted, onNextIsland, preRoundQuestion, mainQuestion }) {
+  const [preRoundAnswer, setPreRoundAnswer] = useState('');
+  const [mainAnswer, setMainAnswer] = useState('');
 
   return (
     <div className="question-console-grid">
-      <section className="surface-panel console-card question-marker cinematic-panel">
-        <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Pre-round Ritual</p>
-        <h3 style={{ fontFamily: 'var(--display)' }}>{island.name} Trial</h3>
-        <p style={{ opacity: 0.8, fontSize: '0.9rem' }}>
-          Align the artifact frequency (UUID) to open the trial.
-        </p>
-        <form
-          className="form-grid cinematic-form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            onSubmitPreRound(preRound);
-          }}
-        >
-          <div className="field">
-            <label htmlFor="pre-question-id">Trial Resonance (UUID)</label>
-            <input
-              id="pre-question-id"
-              className="cinematic-input"
-              value={preRound.question_id}
-              onChange={(event) => setPreRound((current) => ({ ...current, question_id: event.target.value }))}
-              placeholder="Paste resonance frequency"
-              required
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="pre-option">Chosen Path</label>
-            <input
-              id="pre-option"
-              className="cinematic-input"
-              value={preRound.selected_option}
-              onChange={(event) => setPreRound((current) => ({ ...current, selected_option: event.target.value }))}
-              placeholder="A / B / C / D"
-              required
-            />
-          </div>
-          <button className="action-button cinematic-button" type="submit" disabled={loading}>
-            {loading ? 'Communing...' : 'Seal Choice'}
-          </button>
-        </form>
-      </section>
+      {preRoundQuestion && (
+        <section className="surface-panel console-card question-marker cinematic-panel">
+          <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Pre-round Ritual</p>
+          <h3 style={{ fontFamily: 'var(--display)', fontSize: '1.5rem', marginBottom: '1rem' }}>{island.name} Trial</h3>
+          <p style={{ opacity: 0.9, fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--cloud-white)' }}>
+            {preRoundQuestion.question_text}
+          </p>
+          <form
+            className="form-grid cinematic-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              onSubmitPreRound({ question_id: preRoundQuestion.id, selected_option: preRoundAnswer });
+            }}
+          >
+            {preRoundQuestion.options ? (
+              <div className="field">
+                <label>Select your answer</label>
+                <select
+                  className="cinematic-input"
+                  value={preRoundAnswer}
+                  onChange={(e) => setPreRoundAnswer(e.target.value)}
+                  required
+                >
+                  <option value="" disabled>Choose wisely...</option>
+                  {preRoundQuestion.options.map((opt, i) => (
+                    <option key={i} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="field">
+                <label>Your Answer</label>
+                <input
+                  className="cinematic-input"
+                  value={preRoundAnswer}
+                  onChange={(e) => setPreRoundAnswer(e.target.value)}
+                  placeholder="Type your response"
+                  required
+                />
+              </div>
+            )}
+            <button className="action-button cinematic-button" type="submit" disabled={loading}>
+              {loading ? 'Communing...' : 'Seal Choice'}
+            </button>
+          </form>
+        </section>
+      )}
 
-      <section className="surface-panel console-card question-marker cinematic-panel">
-        <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Main Trial Console</p>
-        <h3 style={{ fontFamily: 'var(--display)' }}>{island.pathLabel}</h3>
-        <p style={{ opacity: 0.8, fontSize: '0.9rem' }}>
-          Submit your final answer to appease the guardians of the island.
-        </p>
-        <form
-          className="form-grid cinematic-form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            onSubmitAnswer(mainAnswer);
-          }}
-        >
-          <div className="field">
-            <label htmlFor="main-question-id">Trial Resonance (UUID)</label>
-            <input
-              id="main-question-id"
-              className="cinematic-input"
-              value={mainAnswer.question_id}
-              onChange={(event) => setMainAnswer((current) => ({ ...current, question_id: event.target.value }))}
-              placeholder="Paste resonance frequency"
-              required
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="answer-string">Spoken Answer</label>
-            <textarea
-              id="answer-string"
-              className="cinematic-textarea"
-              value={mainAnswer.answer_string}
-              onChange={(event) => setMainAnswer((current) => ({ ...current, answer_string: event.target.value }))}
-              placeholder="Enter the team's response"
-              required
-            />
-          </div>
-          <button className="action-button cinematic-button" type="submit" disabled={loading}>
-            {loading ? 'Submitting...' : 'Offer Answer'}
-          </button>
-        </form>
-      </section>
+      {(mainQuestion || isCompleted) && (
+        <section className="surface-panel console-card question-marker cinematic-panel">
+          <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Main Trial Console</p>
+          <h3 style={{ fontFamily: 'var(--display)', fontSize: '1.5rem', marginBottom: '1rem' }}>{island.pathLabel}</h3>
+          
+          {isCompleted ? (
+            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+              <p style={{ color: 'var(--success)', marginBottom: '1.5rem', fontSize: '1.2rem' }}>
+                The guardians are appeased. The path is clear.
+              </p>
+              <button 
+                className="action-button cinematic-button" 
+                onClick={onNextIsland} 
+                disabled={loading}
+                style={{ width: '100%', borderColor: 'var(--success)', color: 'var(--success)' }}
+              >
+                {loading ? 'Sailing...' : 'Sail to Next Island'}
+              </button>
+            </div>
+          ) : (
+            <>
+              {mainQuestion.sequence_number >= 10 && (
+                <p style={{ color: 'var(--danger)', marginBottom: '1rem', fontWeight: 'bold' }}>
+                  PENALTY TRIAL ACTIVE
+                </p>
+              )}
+              <p style={{ opacity: 0.9, fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--cloud-white)' }}>
+                {mainQuestion.question_text}
+              </p>
+              <form
+                className="form-grid cinematic-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onSubmitAnswer({ question_id: mainQuestion.id, answer_string: mainAnswer });
+                }}
+              >
+                {mainQuestion.options ? (
+                  <div className="field">
+                    <label>Select your answer</label>
+                    <select
+                      className="cinematic-input"
+                      value={mainAnswer}
+                      onChange={(e) => setMainAnswer(e.target.value)}
+                      required
+                    >
+                      <option value="" disabled>Choose wisely...</option>
+                      {mainQuestion.options.map((opt, i) => (
+                        <option key={i} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="field">
+                    <label>Spoken Answer</label>
+                    <textarea
+                      className="cinematic-textarea"
+                      value={mainAnswer}
+                      onChange={(e) => setMainAnswer(e.target.value)}
+                      placeholder="Enter the team's response"
+                      required
+                    />
+                  </div>
+                )}
+                <button className="action-button cinematic-button" type="submit" disabled={loading}>
+                  {loading ? 'Submitting...' : 'Offer Answer'}
+                </button>
+              </form>
+            </>
+          )}
+        </section>
+      )}
     </div>
   );
 }

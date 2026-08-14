@@ -12,6 +12,12 @@ export function getGameState(token) {
   });
 }
 
+export function getQuestions(token) {
+  return request('/api/game/questions', {
+    headers: withToken(token),
+  });
+}
+
 export function submitPreRound(token, payload) {
   return request('/api/game/submit-pre-round', {
     method: 'POST',
@@ -40,5 +46,12 @@ export function useReward(token, payload) {
     method: 'POST',
     headers: withToken(token),
     body: JSON.stringify(payload),
+  });
+}
+
+export function nextIsland(token) {
+  return request('/api/game/next-island', {
+    method: 'POST',
+    headers: withToken(token),
   });
 }

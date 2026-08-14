@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
 
-function CyclopsIslandUI({ onSelectQuestion, selectedId, hasCyclopsEye }) {
+function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye }) {
   const [eyeUsed, setEyeUsed] = useState(false);
-  const questions = [
-    { id: 1, label: 'Question 1' },
-    { id: 2, label: 'Question 2' },
-    { id: 3, label: 'Question 3' },
-    { id: 4, label: 'Question 4' },
-  ];
-
+  
   const handleEyeClick = () => {
     setEyeUsed(true);
-    // In a full implementation, this would trigger a backend call to eliminate an option
-    // and visually cross it out on the QuestionConsole.
   };
+
+  const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
 
   return (
     <div>
@@ -30,17 +24,28 @@ function CyclopsIslandUI({ onSelectQuestion, selectedId, hasCyclopsEye }) {
       )}
 
       <div className="cyclops-path">
-        {questions.map((q) => (
-          <div 
-            key={q.id} 
-            className={`cyclops-node ${selectedId === q.id ? 'selected' : ''}`}
-            onClick={() => onSelectQuestion(q.id)}
-          >
-            <h4 style={{ fontFamily: 'var(--display)', color: 'var(--cloud-white)', margin: 0, letterSpacing: '0.1em' }}>
-              {q.label}
-            </h4>
-          </div>
-        ))}
+        {baseQuestions.map((q, index) => {
+          let statusClass = '';
+          if (q.status === 'CORRECT') statusClass = 'completed';
+          else if (q.id === activeMainQuestion?.id) statusClass = 'selected active';
+          else if (q.status === 'INCORRECT') statusClass = 'failed';
+
+          return (
+            <div 
+              key={q.id} 
+              className={`cyclops-stone ${statusClass}`}
+            >
+              {hasCyclopsEye ? (
+                <div style={{ color: '#00f0ff', fontSize: '1.5rem', marginBottom: '5px' }}>👁</div>
+              ) : (
+                <div style={{ color: statusClass === 'completed' ? 'var(--success)' : '#888', fontSize: '1.5rem', marginBottom: '5px' }}>
+                  {statusClass === 'completed' ? '✓' : '•'}
+                </div>
+              )}
+              <span>Step {index + 1}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

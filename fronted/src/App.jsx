@@ -29,8 +29,6 @@ function App() {
         }
       />
       <Route path="/admin" element={<AdminPage />} />
-      <Route path="/leaderboard" element={<Navigate to="/journey" replace />} />
-      <Route path="/lobby" element={<Navigate to="/journey" replace />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

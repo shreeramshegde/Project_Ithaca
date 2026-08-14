@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 
-function WitchIslandUI({ onSelectQuestion, selectedId, hasSitOutPenalty }) {
+function WitchIslandUI({ mainQuestions = [], onSelectQuestion, selectedId, hasSitOutPenalty }) {
   const [showPenalty, setShowPenalty] = useState(hasSitOutPenalty);
   
-  const questions = [
-    { id: 1, label: 'First Incantation' },
-    { id: 2, label: 'Second Incantation' },
-    { id: 3, label: 'Final Curse' },
-  ];
-
   return (
     <div>
       {showPenalty && (
@@ -31,18 +25,23 @@ function WitchIslandUI({ onSelectQuestion, selectedId, hasSitOutPenalty }) {
         </div>
       )}
 
-      <div className="witch-structures">
-        {questions.map((q) => (
-          <div 
-            key={q.id} 
-            className={`witch-altar ${selectedId === q.id ? 'selected' : ''}`}
-            onClick={() => onSelectQuestion(q.id)}
-          >
-            <h4 style={{ fontFamily: 'var(--display)', color: 'var(--cloud-white)', margin: 0, letterSpacing: '0.2em' }}>
-              {q.label}
-            </h4>
-          </div>
-        ))}
+      <div className="witch-altars">
+        {mainQuestions.filter(q => q.sequence_number < 10).map((q, index) => {
+          let statusClass = '';
+          if (q.status === 'CORRECT') statusClass = 'completed';
+          else if (q.id === activeMainQuestion?.id) statusClass = 'selected active';
+          else if (q.status === 'INCORRECT') statusClass = 'failed';
+
+          return (
+            <div 
+              key={q.id} 
+              className={`witch-altar ${statusClass}`}
+            >
+              <div className="altar-flame" style={{ backgroundColor: statusClass === 'completed' ? 'var(--success)' : '' }}></div>
+              <span>Altar {index + 1} {statusClass === 'completed' && '✓'}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
