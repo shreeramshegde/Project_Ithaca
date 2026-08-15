@@ -93,13 +93,18 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
               <p style={{ opacity: 0.9, fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--cloud-white)' }}>
                 {mainQuestion.question_text}
               </p>
-              <form
-                className="form-grid cinematic-form"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  onSubmitAnswer({ question_id: mainQuestion.id, answer_string: mainAnswer });
-                }}
-              >
+              {mainQuestion.is_correct ? (
+                <div style={{ padding: '20px', background: 'rgba(7, 21, 38, 0.5)', borderRadius: '8px', border: '1px solid var(--success)', textAlign: 'center' }}>
+                  <p style={{ color: 'var(--success)', margin: 0 }}>This trial has already been completed successfully.</p>
+                </div>
+              ) : (
+                <form
+                  className="form-grid cinematic-form"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    onSubmitAnswer({ question_id: mainQuestion.id, answer_string: mainAnswer });
+                  }}
+                >
                 {mainQuestion.options ? (
                   <div className="field">
                     <label>Select your answer</label>
@@ -131,6 +136,7 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                   {loading ? 'Submitting...' : 'Offer Answer'}
                 </button>
               </form>
+              )}
             </>
           )}
         </section>

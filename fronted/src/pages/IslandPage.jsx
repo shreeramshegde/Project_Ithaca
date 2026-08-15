@@ -6,6 +6,7 @@ import FeedbackBanner from '../components/FeedbackBanner.jsx';
 import GameHud from '../components/GameHud.jsx';
 import QuestionConsole from '../components/QuestionConsole.jsx';
 import RewardPanel from '../components/RewardPanel.jsx';
+import RulesModal from '../components/RulesModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { findIslandBySlug } from '../data/islands.js';
 import { animateIslandEntry } from '../animations/mapAnimations.js';
@@ -24,6 +25,7 @@ function IslandPage() {
   const { token, team, clearSession } = useAuth();
   const [feedback, setFeedback] = useState(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
+  const [showRules, setShowRules] = useState(true);
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],
@@ -119,33 +121,37 @@ function IslandPage() {
 
   const questions = questionsQuery.data?.data?.questions || [];
   const preRoundQuestion = questions.find(q => q.type === 'PRE_ROUND');
-  const isPreRoundComplete = preRoundQuestion?.status === 'CORRECT';
+  const isPreRoundComplete = preRoundQuestion?.is_correct;
 
   const mainQuestions = questions.filter(q => q.type === 'MAIN');
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
   const penaltyQuestions = mainQuestions.filter(q => q.sequence_number >= 10);
 
-  const incorrectBaseCount = baseQuestions.filter(q => q.status === 'INCORRECT').length;
-  const correctPenaltyCount = penaltyQuestions.filter(q => q.status === 'CORRECT').length;
-  const hasOutstandingPenalty = incorrectBaseCount > correctPenaltyCount;
+  const totalFailedAttempts = mainQuestions.reduce((acc, q) => acc + Number(q.incorrect_attempts || 0), 0);
+  const unlockedPenaltyQuestions = penaltyQuestions.slice(0, totalFailedAttempts);
 
   let activeMainQuestion = null;
   let isIslandCompleted = false;
 
   if (baseQuestions.length > 0) {
-    if (hasOutstandingPenalty) {
-      activeMainQuestion = penaltyQuestions.find(q => q.status !== 'CORRECT');
+    if (island.slug === 'lotus') {
+      activeMainQuestion = mainQuestions.find(q => q.id === selectedQuestionId) || null;
+      isIslandCompleted = baseQuestions.every(q => q.is_correct) && unlockedPenaltyQuestions.every(q => q.is_correct);
     } else {
-      activeMainQuestion = baseQuestions.find(q => !q.status);
+      activeMainQuestion = baseQuestions.find(q => !q.is_correct);
+      if (!activeMainQuestion && unlockedPenaltyQuestions.length > 0) {
+        activeMainQuestion = unlockedPenaltyQuestions.find(q => !q.is_correct);
+      }
+      isIslandCompleted = baseQuestions.every(q => q.is_correct) && unlockedPenaltyQuestions.every(q => q.is_correct);
     }
-    isIslandCompleted = baseQuestions.every(q => q.status) && !hasOutstandingPenalty;
   }
 
   // Override the local state if the user correctly answers the final question before the query refetches
-  const isCurrentlyCompleted = isIslandCompleted || (answerMutation.data?.is_correct && !activeMainQuestion);
+  const isCurrentlyCompleted = isIslandCompleted || (answerMutation.data?.is_correct && !activeMainQuestion && island.slug !== 'lotus');
 
   return (
     <main className={`page-shell island-page ${island.themeClass}`}>
+      {showRules && <RulesModal islandSlug={island.slug} onClose={() => setShowRules(false)} />}
       <div className="page-content journey-layout">
         <GameHud
           teamName={team?.team_name}
@@ -169,7 +175,12 @@ function IslandPage() {
 
           <div style={{ display: 'flex', justifyContent: 'center', margin: '40px 0' }}>
             {island.slug === 'lotus' && (
-              <LotusIslandUI mainQuestions={mainQuestions} activeMainQuestion={activeMainQuestion} />
+              <LotusIslandUI 
+                mainQuestions={mainQuestions} 
+                activeMainQuestion={activeMainQuestion} 
+                totalFailedAttempts={totalFailedAttempts}
+                onSelectQuestion={(id) => setSelectedQuestionId(id)}
+              />
             )}
             {island.slug === 'cyclops' && (
               <CyclopsIslandUI
