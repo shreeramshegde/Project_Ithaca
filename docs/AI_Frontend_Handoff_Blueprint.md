@@ -1,14 +1,14 @@
 # 🤖 AI Frontend Handoff Blueprint: Project Ithaca
 
 > **ATTENTION AI AGENT (ANTIGRAVITY / GEMINI 3.1 PRO):** 
-> You are reading the ultimate master blueprint for the frontend architecture of "Project Ithaca", a time-travel themed tech treasure hunt. This document contains the exact rules, constraints, API contracts, and edge cases dictated by the backend. **Do not make assumptions. Follow these instructions exactly to build the React frontend.**
+> You are reading the absolute master blueprint for the frontend architecture of "Project Ithaca", a time-travel themed tech treasure hunt. This document contains the exact rules, constraints, API contracts, database ENUMS, validation schemas, and edge cases dictated by the backend. **Do not make assumptions. Follow these instructions exactly to build the React frontend.**
 
 ---
 
 ## 1. Core Architecture & Authentication
-- **The Premise:** Teams start with exactly 20.00 "years". Their goal is to navigate 4 islands and reach exactly 0.00 years. Correct answers subtract years; wrong answers add penalty years.
+- **The Premise:** Teams start with exactly `20.00` "years". Their goal is to navigate 4 islands and reach exactly `0.00` years. Correct answers subtract years; wrong answers add penalty years.
 - **No Login System:** Teams register once at the venue via `POST /api/auth/register` (providing `team_name` and `auth_code`). 
-- **JWT Storage:** The registration endpoint returns a JWT. You MUST store this JWT in `localStorage`. There is no login screen for returning users. The JWT must be attached as a Bearer token in the `Authorization` header for EVERY subsequent request.
+- **JWT Storage:** The registration endpoint returns a JWT. You MUST store this JWT securely in `localStorage` or `sessionStorage`. There is no login screen for returning users. The JWT must be attached as a Bearer token in the `Authorization` header for EVERY subsequent request.
 - **HUD Synchronization:** The UI must feature a Heads-Up Display (HUD) showing `remaining_years`, `standard_hints_left` (starts at 3), and active inventory. Almost every game endpoint returns updated team stats. You must sync the React Context/State HUD with this fresh data after every API call.
 
 ---
@@ -16,11 +16,11 @@
 ## 2. Dynamic Question Fetching
 **ENDPOINT:** `GET /api/game/questions`
 
-You must NEVER hardcode question UUIDs. When a team arrives at an island, fetch this endpoint. The backend intelligently sorts the questions into a perfect array. 
+You must NEVER hardcode question UUIDs. When a team arrives at an island, fetch this endpoint. The backend intelligently sorts the questions into a perfect array using a secure database `sequence_number`. 
 
 **The Array Structure Guarantee:**
 - `array[0]` is **ALWAYS** the `PRE_ROUND` question.
-- `array[1...N]` are the `MAIN` questions, sorted safely by sequence.
+- `array[1...N]` are the `MAIN` questions, safely ordered.
 
 ---
 
@@ -29,8 +29,8 @@ You must NEVER hardcode question UUIDs. When a team arrives at an island, fetch 
 ### 🔴 Phase A: The Pre-Round (All Islands)
 When a team lands on an island, they must FIRST solve `array[0]` (The Pre-Round GK MCQ). 
 - Use `POST /api/game/submit-pre-round`.
-- **Success:** They earn a specific reward item (e.g., Cyclops Eye) added to their inventory.
-- **Failure:** They receive a time penalty. On Island 3, there is a "hidden wrong answer" trap that gives a massive +2 year penalty if triggered. 
+- **Success:** They earn a specific reward item (e.g., `CYCLOPS_EYE`) added to their inventory.
+- **Failure:** They receive a time penalty. On Island 3, there is a "hidden wrong answer" trap that gives a massive +2.00 year penalty if triggered. 
 - *Once the Pre-Round is answered (right or wrong), unlock Phase B.*
 
 ### 🔵 Phase B: Island 1 - The "Candy Crush" Map
@@ -51,20 +51,20 @@ These islands are **STRICTLY SEQUENTIAL**.
 **ENDPOINT:** `POST /api/game/submit-answer`
 
 - **Payload:** `{ "question_id": "uuid", "answer_string": "user input" }`
-- **Non-MCQ Handling:** For text-based inputs, the backend automatically handles `.toLowerCase()` and uses a Regex to collapse double-spaces into single spaces. You do not need to over-engineer frontend text sanitization.
+- **Non-MCQ Handling:** For text-based inputs, the backend automatically handles `.toLowerCase()` and uses a Regex to collapse double-spaces into single spaces (`/\s+/g`). You do not need to over-engineer frontend text sanitization.
 - **Result:** If `is_correct: false`, display the penalty message returned by the backend, shake the UI (error animation), and leave the question on screen. If `is_correct: true`, show a success animation and progress the flow.
 
 ---
 
 ## 5. Hints & Rewards
-- **Hints (`POST /api/game/use-hint`):** Teams have 3 standard hints for the *entire* game. Pass the `question_id`. Show a warning modal before consumption ("Are you sure? You only have X hints left!").
+- **Hints (`POST /api/game/use-hint`):** Teams have exactly 3 standard hints for the *entire* game. Pass the `question_id`. Show a warning modal before consumption ("Are you sure? You only have X hints left!").
 - **Rewards (`POST /api/game/use-reward`):** 
-  - **Expiration:** Rewards earned on an island are ONLY valid for that specific island. If a team tries to use Athena's Scroll on Island 2, the backend will reject it. 
+  - **Expiration:** Rewards earned on an island are ONLY valid for that specific island. If a team tries to use `ATHENAS_SCROLL` on Island 2, the backend will reject it. 
   - **Types:**
     - `ATHENAS_SCROLL` (Island 1): Gives a free hint without deducting standard hints. Requires `target_question_id`.
     - `CYCLOPS_EYE` (Island 2): Eliminates one wrong MCQ option. Requires `target_question_id`.
-    - `HERMES_SANDALS` (Island 3): Instantly deducts 2 years. Does NOT require a target question.
-    - `THE_BLESSING` (Island 4): Instantly deducts 3 years. Does NOT require a target question.
+    - `HERMES_SANDALS` (Island 3): Instantly deducts 2.00 years. Does NOT require a target question.
+    - `THE_BLESSING` (Island 4): Instantly deducts 3.00 years. Does NOT require a target question.
 
 ---
 
@@ -73,7 +73,7 @@ These islands are **STRICTLY SEQUENTIAL**.
 
 When a team successfully answers all required main questions (and any unlocked penalty questions) for the current island, render a prominent **"Sail to Next Island"** button.
 - Clicking this triggers the endpoint, which updates their `current_island` on the backend.
-- **Endgame Trigger:** If they click this after completing Island 4, the backend will automatically set `is_completed: true` and freeze their `end_time`. The frontend should redirect them to a glorious "Victory / Journey Completed" screen displaying their final `remaining_years` and total time taken. 
+- **Endgame Trigger:** If they click this after completing Island 4, the backend will automatically set `is_completed: true` and freeze their `end_time`. The frontend should immediately redirect them to a glorious "Victory / Journey Completed" screen displaying their final `remaining_years` and total time taken. 
 
 ---
 
@@ -87,7 +87,7 @@ When a team successfully answers all required main questions (and any unlocked p
 ---
 
 ## 8. Database ENUMs Reference
-You will encounter these strings in the API payloads. Ensure your frontend logic maps exactly to these strings (they are case-sensitive).
+You will encounter these strictly-typed strings in the API payloads. Ensure your frontend logic maps exactly to these strings (they are case-sensitive).
 
 - **Question `type`:** 
   - `'PRE_ROUND'`: The initial GK MCQ on an island.
@@ -106,48 +106,211 @@ You will encounter these strings in the API payloads. Ensure your frontend logic
 
 ---
 
-## 9. Comprehensive API Reference (Frontend Usage)
+## 9. EXHAUSTIVE API REFERENCE (Frontend Usage)
 
-### 🟢 `POST /api/auth/register`
+Below is the strict API contract. The backend uses `zod` for validation. Any request that violates these schemas will instantly receive a `400 Bad Request`.
+
+### 🟢 1. Register Team
 Use this to register a team and get the JWT.
-- **Body:** `{ "team_name": "String", "auth_code": "String" }`
-- **Returns:** `{ "token": "JWT_STRING", "data": { "remaining_years": 20.00, ... } }`
+- **URL:** `POST /api/auth/register`
+- **Headers:** `Content-Type: application/json`
+- **Body Validation:** 
+  - `team_name`: String (Min 3, Max 100 characters)
+  - `auth_code`: String (Min 4, Max 100 characters)
+- **Success (201 Created):**
+  ```json
+  {
+    "status": "success",
+    "message": "Team registered successfully",
+    "token": "eyJhbGciOi...",
+    "data": {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "team_name": "The Argonauts",
+      "remaining_years": "20.00",
+      "standard_hints_left": 3,
+      "current_island": 1
+    }
+  }
+  ```
+- **Error (409 Conflict):**
+  ```json
+  {
+    "status": "error",
+    "message": "Team name or Auth code already exists"
+  }
+  ```
 
-### 🟢 `GET /api/game/state`
-Use this on page reload/refresh to populate the HUD and check the team's current island.
+### 🟢 2. Fetch Game State
+Use this on page reload/refresh to populate the HUD.
+- **URL:** `GET /api/game/state`
 - **Headers:** `Authorization: Bearer <token>`
-- **Returns:** `{ "data": { "team": { "remaining_years": 20, "current_island": 1, "standard_hints_left": 3, "is_completed": false }, "inventory": [ { "reward_type": "ATHENAS_SCROLL" } ] } }`
+- **Success (200 OK):**
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "team": {
+        "remaining_years": "20.00",
+        "current_island": 1,
+        "standard_hints_left": 3,
+        "is_completed": false
+      },
+      "inventory": [
+        {
+          "id": "abc...",
+          "reward_type": "ATHENAS_SCROLL",
+          "is_used": false
+        }
+      ]
+    }
+  }
+  ```
 
-### 🟢 `GET /api/game/questions`
-Use this when a team arrives at an island to fetch the questions.
+### 🟢 3. Fetch Questions
+Use this when a team arrives at an island to fetch the securely-sorted questions array. Answers are hidden.
+- **URL:** `GET /api/game/questions`
 - **Headers:** `Authorization: Bearer <token>`
-- **Returns:** JSON Array of Question Objects. Answers are hidden. Includes `id`, `type`, `format`, `question_text`, `options` (if MCQ), `reward_years`, `penalty_years`.
+- **Success (200 OK):**
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "island": 1,
+      "questions": [
+        {
+          "id": "uuid-string-here",
+          "type": "MAIN",
+          "format": "MCQ",
+          "question_text": "What is 2 + 2?",
+          "options": ["1", "2", "3", "4"],
+          "reward_years": "0.50",
+          "penalty_years": "2.00",
+          "difficulty_level": 1
+        }
+      ]
+    }
+  }
+  ```
 
-### 🟢 `POST /api/game/submit-pre-round`
+### 🟢 4. Submit Pre-Round Answer
 Use this for `array[0]`.
-- **Headers:** `Authorization: Bearer <token>`
-- **Body:** `{ "question_id": "uuid", "selected_option": "String" }`
-- **Returns:** `{ "is_correct": true/false, "reward": "REWARD_TYPE" (if correct), "message": "String" }`
+- **URL:** `POST /api/game/submit-pre-round`
+- **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+- **Body Validation:**
+  - `question_id`: Valid UUID string
+  - `selected_option`: String (Min 1 character)
+- **Success (200 OK - Correct):**
+  ```json
+  {
+    "status": "success",
+    "message": "Correct! You earned CYCLOPS_EYE",
+    "is_correct": true,
+    "reward": "CYCLOPS_EYE"
+  }
+  ```
+- **Success (200 OK - Incorrect or Hidden Trap):**
+  ```json
+  {
+    "status": "success",
+    "message": "Hidden trap triggered! +2 years penalty applied.",
+    "is_correct": false
+  }
+  ```
+- **Error (400 Bad Request):** "Pre-round already completed"
 
-### 🟢 `POST /api/game/submit-answer`
-Use this for `array[1...N]`.
-- **Headers:** `Authorization: Bearer <token>`
-- **Body:** `{ "question_id": "uuid", "answer_string": "String" }`
-- **Returns:** `{ "is_correct": true/false, "data": { "remaining_years": 19.5, "current_island": 1 }, "message": "String" }`
+### 🟢 5. Submit Main Answer
+Use this for `array[1...N]`. The backend automatically applies penalties and row-level DB locks to prevent race conditions.
+- **URL:** `POST /api/game/submit-answer`
+- **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+- **Body Validation:**
+  - `question_id`: Valid UUID string
+  - `answer_string`: String (Min 1 character)
+- **Success (200 OK - Correct):**
+  ```json
+  {
+    "status": "success",
+    "message": "Correct answer!",
+    "is_correct": true,
+    "data": {
+      "remaining_years": "19.50",
+      "current_island": 1
+    }
+  }
+  ```
+- **Success (200 OK - Incorrect):**
+  ```json
+  {
+    "status": "success",
+    "message": "Incorrect answer. Penalty applied.",
+    "is_correct": false,
+    "data": {
+      "remaining_years": "22.00",
+      "current_island": 1
+    }
+  }
+  ```
+- **Error (400 Bad Request):** "Question already correctly answered"
 
-### 🟢 `POST /api/game/use-hint`
-Use this to spend one of the 3 standard hints.
-- **Headers:** `Authorization: Bearer <token>`
-- **Body:** `{ "question_id": "uuid" }`
-- **Returns:** `{ "hint": "The hint text", "hints_left": 2 }`
+### 🟢 6. Use Hint
+Spend one of the 3 standard hints.
+- **URL:** `POST /api/game/use-hint`
+- **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+- **Body Validation:**
+  - `question_id`: Valid UUID string (Optional technically, but pass it to get the hint text)
+- **Success (200 OK):**
+  ```json
+  {
+    "status": "success",
+    "message": "Hint activated",
+    "hint": "This is the hint text.",
+    "hints_left": 2
+  }
+  ```
+- **Error (400 Bad Request):** "No standard hints remaining"
+- **Error (404 Not Found):** "No hint available for this question"
 
-### 🟢 `POST /api/game/use-reward`
-Use this to trigger an item from the inventory.
-- **Headers:** `Authorization: Bearer <token>`
-- **Body:** `{ "reward_type": "CYCLOPS_EYE", "target_question_id": "uuid" (optional based on type) }`
-- **Returns:** Contains `hint` string (if Athena's Scroll) or `eliminated_option` string (if Cyclops Eye), or simply a success message (if Sandals/Blessing).
+### 🟢 7. Use Reward
+Trigger an item from the inventory. The backend verifies island validity and applies effects.
+- **URL:** `POST /api/game/use-reward`
+- **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+- **Body Validation:**
+  - `reward_type`: Enum string (must be exactly `ATHENAS_SCROLL`, `CYCLOPS_EYE`, `HERMES_SANDALS`, or `THE_BLESSING`)
+  - `target_question_id`: Valid UUID string (Optional, required for Scroll/Eye)
+- **Success (200 OK - Varies by item):**
+  ```json
+  {
+    "status": "success",
+    "hint": "Free hint text (Athena)",
+    "eliminated_option": "Wrong option (Cyclops)",
+    "message": "Reward applied successfully!"
+  }
+  ```
+- **Error (400 Bad Request):** "Rewards expire! [Reward] is only valid during Island [X], but you are on Island [Y]."
 
-### 🟢 `POST /api/game/next-island`
-Use this when all requirements for the island are complete.
+### 🟢 8. Next Island
+Progress the team when the current island's requirements are met.
+- **URL:** `POST /api/game/next-island`
 - **Headers:** `Authorization: Bearer <token>`
-- **Returns:** `{ "data": { "current_island": 2, "is_completed": false } }`
+- **Success (200 OK - Standard):**
+  ```json
+  {
+    "status": "success",
+    "message": "Sailed to Island 2",
+    "data": {
+      "current_island": 2,
+      "is_completed": false
+    }
+  }
+  ```
+- **Success (200 OK - Game Completed):**
+  ```json
+  {
+    "status": "success",
+    "message": "Congratulations! You have returned to Ithaca.",
+    "data": {
+      "current_island": 4,
+      "is_completed": true
+    }
+  }
+  ```
+- **Error (400 Bad Request):** "Journey is already completed"
