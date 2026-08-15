@@ -19,7 +19,8 @@ const addQuestionSchema = z.object({
     hidden_wrong_answer: z.string().optional(),
     reward_years: z.number().min(0).default(0.0),
     penalty_years: z.number().min(0).default(0.0),
-    difficulty_level: z.number().min(1).default(1)
+    difficulty_level: z.number().min(1).default(1),
+    sequence_number: z.number().min(0).default(0)
   })
 });
 

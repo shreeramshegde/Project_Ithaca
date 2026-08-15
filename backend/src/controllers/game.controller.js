@@ -26,7 +26,7 @@ const getQuestions = async (req, res) => {
     const currentIsland = teamRes.rows[0].current_island;
 
     const qRes = await pool.query(
-      'SELECT id, type, format, question_text, options, reward_years, penalty_years, difficulty_level FROM questions WHERE island_id = $1 ORDER BY type DESC, id ASC', 
+      'SELECT id, type, format, question_text, options, reward_years, penalty_years, difficulty_level FROM questions WHERE island_id = $1 ORDER BY type DESC, sequence_number ASC', 
       [currentIsland]
     );
 
