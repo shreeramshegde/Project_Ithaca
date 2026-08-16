@@ -8,8 +8,12 @@
 ## 1. Core Architecture & Authentication
 - **The Premise:** Teams start with exactly `20.00` "years". Their goal is to navigate 4 islands and reach exactly `0.00` years. Correct answers subtract years; wrong answers add penalty years.
 - **No Login System:** Teams register once at the venue via `POST /api/auth/register` (providing `team_name` and `auth_code`). 
-- **JWT Storage:** The registration endpoint returns a JWT. You MUST store this JWT securely in `localStorage` or `sessionStorage`. There is no login screen for returning users. The JWT must be attached as a Bearer token in the `Authorization` header for EVERY subsequent request.
-- **HUD Synchronization:** The UI must feature a Heads-Up Display (HUD) showing `remaining_years`, `standard_hints_left` (starts at 3), and active inventory. Almost every game endpoint returns updated team stats. You must sync the React Context/State HUD with this fresh data after every API call.
+- **JWT Storage & Routing Flow:** 
+  1. The app MUST start on a Registration/Welcome Screen.
+  2. Upon successful registration, store the returned JWT securely in `localStorage` or `sessionStorage`.
+  3. Only AFTER the token is saved should you redirect the user to the main Game Dashboard route.
+  4. There is no traditional "login" screen for returning users. If a JWT exists in storage on page load, automatically bypass the registration screen. The JWT must be attached as a Bearer token in the `Authorization` header for EVERY subsequent request.
+- **HUD Synchronization:** The main Game Dashboard must call `GET /api/game/state` on mount to populate the Heads-Up Display (HUD) showing `remaining_years`, `standard_hints_left` (starts at 3), and active inventory. Almost every game endpoint returns updated team stats. You must sync the React Context/State HUD with this fresh data after every API call.
 
 ---
 
@@ -53,6 +57,7 @@ These islands are **STRICTLY SEQUENTIAL**.
 - **Payload:** `{ "question_id": "uuid", "answer_string": "user input" }`
 - **Non-MCQ Handling:** For text-based inputs, the backend automatically handles `.toLowerCase()` and uses a Regex to collapse double-spaces into single spaces (`/\s+/g`). You do not need to over-engineer frontend text sanitization.
 - **Result:** If `is_correct: false`, display the penalty message returned by the backend, shake the UI (error animation), and leave the question on screen. If `is_correct: true`, show a success animation and progress the flow.
+- **CRITICAL UI DIRECTIVE (NO REFRESHING):** You MUST NOT use `window.location.reload()` or require the user to refresh the page. React must be reactive! Immediately after `submit-answer` resolves (whether correct or incorrect), you MUST silently re-fetch `GET /api/game/questions` and `GET /api/game/state` in the background and update your React State. This ensures the UI instantly reveals newly unlocked penalty nodes or displays green "completed" checkmarks without a page refresh.
 
 ---
 
@@ -81,7 +86,7 @@ When a team successfully answers all required main questions (and any unlocked p
 1. **No Placeholders:** Generate a premium, production-ready UI. Use harmonious color palettes (deep ocean blues, mythical golds).
 2. **Animations:** Use micro-animations (Framer Motion or CSS transitions) for revealing questions, showing penalty red-flashes, and reward usage.
 3. **Responsive:** Must be flawlessly responsive. Teams may be using mobile phones while running around the venue.
-4. **State Management:** Abstract the API calls into custom React hooks (e.g., `useGameData()`) so the UI components remain clean. 
+4. **State Management & Reactivity:** Abstract the API calls into custom React hooks (e.g., `useGameData()`) so the UI components remain clean. You MUST use a tool like **React Query (@tanstack/react-query)** or rigorous `useEffect` dependencies to invalidate and re-fetch queries after mutations. NEVER require a page refresh to show UI updates.
 5. **Do not hardcode backend logic:** The backend dictates penalties, rewards, and correctness. The frontend is a beautiful, dumb presenter of the backend's truth.
 
 ---
@@ -314,3 +319,67 @@ Progress the team when the current island's requirements are met.
   }
   ```
 - **Error (400 Bad Request):** "Journey is already completed"
+
+---
+
+## 10. ADMIN API REFERENCE (For Projector / Dashboard)
+
+The frontend team may also be building the Admin Dashboard or projector leaderboard. These endpoints require **Basic Auth**, NOT a Bearer token. 
+
+*Headers for all Admin Endpoints:* `Authorization: Basic <base64_encoded_credentials>`
+
+### 🔴 1. Get Leaderboard
+Fetches the current standings, sorted by lowest remaining years, shortest duration, and most hints left.
+- **URL:** `GET /api/admin/leaderboard`
+- **Success (200 OK):**
+  ```json
+  {
+    "status": "success",
+    "data": [
+      {
+        "id": "uuid-here",
+        "team_name": "The Argonauts",
+        "remaining_years": "14.50",
+        "current_island": 4,
+        "standard_hints_left": 2,
+        "is_completed": true,
+        "duration_seconds": 1245.5
+      }
+    ]
+  }
+  ```
+
+### 🔴 2. Adjust Team Years Manually
+Use this if an admin needs to manually add or subtract time due to a dispute.
+- **URL:** `POST /api/admin/adjust-years`
+- **Headers:** `Content-Type: application/json`
+- **Body:** `{ "team_id": "uuid", "adjustment": -5.0 }`
+- **Success (200 OK):**
+  ```json
+  {
+    "status": "success",
+    "message": "Score adjusted successfully",
+    "data": { "id": "uuid", "team_name": "The Argonauts", "remaining_years": "9.50" }
+  }
+  ```
+
+### 🔴 3. Fetch All Raw Questions
+Use this to populate an admin dashboard table.
+- **URL:** `GET /api/admin/questions`
+- **Success (200 OK):** JSON Array of all questions in the database, including the answers and hidden traps.
+
+### 🔴 4. Add New Question
+Use this to insert a new question on the fly without touching the database.
+- **URL:** `POST /api/admin/questions`
+- **Headers:** `Content-Type: application/json`
+- **Body Validation (Zod):**
+  - `island_id`: Number (1-4)
+  - `type`: 'PRE_ROUND' | 'MAIN'
+  - `format`: 'MCQ' | 'NON_MCQ'
+  - `question_text`: String (min 5)
+  - `correct_answer`: String (min 1)
+  - `reward_years`: Number (min 0)
+  - `penalty_years`: Number (min 0)
+  - `sequence_number`: Number (min 0)
+  - *Optional:* `hint_text`, `options` (Array of Strings), `hidden_wrong_answer`
+- **Success (201 Created):** Returns the newly created question object.
