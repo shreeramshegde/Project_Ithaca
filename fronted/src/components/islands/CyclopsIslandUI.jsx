@@ -1,48 +1,47 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye }) {
-  const [eyeUsed, setEyeUsed] = useState(false);
-  
-  const handleEyeClick = () => {
-    setEyeUsed(true);
-  };
-
-  const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
+function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye, onUseCyclopsEye }) {
+  const baseQuestions = mainQuestions.filter((q) => q.sequence_number < 10);
 
   return (
-    <div>
-      {hasCyclopsEye && (
-        <div className="cyclops-eye-action">
-          <button 
-            className={`cyclops-eye-btn ${eyeUsed ? 'active' : ''}`} 
-            onClick={handleEyeClick}
-            disabled={eyeUsed}
-          >
-            {eyeUsed ? 'Eye of the Cyclops Used' : 'Use Cyclops Eye'}
-          </button>
+    <div className="island-visual-container">
+      <div className="island-visual-header">
+        <span className="visual-icon">👁️</span>
+        <div>
+          <h3>Cyclops Boulder Ascent</h3>
+          <p className="visual-caption">Strictly Sequential: You must clear each stone barrier before climbing higher.</p>
         </div>
-      )}
+      </div>
 
       <div className="cyclops-path">
         {baseQuestions.map((q, index) => {
-          let statusClass = '';
-          if (q.status === 'CORRECT') statusClass = 'completed';
-          else if (q.id === activeMainQuestion?.id) statusClass = 'selected active';
-          else if (q.status === 'INCORRECT') statusClass = 'failed';
+          const isActive = q.id === activeMainQuestion?.id;
+          let statusClass = 'locked';
+          let statusSymbol = '🔒';
+          let statusLabel = 'Blocked by Boulder';
+
+          if (q.status === 'CORRECT') {
+            statusClass = 'completed';
+            statusSymbol = '✓';
+            statusLabel = 'Boulder Cleared (−1.0 yr)';
+          } else if (q.status === 'INCORRECT') {
+            statusClass = 'failed';
+            statusSymbol = '✗';
+            statusLabel = 'Retrying Barrier (+1.5 yr)';
+          } else if (isActive) {
+            statusClass = 'active selected';
+            statusSymbol = '⚔️';
+            statusLabel = 'Active Challenge';
+          }
 
           return (
-            <div 
-              key={q.id} 
-              className={`cyclops-stone ${statusClass}`}
-            >
-              {hasCyclopsEye ? (
-                <div style={{ color: '#00f0ff', fontSize: '1.5rem', marginBottom: '5px' }}>👁</div>
-              ) : (
-                <div style={{ color: statusClass === 'completed' ? 'var(--success)' : '#888', fontSize: '1.5rem', marginBottom: '5px' }}>
-                  {statusClass === 'completed' ? '✓' : '•'}
-                </div>
-              )}
-              <span>Step {index + 1}</span>
+            <div key={q.id} className={`cyclops-stone ${statusClass}`}>
+              <div className="stone-glyph">{statusSymbol}</div>
+              <div className="stone-content">
+                <h4>Step {index + 1}</h4>
+                <span className="marker-badge">{q.format}</span>
+              </div>
+              <span className="stone-status">{statusLabel}</span>
             </div>
           );
         })}

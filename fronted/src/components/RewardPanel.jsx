@@ -1,81 +1,113 @@
-import { useEffect, useMemo, useState } from 'react';
-import { REWARD_LABELS } from '../data/islands.js';
+import React, { useState } from 'react';
+import { REWARD_LABELS, REWARD_DESCRIPTIONS } from '../data/islands.js';
+import BlessingModal from './common/BlessingModal.jsx';
 
-function RewardPanel({ inventory, onUseHint, onUseReward, loading }) {
-  const [rewardType, setRewardType] = useState(inventory?.[0]?.reward_type || 'ATHENAS_SCROLL');
-  const [targetQuestionId, setTargetQuestionId] = useState('');
+function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, hintsLeft = 3, extraHints = 0, currentIslandSlug, activeQuestionId, hasActiveSitOut }) {
+  const [blessingOpen, setBlessingOpen] = useState(false);
 
-  const options = useMemo(() => {
-    if (!inventory?.length) {
-      return Object.entries(REWARD_LABELS).map(([value, label]) => ({ value, label }));
+  const activeRewards = inventory.filter((item) => !item.is_used);
+
+  const handleRewardClick = (item) => {
+    if (item.reward_type === 'THE_BLESSING') {
+      setBlessingOpen(true);
+    } else if (item.reward_type === 'CYCLOPS_EYE') {
+      onUseReward({
+        reward_type: 'CYCLOPS_EYE',
+        target_question_id: activeQuestionId,
+      });
+    } else if (item.reward_type === 'ATHENAS_SCROLL') {
+      // Automatically grants hint
+      onUseHint();
+    } else {
+      onUseReward({
+        reward_type: item.reward_type,
+        target_question_id: activeQuestionId,
+      });
     }
+  };
 
-    return inventory.map((item) => ({
-      value: item.reward_type,
-      label: REWARD_LABELS[item.reward_type] || item.reward_type,
-    }));
-  }, [inventory]);
-
-  useEffect(() => {
-    if (!options.some((option) => option.value === rewardType)) {
-      setRewardType(options[0]?.value || 'ATHENAS_SCROLL');
-    }
-  }, [options, rewardType]);
+  const handleBlessingConfirm = (choice) => {
+    onUseReward({
+      reward_type: 'THE_BLESSING',
+      choice,
+    });
+  };
 
   return (
-    <section className="surface-panel reward-panel cinematic-panel">
-      <div style={{ marginBottom: '20px' }}>
-        <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Hints and Artifacts</p>
-        <h3 style={{ fontFamily: 'var(--display)' }}>Use Divine Favor</h3>
-      </div>
-      <div className="reward-actions cinematic-form">
-        <button type="button" className="secondary-button cinematic-button" onClick={onUseHint} disabled={loading}>
-          {loading ? 'Requesting...' : 'Use Standard Hint'}
-        </button>
-        
-        <div style={{ margin: '20px 0', borderTop: '1px solid rgba(198,165,106,0.1)' }} />
+    <>
+      <section className="surface-panel reward-panel cinematic-panel">
+        <div className="panel-header-row">
+          <div>
+            <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Hold & Armory</p>
+            <h3 style={{ fontFamily: 'var(--display)', fontSize: '1.4rem' }}>Divine Favor & Hints</h3>
+          </div>
+          <div className="hint-pill-badge">
+            <span>💡 {hintsLeft} Standard {extraHints > 0 && `+ ${extraHints} Athena`} Left</span>
+          </div>
+        </div>
 
-        <form
-          className="reward-form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            onUseReward({
-              reward_type: rewardType,
-              target_question_id: targetQuestionId || undefined,
-            });
-          }}
-        >
-          <div className="field">
-            <label htmlFor="reward-type">Artifact to use</label>
-            <select 
-              id="reward-type" 
-              className="cinematic-input"
-              value={rewardType} 
-              onChange={(event) => setRewardType(event.target.value)}
+        <div className="reward-action-grid">
+          {/* Hint Action Button */}
+          <div className="reward-card hint-card">
+            <div className="reward-card-header">
+              <span className="reward-icon">🏛️</span>
+              <div>
+                <h4>Ask Athena for a Hint</h4>
+                <p>
+                  {extraHints > 0
+                    ? "Athena's Scroll is active! This hint will NOT consume a standard hint."
+                    : `Consumes 1 of your 3 standard hints (${hintsLeft} remaining).`}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="secondary-button cinematic-button"
+              onClick={onUseHint}
+              disabled={loading || (hintsLeft <= 0 && extraHints <= 0)}
             >
-              {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              {loading ? 'Consulting the Gods...' : extraHints > 0 ? "Use Athena's Free Hint" : 'Use Standard Hint'}
+            </button>
           </div>
-          <div className="field">
-            <label htmlFor="reward-question-id">Target Resonance (UUID)</label>
-            <input
-              id="reward-question-id"
-              className="cinematic-input"
-              value={targetQuestionId}
-              onChange={(event) => setTargetQuestionId(event.target.value)}
-              placeholder="Required for targeted rewards"
-            />
+
+          {/* Active Artifacts List */}
+          <div className="reward-card artifacts-card">
+            <h4>Acquired Artifacts</h4>
+            {activeRewards.length === 0 ? (
+              <p className="muted-copy" style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                No active artifacts in inventory. Answer the Pre-Round GK questions on each island to earn them!
+              </p>
+            ) : (
+              <div className="active-rewards-list">
+                {activeRewards.map((item) => (
+                  <div key={item.id} className="artifact-pill-card">
+                    <div>
+                      <strong>{REWARD_LABELS[item.reward_type] || item.reward_type}</strong>
+                      <p className="artifact-desc">{REWARD_DESCRIPTIONS[item.reward_type]}</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="action-button cinematic-button small-btn"
+                      onClick={() => handleRewardClick(item)}
+                      disabled={loading}
+                    >
+                      Activate
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <button className="action-button cinematic-button" type="submit" disabled={loading}>
-            Unleash Artifact
-          </button>
-        </form>
-      </div>
-    </section>
+        </div>
+      </section>
+
+      <BlessingModal
+        isOpen={blessingOpen}
+        onClose={() => setBlessingOpen(false)}
+        onConfirm={handleBlessingConfirm}
+        hasActiveSitOut={hasActiveSitOut}
+      />
+    </>
   );
 }
 

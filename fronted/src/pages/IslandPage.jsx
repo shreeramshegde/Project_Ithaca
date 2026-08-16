@@ -1,226 +1,347 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
-import { getGameState, submitAnswer, submitPreRound, useHint, useReward, nextIsland, getQuestions } from '../api/game.js';
-import FeedbackBanner from '../components/FeedbackBanner.jsx';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useGame } from '../context/GameContext.jsx';
+import { findIslandBySlug, ISLANDS } from '../data/islands.js';
+import { getIslandQuestions } from '../data/questionsData.js';
 import GameHud from '../components/GameHud.jsx';
+import FeedbackBanner from '../components/FeedbackBanner.jsx';
 import QuestionConsole from '../components/QuestionConsole.jsx';
 import RewardPanel from '../components/RewardPanel.jsx';
-import { useAuth } from '../context/AuthContext.jsx';
-import { findIslandBySlug } from '../data/islands.js';
-import { animateIslandEntry } from '../animations/mapAnimations.js';
-import EnvironmentalMarker from '../components/EnvironmentalMarker.jsx';
 import LotusIslandUI from '../components/islands/LotusIslandUI.jsx';
 import CyclopsIslandUI from '../components/islands/CyclopsIslandUI.jsx';
 import SirensIslandUI from '../components/islands/SirensIslandUI.jsx';
 import WitchIslandUI from '../components/islands/WitchIslandUI.jsx';
+import HintModal from '../components/common/HintModal.jsx';
+import SitOutModal from '../components/common/SitOutModal.jsx';
 import '../journey-map.css';
 import '../island-ui.css';
 
-function IslandPage() {
+export default function IslandPage() {
   const { islandSlug } = useParams();
-  const island = findIslandBySlug(islandSlug);
-  const queryClient = useQueryClient();
-  const { token, team, clearSession } = useAuth();
+  const navigate = useNavigate();
+  const { team } = useAuth();
+  const {
+    gameState,
+    submitPreRound,
+    submitAnswer,
+    useHint,
+    useReward,
+    advanceToNextIsland,
+    activeHint,
+    setActiveHint,
+    sitOutModalOpen,
+    setSitOutModalOpen,
+  } = useGame();
+
   const [feedback, setFeedback] = useState(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const stateQuery = useQuery({
-    queryKey: ['game-state', token],
-    queryFn: () => getGameState(token),
-    refetchInterval: 10000,
-  });
+  const island = findIslandBySlug(islandSlug);
+  const currentIslandId = gameState.current_island || 1;
 
-  const currentIsland = stateQuery.data?.data?.team?.current_island;
+  // If island is locked or beyond current, redirect to map
+  useEffect(() => {
+    if (!island) {
+      navigate('/journey', { replace: true });
+      return;
+    }
+    if (island.id > currentIslandId) {
+      navigate('/journey', { replace: true });
+      return;
+    }
+    if (island.slug === 'ithaca' || currentIslandId > 4) {
+      navigate('/victory', { replace: true });
+    }
+  }, [island, currentIslandId, navigate]);
 
-  const questionsQuery = useQuery({
-    queryKey: ['game-questions', token, currentIsland],
-    queryFn: () => getQuestions(token),
-    enabled: !!currentIsland,
-  });
+  // Questions for this island
+  const islandData = useMemo(() => {
+    return island ? getIslandQuestions(island.id) : null;
+  }, [island]);
 
-  const refreshState = () => queryClient.invalidateQueries({ queryKey: ['game-state', token] });
+  // Check pre-round status
+  const preRoundQuestion = islandData?.preRound || null;
+  const preRoundProgress = preRoundQuestion ? gameState.progress[preRoundQuestion.id] : null;
+  const isPreRoundAttempted = Boolean(preRoundProgress);
 
-  const onMutationSuccess = (title, payload) => {
-    setFeedback({
-      kind: 'success',
-      title,
-      message: payload?.message || 'The backend accepted the action and the latest state is syncing now.',
-    });
-    refreshState();
+  // Main questions + penalty pool
+  const mainQuestions = useMemo(() => {
+    if (!islandData?.questions) return [];
+    return islandData.questions.map((q) => ({
+      ...q,
+      status: gameState.progress[q.id]?.status || null,
+    }));
+  }, [islandData, gameState.progress]);
+
+  const penaltyQuestions = useMemo(() => {
+    if (!islandData?.penaltyPool) return [];
+    return islandData.penaltyPool.map((q) => ({
+      ...q,
+      status: gameState.progress[q.id]?.status || null,
+    }));
+  }, [islandData, gameState.progress]);
+
+  // Determine active question
+  const activeMainQuestion = useMemo(() => {
+    if (!isPreRoundAttempted) return null;
+
+    // 1. If user manually selected a question (non-sequential islands: 1, 3, 4)
+    if (selectedQuestionId) {
+      const selected = [...mainQuestions, ...penaltyQuestions].find((q) => q.id === selectedQuestionId);
+      if (selected && !selected.status) return selected;
+    }
+
+    // 2. Check if any active penalty question needs solving on Island 1
+    if (island?.id === 1 && gameState.activePenaltyIndex > 0) {
+      const triggeredPenalties = penaltyQuestions.slice(0, Math.min(gameState.activePenaltyIndex, penaltyQuestions.length));
+      const activePenalty = triggeredPenalties.find((pq) => !pq.status);
+      if (activePenalty) return activePenalty;
+    }
+
+    // 3. For sequential island (Cyclops - Island 2), pick first unsolved step
+    if (island?.isSequential) {
+      return mainQuestions.find((q) => q.status !== 'CORRECT') || null;
+    }
+
+    // 4. Default: first unattempted question
+    return mainQuestions.find((q) => !q.status) || null;
+  }, [isPreRoundAttempted, island, gameState.activePenaltyIndex, penaltyQuestions, selectedQuestionId, mainQuestions]);
+
+  // Check if island is completed
+  const isIslandCompleted = useMemo(() => {
+    if (!isPreRoundAttempted || !island || mainQuestions.length === 0) return false;
+
+    if (island.id === 2) {
+      // Island 2 (Cyclops) is strictly sequential: each boulder must be solved
+      return mainQuestions.every((q) => q.status === 'CORRECT');
+    }
+
+    if (island.id === 1) {
+      // Island 1: All main questions attempted + any triggered penalty questions attempted
+      const allBaseAttempted = mainQuestions.every((q) => Boolean(q.status));
+      const triggeredPenalties = penaltyQuestions.slice(0, Math.min(gameState.activePenaltyIndex, penaltyQuestions.length));
+      const allPenaltiesAttempted = triggeredPenalties.every((pq) => Boolean(pq.status));
+      return allBaseAttempted && allPenaltiesAttempted;
+    }
+
+    // Island 3 and 4: Non-sequential, single-attempt per question
+    return mainQuestions.every((q) => Boolean(q.status));
+  }, [isPreRoundAttempted, island, mainQuestions, penaltyQuestions, gameState.activePenaltyIndex]);
+
+  // Handlers
+  const handlePreRoundSubmit = async (payload) => {
+    setLoading(true);
+    setFeedback(null);
+    try {
+      const res = await submitPreRound(island.id, payload.selected_option);
+      setFeedback({
+        kind: res.isCorrect ? 'success' : res.isTrap ? 'error' : 'info',
+        title: res.isCorrect ? 'Ritual Complete' : res.isTrap ? 'Hidden Trap Triggered!' : 'Oracle Answered',
+        message: res.message,
+      });
+    } catch (err) {
+      setFeedback({
+        kind: 'error',
+        title: 'Ritual Failed',
+        message: err.message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const preRoundMutation = useMutation({
-    mutationFn: (payload) => submitPreRound(token, payload),
-    onSuccess: (payload) => onMutationSuccess('Pre-round processed', payload),
-    onError: (error) => setFeedback({ kind: 'error', title: 'Pre-round failed', message: error.message }),
-  });
+  const handleAnswerSubmit = async (payload) => {
+    setLoading(true);
+    setFeedback(null);
+    try {
+      const res = await submitAnswer(island.id, payload.question_id, payload.answer_string);
+      setFeedback({
+        kind: res.isCorrect ? 'success' : 'error',
+        title: res.isCorrect ? 'Correct Solution!' : 'Incorrect Solution',
+        message: res.message,
+      });
+      // Reset manual selection so it auto-picks next question
+      setSelectedQuestionId(null);
+    } catch (err) {
+      setFeedback({
+        kind: 'error',
+        title: 'Submission Failed',
+        message: err.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const answerMutation = useMutation({
-    mutationFn: (payload) => submitAnswer(token, payload),
-    onSuccess: (payload) => onMutationSuccess('Answer processed', payload),
-    onError: (error) => setFeedback({ kind: 'error', title: 'Submission failed', message: error.message }),
-  });
-
-  const nextIslandMutation = useMutation({
-    mutationFn: () => nextIsland(token),
-    onSuccess: (payload) => {
-      onMutationSuccess('Journey Continues', payload);
-      // Wait a moment before redirecting to allow the success message to show
-      setTimeout(() => {
-        window.location.href = '/journey'; // Force full unmount to trigger map entry animations fresh
-      }, 1500);
-    },
-    onError: (error) => setFeedback({ kind: 'error', title: 'Failed to progress', message: error.message }),
-  });
-
-  const hintMutation = useMutation({
-    mutationFn: () => useHint(token),
-    onSuccess: (payload) => {
+  const handleUseHint = async () => {
+    setLoading(true);
+    try {
+      const qId = activeMainQuestion?.id || preRoundQuestion?.id;
+      const hint = await useHint(qId);
       setFeedback({
         kind: 'info',
-        title: 'Hint received',
-        message: payload?.hint || payload?.message || 'A hint was returned by the backend.',
+        title: 'Oracle Hint Received',
+        message: `Hint: "${hint}"`,
       });
-      refreshState();
-    },
-    onError: (error) => setFeedback({ kind: 'error', title: 'Hint unavailable', message: error.message }),
-  });
-
-  const rewardMutation = useMutation({
-    mutationFn: (payload) => useReward(token, payload),
-    onSuccess: (payload) => onMutationSuccess('Reward activated', payload),
-    onError: (error) => setFeedback({ kind: 'error', title: 'Reward unavailable', message: error.message }),
-  });
-
-  const loading = preRoundMutation.isPending || answerMutation.isPending || hintMutation.isPending || rewardMutation.isPending || nextIslandMutation.isPending;
-  const inventory = stateQuery.data?.data?.inventory || [];
-
-  const isLocked = useMemo(() => {
-    if (!island || !currentIsland) {
-      return false;
+    } catch (err) {
+      setFeedback({
+        kind: 'error',
+        title: 'Hint Unavailable',
+        message: err.message,
+      });
+    } finally {
+      setLoading(false);
     }
-    return island.id > currentIsland;
-  }, [currentIsland, island]);
+  };
 
-  useEffect(() => {
-    animateIslandEntry();
-  }, []);
-
-  useEffect(() => {
-    if (stateQuery.error?.message === 'Invalid or expired token') {
-      clearSession();
+  const handleUseReward = async (payload) => {
+    setLoading(true);
+    try {
+      const res = await useReward(payload.reward_type, payload.target_question_id || activeMainQuestion?.id, payload);
+      setFeedback({
+        kind: 'success',
+        title: 'Artifact Unleashed',
+        message: res.message,
+      });
+    } catch (err) {
+      setFeedback({
+        kind: 'error',
+        title: 'Unable to Use Artifact',
+        message: err.message,
+      });
+    } finally {
+      setLoading(false);
     }
-  }, [clearSession, stateQuery.error?.message]);
+  };
 
-  if (!island || isLocked) {
-    return <Navigate to="/journey" replace />;
-  }
-
-  const questions = questionsQuery.data?.data?.questions || [];
-  const preRoundQuestion = questions.find(q => q.type === 'PRE_ROUND');
-  const isPreRoundComplete = preRoundQuestion?.status === 'CORRECT';
-
-  const mainQuestions = questions.filter(q => q.type === 'MAIN');
-  const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
-  const penaltyQuestions = mainQuestions.filter(q => q.sequence_number >= 10);
-
-  const incorrectBaseCount = baseQuestions.filter(q => q.status === 'INCORRECT').length;
-  const correctPenaltyCount = penaltyQuestions.filter(q => q.status === 'CORRECT').length;
-  const hasOutstandingPenalty = incorrectBaseCount > correctPenaltyCount;
-
-  let activeMainQuestion = null;
-  let isIslandCompleted = false;
-
-  if (baseQuestions.length > 0) {
-    if (hasOutstandingPenalty) {
-      activeMainQuestion = penaltyQuestions.find(q => q.status !== 'CORRECT');
-    } else {
-      activeMainQuestion = baseQuestions.find(q => !q.status);
+  const handleNextIsland = async () => {
+    setLoading(true);
+    try {
+      await advanceToNextIsland(island.id);
+      if (island.id >= 4) {
+        navigate('/victory');
+      } else {
+        const nextIsland = ISLANDS.find((i) => i.id === island.id + 1);
+        if (nextIsland && nextIsland.slug !== 'ithaca') {
+          navigate(`/journey/${nextIsland.slug}`);
+        } else {
+          navigate('/journey');
+        }
+      }
+    } catch (err) {
+      setFeedback({
+        kind: 'error',
+        title: 'Navigation Error',
+        message: err.message,
+      });
+    } finally {
+      setLoading(false);
     }
-    isIslandCompleted = baseQuestions.every(q => q.status) && !hasOutstandingPenalty;
-  }
+  };
 
-  // Override the local state if the user correctly answers the final question before the query refetches
-  const isCurrentlyCompleted = isIslandCompleted || (answerMutation.data?.is_correct && !activeMainQuestion);
+  if (!island) return null;
 
   return (
     <main className={`page-shell island-page ${island.themeClass}`}>
       <div className="page-content journey-layout">
         <GameHud
           teamName={team?.team_name}
-          state={stateQuery.data?.data}
-          previousYears={team?.remaining_years}
-          onLogout={clearSession}
+          state={gameState}
+          previousYears={gameState.remaining_years}
+          extraHints={gameState.extra_hints}
+          sitOutPenaltyActive={gameState.sitOutPenaltyActive}
         />
 
         <section className="journey-main">
           <header className="island-hero">
             <div>
-              <h1 className="display-title">{island.title}</h1>
-              <p className="eyebrow">Island {island.id} of 5</p>
+              <span className="eyebrow" style={{ color: '#c6a56a' }}>
+                Stage {island.id} of 4 &bull; {island.pathLabel}
+              </span>
+              <h1 className="display-title">{island.name}</h1>
+              <p className="hero-blurb">{island.blurb}</p>
             </div>
             <Link to="/journey" className="ghost-button cinematic-button">
-              ← View Map
+              ← Return to Ocean Map
             </Link>
           </header>
 
           <FeedbackBanner result={feedback} />
 
-          <div style={{ display: 'flex', justifyContent: 'center', margin: '40px 0' }}>
+          {/* Dedicated Island Visual Indicator Component */}
+          <div className="island-visual-wrapper">
             {island.slug === 'lotus' && (
-              <LotusIslandUI mainQuestions={mainQuestions} activeMainQuestion={activeMainQuestion} />
+              <LotusIslandUI
+                mainQuestions={mainQuestions}
+                activeMainQuestion={activeMainQuestion}
+                onSelectQuestion={(id) => setSelectedQuestionId(id)}
+                penaltyQuestions={penaltyQuestions}
+                activePenaltyIndex={gameState.activePenaltyIndex}
+              />
             )}
             {island.slug === 'cyclops' && (
               <CyclopsIslandUI
                 mainQuestions={mainQuestions}
                 activeMainQuestion={activeMainQuestion}
-                hasCyclopsEye={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'CYCLOPS_EYE')}
+                hasCyclopsEye={gameState.inventory.some((i) => i.reward_type === 'CYCLOPS_EYE' && !i.is_used)}
+                onUseCyclopsEye={(qId) => handleUseReward({ reward_type: 'CYCLOPS_EYE', target_question_id: qId })}
               />
             )}
             {island.slug === 'sirens' && (
-              <SirensIslandUI mainQuestions={mainQuestions} activeMainQuestion={activeMainQuestion} />
+              <SirensIslandUI
+                mainQuestions={mainQuestions}
+                activeMainQuestion={activeMainQuestion}
+                onSelectQuestion={(id) => setSelectedQuestionId(id)}
+              />
             )}
             {island.slug === 'witch' && (
               <WitchIslandUI
                 mainQuestions={mainQuestions}
                 activeMainQuestion={activeMainQuestion}
-                hasSitOutPenalty={hasOutstandingPenalty}
+                onSelectQuestion={(id) => setSelectedQuestionId(id)}
+                hasSitOutPenalty={gameState.sitOutPenaltyActive}
               />
-            )}
-            {island.slug === 'ithaca' && (
-              <div style={{ textAlign: 'center', color: 'var(--cloud-white)' }}>
-                <h2 style={{ fontFamily: 'var(--display)' }}>Welcome Home</h2>
-                <p>The journey is complete.</p>
-              </div>
             )}
           </div>
 
-          {island.slug !== 'ithaca' && (
-            <div id="question-console-area">
-              <QuestionConsole
-                island={island}
-                loading={loading}
-                preRoundQuestion={!isPreRoundComplete ? preRoundQuestion : null}
-                mainQuestion={isPreRoundComplete ? activeMainQuestion : null}
-                onSubmitPreRound={(payload) => preRoundMutation.mutate(payload)}
-                onSubmitAnswer={(payload) => answerMutation.mutate(payload)}
-                isCompleted={isCurrentlyCompleted}
-                onNextIsland={() => nextIslandMutation.mutate()}
-              />
-            </div>
-          )}
-
-          <RewardPanel
-            inventory={stateQuery.data?.data?.inventory}
+          {/* Question Console */}
+          <QuestionConsole
+            island={island}
             loading={loading}
-            onUseHint={() => hintMutation.mutate()}
-            onUseReward={(payload) => rewardMutation.mutate(payload)}
+            isCompleted={isIslandCompleted}
+            onNextIsland={handleNextIsland}
+            preRoundQuestion={!isPreRoundAttempted ? preRoundQuestion : null}
+            mainQuestion={isPreRoundAttempted ? activeMainQuestion : null}
+            onSubmitPreRound={handlePreRoundSubmit}
+            onSubmitAnswer={handleAnswerSubmit}
+            eliminatedOptions={gameState.cyclopsEliminatedOptions}
+            hasCyclopsEye={gameState.inventory.some((i) => i.reward_type === 'CYCLOPS_EYE' && !i.is_used)}
+            onUseCyclopsEye={(qId) => handleUseReward({ reward_type: 'CYCLOPS_EYE', target_question_id: qId })}
+          />
+
+          {/* Reward & Inventory Controls */}
+          <RewardPanel
+            inventory={gameState.inventory}
+            loading={loading}
+            hintsLeft={gameState.standard_hints_left}
+            extraHints={gameState.extra_hints}
+            currentIslandSlug={island.slug}
+            activeQuestionId={activeMainQuestion?.id}
+            hasActiveSitOut={gameState.sitOutPenaltyActive}
+            onUseHint={handleUseHint}
+            onUseReward={handleUseReward}
           />
         </section>
       </div>
+
+      <HintModal hint={activeHint} onClose={() => setActiveHint(null)} />
+      <SitOutModal
+        isOpen={sitOutModalOpen}
+        onClose={() => setSitOutModalOpen(false)}
+        onConfirmMember={() => {}}
+      />
     </main>
   );
 }
-
-export default IslandPage;

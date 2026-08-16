@@ -1,10 +1,12 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import IslandPage from './pages/IslandPage.jsx';
 import JourneyPage from './pages/JourneyPage.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
+import VictoryPage from './pages/VictoryPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 function App() {
@@ -25,6 +27,14 @@ function App() {
         element={
           <ProtectedRoute>
             <IslandPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/victory"
+        element={
+          <ProtectedRoute>
+            <VictoryPage />
           </ProtectedRoute>
         }
       />

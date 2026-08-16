@@ -6,3 +6,10 @@ export function registerTeam(payload) {
     body: JSON.stringify(payload),
   });
 }
+
+export function loginTeam(payload) {
+  return request('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}

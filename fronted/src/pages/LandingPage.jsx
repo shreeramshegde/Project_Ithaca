@@ -1,93 +1,159 @@
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { runDepartureAnimation, runLandingAnimation } from '../animations/landingAnimations.js';
-import usePrefersReducedMotion from '../hooks/usePrefersReducedMotion.js';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import RulesModal from '../components/common/RulesModal.jsx';
+import { ISLANDS } from '../data/islands.js';
 import './LandingPage.css';
 
 function LandingPage() {
-  const navigate = useNavigate();
-  const reducedMotion = usePrefersReducedMotion();
-  const [isDeparting, setIsDeparting] = useState(false);
-
-  const videoRef = useRef(null);
-  const overlayRef = useRef(null);
-  const vignetteRef = useRef(null);
-  const titleRef = useRef(null);
-  const subtitleRef = useRef(null);
-  const quoteRef = useRef(null);
-  const actionsRef = useRef(null);
-
-  const refs = {
-    video: videoRef,
-    overlay: overlayRef,
-    vignette: vignetteRef,
-    title: titleRef,
-    subtitle: subtitleRef,
-    quote: quoteRef,
-    actions: actionsRef,
-  };
-
-  useEffect(() => runLandingAnimation(refs, reducedMotion), [reducedMotion]);
-
-  const handleEnter = () => {
-    setIsDeparting(true);
-    const timeline = runDepartureAnimation(refs, reducedMotion);
-    timeline.eventCallback('onComplete', () => navigate('/login'));
-    if (reducedMotion) {
-      navigate('/login');
-    }
-  };
+  const [rulesOpen, setRulesOpen] = useState(false);
 
   return (
-    <main className="page-shell landing-page">
-      <div className="landing-video-wrap" aria-hidden="true">
-        <video
-          ref={videoRef}
-          className="landing-video"
-          src="/assets/landing/ocean-background.mp4"
-          poster="/assets/landing/ocean-poster.webp"
-          autoPlay
-          muted
-          loop
-          playsInline
-        />
-        <div className="landing-overlay" ref={overlayRef} />
-        <div className="landing-vignette" ref={vignetteRef} />
+    <main className="ithaca-landing">
+      {/* Atmospheric background */}
+      <div className="sky-glow" />
+      <div className="map-lines" />
+      <div className="stars" />
+
+      {/* Ocean waves */}
+      <div className="ocean">
+        <div className="wave wave-one" />
+        <div className="wave wave-two" />
+        <div className="wave wave-three" />
       </div>
 
-      <div className="page-content landing-content">
-        <header className="landing-topbar">
+      {/* Left compass */}
+      <div className="compass compass-left">
+        <div className="compass-ring ring-one" />
+        <div className="compass-ring ring-two" />
+        <div className="compass-needle" />
+        <span className="north">N</span>
+        <span className="south">S</span>
+        <span className="east">E</span>
+        <span className="west">W</span>
+      </div>
+
+      {/* Right compass */}
+      <div className="compass compass-right">
+        <div className="compass-ring ring-one" />
+        <div className="compass-ring ring-two" />
+        <div className="compass-needle" />
+        <span className="north">N</span>
+        <span className="south">S</span>
+        <span className="east">E</span>
+        <span className="west">W</span>
+      </div>
+
+      {/* Greek temple */}
+      <div className="temple">
+        <div className="temple-roof" />
+        <div className="temple-columns">
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+        <div className="temple-base" />
+      </div>
+
+      {/* Sailing ship */}
+      <div className="ship">
+        <div className="ship-sail sail-main" />
+        <div className="ship-sail sail-small" />
+        <div className="ship-mast" />
+        <div className="ship-body" />
+      </div>
+
+      {/* Left parchment */}
+      <aside className="parchment">
+        <div className="parchment-top" />
+        <h2>THE JOURNEY<br />BEGINS</h2>
+        <div className="parchment-anchor">⚓</div>
+        <div className="parchment-line" />
+        <p>20 YEARS REMAIN.</p>
+        <p>FOUR TRIALS<br />STAND AHEAD.</p>
+        <div className="parchment-line" />
+        <strong>FIND YOUR WAY<br />TO ITHACA.</strong>
+        <div className="parchment-bottom" />
+      </aside>
+
+      {/* Header */}
+      <header className="ithaca-header">
+        <div className="brand">
+          <span className="brand-symbol">✦</span>
           <div>
-            <p className="topbar-brand">NIE IEEE Student Branch</p>
-            <p className="topbar-title">Odyssey Event Experience</p>
+            <div className="brand-name">PROJECT ITHACA</div>
           </div>
-        </header>
+        </div>
 
-        <section className="landing-stage">
-          <div className="landing-copy">
-            <p ref={subtitleRef} className="landing-kicker">
-              The Tech Odyssey
-            </p>
-            <h1 ref={titleRef} className="display-title landing-heading">
-              Project Ithaca
-            </h1>
-            <p className="landing-subheading">The Tech Odyssey</p>
-            <p ref={quoteRef} className="landing-quote">
-              Four trials. One journey home.
-            </p>
-            <div ref={actionsRef} className="landing-actions">
-              <button
-                type="button"
-                className="enter-button"
-                disabled={isDeparting}
-                onClick={handleEnter}
-              >
-                <span>{isDeparting ? 'Opening Passage...' : 'Enter The Odyssey'}</span>
-              </button>
-            </div>
+        <nav className="header-links">
+          <button type="button" className="ghost-button small-btn" onClick={() => setRulesOpen(true)}>
+            📜 RULES & SCORING
+          </button>
+          <Link to="/admin" className="ghost-button small-btn">
+            📊 LEADERBOARD
+          </Link>
+          <Link to="/login" className="action-button small-btn">
+            REGISTER / LOGIN
+          </Link>
+        </nav>
+      </header>
+
+      {/* Main hero */}
+      <section className="ithaca-content">
+        <p className="journey-label">A TECHNICAL ODYSSEY ACROSS THE UNKNOWN</p>
+
+        <div className="gold-ornament">
+          <span />
+          <b>✦</b>
+          <span />
+        </div>
+
+        <h1>ITHACA</h1>
+
+        <div className="title-subtitle">THE TECH ODYSSEY</div>
+
+        <div className="gold-ornament small">
+          <span />
+          <b>◆</b>
+          <span />
+        </div>
+
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+          <Link to="/login" className="journey-button">
+            <span>✦</span>
+            BEGIN JOURNEY
+            <span>✦</span>
+          </Link>
+          <button type="button" className="secondary-button cinematic-button" onClick={() => setRulesOpen(true)}>
+            <span>📜</span> View Rules & Lore
+          </button>
+        </div>
+
+        {/* Journey information */}
+        <div className="journey-card">
+          <div className="journey-side">
+            <span>⌛</span>
           </div>
-        </section>
-      </div>
+
+          <div className="journey-info">
+            <p>STARTING BANK</p>
+            <strong>20.0</strong>
+            <small>YEARS</small>
+          </div>
+
+          <div className="journey-divider" />
+
+          <div className="journey-side">
+            <span>⚓</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Vignette */}
+      <div className="vignette" />
+
+      <RulesModal isOpen={rulesOpen} onClose={() => setRulesOpen(false)} />
     </main>
   );
 }

@@ -1,43 +1,29 @@
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { animateMapCamera } from '../animations/mapAnimations.js';
-import { getGameState } from '../api/game.js';
-import FeedbackBanner from '../components/FeedbackBanner.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useGame } from '../context/GameContext.jsx';
 import MapHud from '../components/MapHud.jsx';
 import OceanMap from '../components/OceanMap.jsx';
-import { useAuth } from '../context/AuthContext.jsx';
-import '../journey-map.css'; // Import map styles
+import RulesModal from '../components/common/RulesModal.jsx';
+import { animateMapCamera } from '../animations/mapAnimations.js';
+import '../journey-map.css';
 
-function JourneyPage() {
+export default function JourneyPage() {
   const navigate = useNavigate();
-  const { token, team, clearSession } = useAuth();
-  const [previousYears, setPreviousYears] = useState(team?.remaining_years ?? null);
+  const { team, clearSession } = useAuth();
+  const { gameState } = useGame();
+  const [rulesOpen, setRulesOpen] = useState(false);
 
-  const stateQuery = useQuery({
-    queryKey: ['game-state', token],
-    queryFn: () => getGameState(token),
-    refetchInterval: 10000,
-  });
-
-  useEffect(() => {
-    if (stateQuery.error?.message === 'Invalid or expired token') {
-      clearSession();
-    }
-  }, [clearSession, stateQuery.error?.message]);
-
-  useEffect(() => {
-    const currentYears = stateQuery.data?.data?.team?.remaining_years;
-    if (currentYears !== undefined) {
-      setPreviousYears((current) => (current === null ? currentYears : current));
-    }
-  }, [stateQuery.data?.data?.team?.remaining_years]);
+  const currentIsland = gameState.current_island || 1;
 
   const handleIslandClick = (slug) => {
     animateMapCamera(slug);
-    // Allow the camera animation to begin, then navigate reliably
     setTimeout(() => {
-      navigate(`/journey/${slug}`);
+      if (slug === 'ithaca' || currentIsland > 4) {
+        navigate('/victory');
+      } else {
+        navigate(`/journey/${slug}`);
+      }
     }, 300);
   };
 
@@ -45,28 +31,49 @@ function JourneyPage() {
     <main className="page-shell journey-page-cinematic">
       <MapHud
         teamName={team?.team_name}
-        state={stateQuery.data?.data}
-        previousYears={previousYears}
+        state={gameState}
+        previousYears={gameState.remaining_years}
+        onOpenRules={() => setRulesOpen(true)}
       />
-      
-      {stateQuery.isError && (
-        <div style={{ position: 'absolute', top: 100, left: 40, right: 40, zIndex: 10 }}>
-          <FeedbackBanner
-            result={{
-              kind: 'error',
-              title: 'Unable to load journey state',
-              message: stateQuery.error.message,
-            }}
-          />
-        </div>
-      )}
 
-      <OceanMap 
-        currentIsland={stateQuery.data?.data?.team?.current_island} 
+      <OceanMap
+        currentIsland={currentIsland}
         onIslandClick={handleIslandClick}
       />
+
+      <div className="map-bottom-controls">
+        <button
+          type="button"
+          className="action-button cinematic-button map-quick-enter-btn"
+          onClick={() => {
+            const slugs = ['lotus', 'cyclops', 'sirens', 'witch', 'ithaca'];
+            const targetSlug = slugs[Math.min(currentIsland - 1, 4)];
+            handleIslandClick(targetSlug);
+          }}
+        >
+          <span>⚔️</span>
+          Enter Active Island Trial
+          <span>⚔️</span>
+        </button>
+
+        <button
+          type="button"
+          className="ghost-button cinematic-button"
+          onClick={() => setRulesOpen(true)}
+        >
+          📜 Rules Reference
+        </button>
+
+        <button
+          type="button"
+          className="ghost-button cinematic-button"
+          onClick={clearSession}
+        >
+          Logout
+        </button>
+      </div>
+
+      <RulesModal isOpen={rulesOpen} onClose={() => setRulesOpen(false)} />
     </main>
   );
 }
-
-export default JourneyPage;
