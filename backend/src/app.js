@@ -24,6 +24,11 @@ const swaggerOptions = {
     servers: [
       {
         url: 'http://localhost:3000',
+        description: 'Local Development Server',
+      },
+      {
+        url: 'https://ithaca-backend.onrender.com',
+        description: 'Production Server',
       },
     ],
     components: {
