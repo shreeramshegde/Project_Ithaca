@@ -1,7 +1,7 @@
 import { ISLANDS, REWARD_LABELS } from '../data/islands.js';
 import JourneyYears from './JourneyYears.jsx';
 
-function GameHud({ teamName, state, previousYears, flashValue }) {
+function GameHud({ teamName, state, previousYears, flashValue, onLogout }) {
   const currentIsland = ISLANDS.find((island) => island.id === state?.team?.current_island);
 
   return (
