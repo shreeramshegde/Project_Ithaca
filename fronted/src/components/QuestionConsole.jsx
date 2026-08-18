@@ -97,6 +97,11 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                 <div style={{ padding: '20px', background: 'rgba(7, 21, 38, 0.5)', borderRadius: '8px', border: '1px solid var(--success)', textAlign: 'center' }}>
                   <p style={{ color: 'var(--success)', margin: 0 }}>This trial has already been completed successfully.</p>
                 </div>
+              ) : mainQuestion.is_correct || Number(mainQuestion.incorrect_attempts || 0) > 0 ? (
+                <div style={{ textAlign: 'center', marginTop: '2rem', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', borderRadius: '8px' }}>
+                  <p style={{ color: 'var(--gold)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '1.2rem' }}>Attempt Sealed</p>
+                  <p style={{ color: 'var(--cloud)', fontSize: '0.9rem' }}>The fates have recorded your answer for this trial.</p>
+                </div>
               ) : (
                 <form
                   className="form-grid cinematic-form"

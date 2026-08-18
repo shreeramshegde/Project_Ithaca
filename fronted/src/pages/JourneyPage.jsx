@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { animateMapCamera } from '../animations/mapAnimations.js';
 import { getGameState } from '../api/game.js';
 import FeedbackBanner from '../components/FeedbackBanner.jsx';
@@ -11,8 +11,10 @@ import '../journey-map.css'; // Import map styles
 
 function JourneyPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { token, team, clearSession } = useAuth();
   const [previousYears, setPreviousYears] = useState(team?.remaining_years ?? null);
+  const traveledFrom = location.state?.traveledFrom;
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],
@@ -47,6 +49,7 @@ function JourneyPage() {
         teamName={team?.team_name}
         state={stateQuery.data?.data}
         previousYears={previousYears}
+        onLogout={clearSession}
       />
       
       {stateQuery.isError && (
@@ -63,6 +66,7 @@ function JourneyPage() {
 
       <OceanMap 
         currentIsland={stateQuery.data?.data?.team?.current_island} 
+        traveledFrom={traveledFrom}
         onIslandClick={handleIslandClick}
       />
     </main>

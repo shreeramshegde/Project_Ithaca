@@ -10,12 +10,13 @@ class ApiError extends Error {
 }
 
 async function request(path, options = {}) {
+  const { headers, ...restOptions } = options;
   const response = await fetch(`${API_BASE}${path}`, {
+    ...restOptions,
     headers: {
       'Content-Type': 'application/json',
-      ...(options.headers || {}),
+      ...(headers || {}),
     },
-    ...options,
   });
 
   const contentType = response.headers.get('content-type') || '';

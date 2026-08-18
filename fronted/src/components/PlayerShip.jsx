@@ -1,19 +1,33 @@
-function PlayerShip({ nodes, currentIsland }) {
-  if (!currentIsland) return null;
+import { useEffect, useRef, useState } from 'react';
+import { animateShipTravel } from '../animations/mapAnimations.js';
 
-  // Find the position of the current island
-  const currentNode = nodes.find((n) => n.id === currentIsland);
-  if (!currentNode) return null;
+function PlayerShip({ nodes, currentIsland, traveledFrom }) {
+  const shipRef = useRef(null);
+  
+  // Decide where to initially mount the ship
+  const initialIslandId = traveledFrom || currentIsland;
+  const initialNode = nodes.find((n) => n.id === initialIslandId);
+  const targetNode = nodes.find((n) => n.id === currentIsland);
 
-  const { x, y } = currentNode.pos;
+  useEffect(() => {
+    if (traveledFrom && traveledFrom !== currentIsland && targetNode) {
+      // Trigger the GSAP animation to move the ship
+      animateShipTravel(initialNode, targetNode, shipRef);
+    }
+  }, [traveledFrom, currentIsland, targetNode, initialNode]);
 
-  // The ship hovers slightly above/left of the island center
+  if (!initialNode) return null;
+
+  const { x, y } = initialNode.pos;
+
   return (
     <div
+      ref={shipRef}
       className="player-ship-container"
       style={{
         left: `${x}%`,
         top: `${y}%`,
+        position: 'absolute',
       }}
     >
       <img

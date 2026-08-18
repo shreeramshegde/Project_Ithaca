@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { runDepartureAnimation, runLandingAnimation } from '../animations/landingAnimations.js';
 import usePrefersReducedMotion from '../hooks/usePrefersReducedMotion.js';
 import './LandingPage.css';
+import backgroundVideo from '../animations/landing_background.mp4';
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -41,18 +42,24 @@ function LandingPage() {
   return (
     <main className="page-shell landing-page">
       <div className="landing-video-wrap" aria-hidden="true">
-        <video
-          ref={videoRef}
-          className="landing-video"
-          src="/assets/landing/ocean-background.mp4"
-          poster="/assets/landing/ocean-poster.webp"
-          autoPlay
-          muted
-          loop
-          playsInline
-        />
+        <div className="video-cropper">
+          <video
+            ref={videoRef}
+            className="landing-video"
+            src={backgroundVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+        </div>
         <div className="landing-overlay" ref={overlayRef} />
         <div className="landing-vignette" ref={vignetteRef} />
+        
+        {/* Cover for Gemini watermark */}
+        <div className="watermark-cover">
+          <img src="/assets/landing/ieee_logo.svg" alt="IEEE" className="ieee-watermark-logo" />
+        </div>
       </div>
 
       <div className="page-content landing-content">

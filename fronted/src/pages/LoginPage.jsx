@@ -39,11 +39,20 @@ function LoginPage() {
     },
   });
 
+  const queryParams = new URLSearchParams(location.search);
+  const shouldClear = queryParams.get('clear') === 'true';
+
   useEffect(() => {
-    if (isAuthenticated) {
+    if (shouldClear) {
+      const { clearSession } = require('../context/AuthContext.jsx'); // or we can use clearSession from useAuth
+      // actually we already have useAuth but it didn't export clearSession in the destructuring here
+      // Let's just use localStorage for a quick clear
+      window.localStorage.removeItem('ithaca-team-session');
+      window.location.href = '/login'; // reload without query params
+    } else if (isAuthenticated) {
       navigate('/journey', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, shouldClear]);
 
   return (
     <main className="page-shell auth-page">

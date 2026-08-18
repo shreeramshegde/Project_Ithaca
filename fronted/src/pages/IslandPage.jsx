@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams, useNavigate } from 'react-router-dom';
 import { getGameState, submitAnswer, submitPreRound, useHint, useReward, nextIsland, getQuestions } from '../api/game.js';
 import FeedbackBanner from '../components/FeedbackBanner.jsx';
 import GameHud from '../components/GameHud.jsx';
@@ -21,6 +21,7 @@ import '../island-ui.css';
 function IslandPage() {
   const { islandSlug } = useParams();
   const island = findIslandBySlug(islandSlug);
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { token, team, clearSession } = useAuth();
   const [feedback, setFeedback] = useState(null);
@@ -41,7 +42,10 @@ function IslandPage() {
     enabled: !!currentIsland,
   });
 
-  const refreshState = () => queryClient.invalidateQueries({ queryKey: ['game-state', token] });
+  const refreshState = () => {
+    queryClient.invalidateQueries({ queryKey: ['game-state', token] });
+    queryClient.invalidateQueries({ queryKey: ['game-questions', token, currentIsland] });
+  };
 
   const onMutationSuccess = (title, payload) => {
     setFeedback({
@@ -68,9 +72,8 @@ function IslandPage() {
     mutationFn: () => nextIsland(token),
     onSuccess: (payload) => {
       onMutationSuccess('Journey Continues', payload);
-      // Wait a moment before redirecting to allow the success message to show
       setTimeout(() => {
-        window.location.href = '/journey'; // Force full unmount to trigger map entry animations fresh
+        navigate('/journey', { state: { traveledFrom: currentIsland } });
       }, 1500);
     },
     onError: (error) => setFeedback({ kind: 'error', title: 'Failed to progress', message: error.message }),
@@ -102,7 +105,7 @@ function IslandPage() {
     if (!island || !currentIsland) {
       return false;
     }
-    return island.id > currentIsland;
+    return island.id !== currentIsland;
   }, [currentIsland, island]);
 
   useEffect(() => {
@@ -110,7 +113,7 @@ function IslandPage() {
   }, []);
 
   useEffect(() => {
-    if (stateQuery.error?.message === 'Invalid or expired token') {
+    if (stateQuery.error?.message === 'Invalid or expired token' || stateQuery.error?.message === 'Team not found') {
       clearSession();
     }
   }, [clearSession, stateQuery.error?.message]);
@@ -121,7 +124,7 @@ function IslandPage() {
 
   const questions = questionsQuery.data?.data?.questions || [];
   const preRoundQuestion = questions.find(q => q.type === 'PRE_ROUND');
-  const isPreRoundComplete = preRoundQuestion?.is_correct;
+  const isPreRoundComplete = preRoundQuestion?.is_correct || Number(preRoundQuestion?.incorrect_attempts || 0) > 0;
 
   const mainQuestions = questions.filter(q => q.type === 'MAIN');
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
@@ -148,6 +151,8 @@ function IslandPage() {
 
   // Override the local state if the user correctly answers the final question before the query refetches
   const isCurrentlyCompleted = isIslandCompleted || (answerMutation.data?.is_correct && !activeMainQuestion && island.slug !== 'lotus');
+
+  // The user must manually click 'Sail to Next Island' in QuestionConsole to progress
 
   return (
     <main className={`page-shell island-page ${island.themeClass}`}>
@@ -178,8 +183,8 @@ function IslandPage() {
               <LotusIslandUI 
                 mainQuestions={mainQuestions} 
                 activeMainQuestion={activeMainQuestion} 
+                onSelectQuestion={setSelectedQuestionId}
                 totalFailedAttempts={totalFailedAttempts}
-                onSelectQuestion={(id) => setSelectedQuestionId(id)}
               />
             )}
             {island.slug === 'cyclops' && (
@@ -187,6 +192,7 @@ function IslandPage() {
                 mainQuestions={mainQuestions}
                 activeMainQuestion={activeMainQuestion}
                 hasCyclopsEye={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'CYCLOPS_EYE')}
+                totalFailedAttempts={totalFailedAttempts}
               />
             )}
             {island.slug === 'sirens' && (

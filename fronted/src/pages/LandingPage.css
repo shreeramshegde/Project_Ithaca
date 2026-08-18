@@ -7,6 +7,13 @@
   pointer-events: none;
 }
 
+.video-cropper {
+  width: 100%;
+  height: 100%;
+  /* Zoom in to crop the edges where watermarks usually reside */
+  transform: scale(1.12);
+}
+
 .landing-video {
   width: 100%;
   height: 100%;
@@ -34,6 +41,26 @@
   pointer-events: none;
   background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.32) 100%);
   mix-blend-mode: multiply;
+}
+
+.watermark-cover {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+  padding: 30px 30px 25px 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.ieee-watermark-logo {
+  width: 90px;
+  height: auto;
+  opacity: 0.9;
+  /* Convert the blue SVG to white to match the center text */
+  filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
 .landing-content {

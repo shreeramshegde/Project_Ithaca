@@ -21,7 +21,7 @@ export function getStateForIsland(islandId, currentIsland) {
   return 'locked';
 }
 
-function OceanMap({ currentIsland, onIslandClick }) {
+function OceanMap({ currentIsland, traveledFrom, onIslandClick }) {
   // Build the list of nodes for the path and rendering
   const nodes = ISLANDS.map((island) => ({
     ...island,
@@ -39,14 +39,14 @@ function OceanMap({ currentIsland, onIslandClick }) {
             key={node.id}
             island={node}
             onClick={() => {
-              if (node.state !== 'locked') {
+              if (node.state === 'active') {
                 onIslandClick(node.slug);
               }
             }}
           />
         ))}
 
-        <PlayerShip nodes={nodes} currentIsland={currentIsland} />
+        <PlayerShip nodes={nodes} currentIsland={currentIsland} traveledFrom={traveledFrom} />
       </div>
       <IslandTooltip />
     </div>

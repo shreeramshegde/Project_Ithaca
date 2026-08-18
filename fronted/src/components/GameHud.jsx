@@ -22,7 +22,14 @@ function GameHud({ teamName, state, previousYears, flashValue }) {
         <div className="hud-meta">
           <div>
             <p className="eyebrow">Crew</p>
-            <h3>{teamName || 'Unnamed Crew'}</h3>
+            <h3 style={{ marginBottom: '8px' }}>{teamName || 'Unnamed Crew'}</h3>
+            <button 
+              onClick={onLogout}
+              className="action-button cinematic-button" 
+              style={{ padding: '4px 8px', fontSize: '0.8rem', border: '1px solid var(--danger)', color: 'var(--danger)', background: 'transparent' }}
+            >
+              Abandon Ship
+            </button>
           </div>
           <div>
             <p className="eyebrow">Hints</p>
