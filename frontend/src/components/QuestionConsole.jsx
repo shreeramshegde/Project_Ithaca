@@ -10,7 +10,7 @@ const INITIAL_MAIN = {
   answer_string: '',
 };
 
-function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, isCompleted, onNextIsland, preRoundQuestion, mainQuestion }) {
+function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, isCompleted, onNextIsland, preRoundQuestion, mainQuestion, disableRetry, eliminatedOption, sitOutRequired, onSitOutAcknowledge }) {
   const [preRoundAnswer, setPreRoundAnswer] = useState('');
   const [mainAnswer, setMainAnswer] = useState('');
 
@@ -90,6 +90,17 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                   PENALTY TRIAL ACTIVE
                 </p>
               )}
+              {sitOutRequired && (
+                <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(255, 60, 60, 0.2)', border: '1px solid var(--danger)', borderRadius: '8px' }}>
+                  <p style={{ color: 'var(--danger)', fontWeight: 'bold', marginBottom: '0.5rem' }}>⚠️ CIRCE'S CURSE TRIGGERED ⚠️</p>
+                  <p style={{ color: 'var(--cloud-white)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                    An incorrect answer has provoked Circe! One of your crew members has been transformed into a pig and must sit out this challenge.
+                  </p>
+                  <button onClick={onSitOutAcknowledge} className="action-button cinematic-button" style={{ width: '100%', borderColor: 'var(--danger)', color: 'var(--danger)' }}>
+                    Acknowledge Sit-Out
+                  </button>
+                </div>
+              )}
               <p style={{ opacity: 0.9, fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--cloud-white)' }}>
                 {mainQuestion.question_text}
               </p>
@@ -97,7 +108,7 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                 <div style={{ padding: '20px', background: 'rgba(7, 21, 38, 0.5)', borderRadius: '8px', border: '1px solid var(--success)', textAlign: 'center' }}>
                   <p style={{ color: 'var(--success)', margin: 0 }}>This trial has already been completed successfully.</p>
                 </div>
-              ) : mainQuestion.is_correct || Number(mainQuestion.incorrect_attempts || 0) > 0 ? (
+              ) : disableRetry && Number(mainQuestion.incorrect_attempts || 0) > 0 ? (
                 <div style={{ textAlign: 'center', marginTop: '2rem', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', borderRadius: '8px' }}>
                   <p style={{ color: 'var(--gold)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '1.2rem' }}>Attempt Sealed</p>
                   <p style={{ color: 'var(--cloud)', fontSize: '0.9rem' }}>The fates have recorded your answer for this trial.</p>
@@ -107,7 +118,9 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                   className="form-grid cinematic-form"
                   onSubmit={(event) => {
                     event.preventDefault();
-                    onSubmitAnswer({ question_id: mainQuestion.id, answer_string: mainAnswer });
+                    if (!sitOutRequired) {
+                      onSubmitAnswer({ question_id: mainQuestion.id, answer_string: mainAnswer });
+                    }
                   }}
                 >
                 {mainQuestion.options ? (
@@ -118,10 +131,18 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                       value={mainAnswer}
                       onChange={(e) => setMainAnswer(e.target.value)}
                       required
+                      disabled={sitOutRequired}
                     >
                       <option value="" disabled>Choose wisely...</option>
                       {mainQuestion.options.map((opt, i) => (
-                        <option key={i} value={opt}>{opt}</option>
+                        <option 
+                          key={i} 
+                          value={opt} 
+                          disabled={opt === eliminatedOption}
+                          style={{ textDecoration: opt === eliminatedOption ? 'line-through' : 'none', color: opt === eliminatedOption ? '#666' : 'inherit' }}
+                        >
+                          {opt} {opt === eliminatedOption ? '(Eliminated)' : ''}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -134,10 +155,11 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                       onChange={(e) => setMainAnswer(e.target.value)}
                       placeholder="Enter the team's response"
                       required
+                      disabled={sitOutRequired}
                     />
                   </div>
                 )}
-                <button className="action-button cinematic-button" type="submit" disabled={loading}>
+                <button className="action-button cinematic-button" type="submit" disabled={loading || sitOutRequired}>
                   {loading ? 'Submitting...' : 'Offer Answer'}
                 </button>
               </form>

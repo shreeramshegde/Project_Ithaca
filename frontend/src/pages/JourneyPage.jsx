@@ -65,7 +65,7 @@ function JourneyPage() {
       )}
 
       <OceanMap 
-        currentIsland={stateQuery.data?.data?.team?.current_island} 
+        currentIsland={stateQuery.data?.data?.team?.is_completed ? 5 : stateQuery.data?.data?.team?.current_island} 
         traveledFrom={traveledFrom}
         onIslandClick={handleIslandClick}
       />

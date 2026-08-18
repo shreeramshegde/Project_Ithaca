@@ -15,6 +15,7 @@ import LotusIslandUI from '../components/islands/LotusIslandUI.jsx';
 import CyclopsIslandUI from '../components/islands/CyclopsIslandUI.jsx';
 import SirensIslandUI from '../components/islands/SirensIslandUI.jsx';
 import WitchIslandUI from '../components/islands/WitchIslandUI.jsx';
+import IthacaIslandUI from '../components/islands/IthacaIslandUI.jsx';
 import '../journey-map.css';
 import '../island-ui.css';
 
@@ -27,6 +28,7 @@ function IslandPage() {
   const [feedback, setFeedback] = useState(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
   const [showRules, setShowRules] = useState(true);
+  const [sitOutRequired, setSitOutRequired] = useState(false);
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],
@@ -64,7 +66,12 @@ function IslandPage() {
 
   const answerMutation = useMutation({
     mutationFn: (payload) => submitAnswer(token, payload),
-    onSuccess: (payload) => onMutationSuccess('Answer processed', payload),
+    onSuccess: (payload) => {
+      onMutationSuccess('Answer processed', payload);
+      if (island?.slug === 'witch' && payload.is_correct === false) {
+        setSitOutRequired(true);
+      }
+    },
     onError: (error) => setFeedback({ kind: 'error', title: 'Submission failed', message: error.message }),
   });
 
@@ -100,6 +107,15 @@ function IslandPage() {
 
   const loading = preRoundMutation.isPending || answerMutation.isPending || hintMutation.isPending || rewardMutation.isPending || nextIslandMutation.isPending;
   const inventory = stateQuery.data?.data?.inventory || [];
+  const eliminatedOption = rewardMutation.data?.eliminated_option;
+
+  const handleRewardClick = (rewardType) => {
+    const payload = { reward_type: rewardType };
+    if (rewardType === 'CYCLOPS_EYE' && activeMainQuestion) {
+      payload.target_question_id = activeMainQuestion.id;
+    }
+    rewardMutation.mutate(payload);
+  };
 
   const isLocked = useMemo(() => {
     if (!island || !currentIsland) {
@@ -137,7 +153,7 @@ function IslandPage() {
   let isIslandCompleted = false;
 
   if (baseQuestions.length > 0) {
-    if (island.slug === 'lotus') {
+    if (island.slug === 'lotus' || island.slug === 'sirens') {
       activeMainQuestion = mainQuestions.find(q => q.id === selectedQuestionId) || null;
       isIslandCompleted = baseQuestions.every(q => q.is_correct) && unlockedPenaltyQuestions.every(q => q.is_correct);
     } else {
@@ -191,18 +207,26 @@ function IslandPage() {
               <CyclopsIslandUI
                 mainQuestions={mainQuestions}
                 activeMainQuestion={activeMainQuestion}
-                hasCyclopsEye={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'CYCLOPS_EYE')}
+                hasCyclopsEye={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'CYCLOPS_EYE' && !i.is_used)}
+                onEyeClick={() => handleRewardClick('CYCLOPS_EYE')}
                 totalFailedAttempts={totalFailedAttempts}
               />
             )}
             {island.slug === 'sirens' && (
-              <SirensIslandUI mainQuestions={mainQuestions} activeMainQuestion={activeMainQuestion} />
+              <SirensIslandUI 
+                mainQuestions={mainQuestions} 
+                activeMainQuestion={activeMainQuestion} 
+                onSelectQuestion={setSelectedQuestionId}
+                hasSandals={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'HERMES_SANDALS' && !i.is_used)}
+                onSandalsClick={() => handleRewardClick('HERMES_SANDALS')}
+              />
             )}
             {island.slug === 'witch' && (
-              <WitchIslandUI
-                mainQuestions={mainQuestions}
-                activeMainQuestion={activeMainQuestion}
-                hasSitOutPenalty={hasOutstandingPenalty}
+              <WitchIslandUI 
+                mainQuestions={mainQuestions} 
+                activeMainQuestion={activeMainQuestion} 
+                hasBlessing={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'THE_BLESSING' && !i.is_used)}
+                onBlessingClick={() => handleRewardClick('THE_BLESSING')}
               />
             )}
             {island.slug === 'ithaca' && (
@@ -217,13 +241,17 @@ function IslandPage() {
             <div id="question-console-area">
               <QuestionConsole
                 island={island}
-                loading={loading}
                 preRoundQuestion={!isPreRoundComplete ? preRoundQuestion : null}
                 mainQuestion={isPreRoundComplete ? activeMainQuestion : null}
-                onSubmitPreRound={(payload) => preRoundMutation.mutate(payload)}
-                onSubmitAnswer={(payload) => answerMutation.mutate(payload)}
+                loading={loading}
                 isCompleted={isCurrentlyCompleted}
                 onNextIsland={() => nextIslandMutation.mutate()}
+                onSubmitPreRound={(payload) => preRoundMutation.mutate(payload)}
+                onSubmitAnswer={(payload) => answerMutation.mutate(payload)}
+                disableRetry={island.slug === 'lotus' && activeMainQuestion?.sequence_number < 10}
+                eliminatedOption={eliminatedOption}
+                sitOutRequired={sitOutRequired}
+                onSitOutAcknowledge={() => setSitOutRequired(false)}
               />
             </div>
           )}

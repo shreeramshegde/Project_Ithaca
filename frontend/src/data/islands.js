@@ -35,6 +35,15 @@ export const ISLANDS = [
     themeClass: 'witch',
     pathLabel: 'Final gauntlet',
   },
+  {
+    id: 5,
+    slug: 'ithaca',
+    name: "Ithaca",
+    title: 'Home at Last',
+    blurb: 'The journey ends here. The Odyssey is complete.',
+    themeClass: 'ithaca',
+    pathLabel: 'Journey Complete',
+  }
 ];
 
 export const REWARD_LABELS = {

@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
 
-function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye, totalFailedAttempts = 0 }) {
-  const [eyeUsed, setEyeUsed] = useState(false);
-  
-  const handleEyeClick = () => {
-    setEyeUsed(true);
-  };
-
+function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye, onEyeClick }) {
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
   const penaltyQuestions = mainQuestions.filter(q => q.sequence_number >= 10);
-  const unlockedPenaltyQuestions = penaltyQuestions.slice(0, totalFailedAttempts);
+  const unlockedPenaltyQuestions = penaltyQuestions; // Not applicable on Cyclops really, but keep logic
   
   const allNodes = [...baseQuestions, ...unlockedPenaltyQuestions];
 
@@ -18,15 +12,14 @@ function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye
       {hasCyclopsEye && (
         <div className="cyclops-eye-action" style={{ marginBottom: '2rem' }}>
           <button 
-            className={`action-button cinematic-button ${eyeUsed ? 'completed' : ''}`} 
-            onClick={handleEyeClick}
-            disabled={eyeUsed}
+            className="action-button cinematic-button" 
+            onClick={onEyeClick}
             style={{ 
-              borderColor: eyeUsed ? 'var(--success)' : '#00f0ff', 
-              color: eyeUsed ? 'var(--success)' : '#00f0ff' 
+              borderColor: '#00f0ff', 
+              color: '#00f0ff' 
             }}
           >
-            {eyeUsed ? 'Eye of the Cyclops Used' : 'Use Cyclops Eye to Reveal Path'}
+            Use Cyclops Eye to Reveal Path
           </button>
         </div>
       )}
