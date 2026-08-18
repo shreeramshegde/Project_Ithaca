@@ -24,6 +24,20 @@ router.get('/state', gameController.getState);
 
 /**
  * @swagger
+ * /api/game/questions:
+ *   get:
+ *     summary: Get all questions for the team's current island
+ *     tags: [Game]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of questions for the current island
+ */
+router.get('/questions', gameController.getQuestions);
+
+/**
+ * @swagger
  * /api/game/submit-pre-round:
  *   post:
  *     summary: Submit pre-round GK MCQ
@@ -110,5 +124,19 @@ router.post('/use-hint', gameController.useHint);
  *         description: Reward activated
  */
 router.post('/use-reward', validate(useRewardSchema), gameController.useReward);
+
+/**
+ * @swagger
+ * /api/game/next-island:
+ *   post:
+ *     summary: Progress team to the next island
+ *     tags: [Game]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Sailed to next island or finished game
+ */
+router.post('/next-island', gameController.nextIsland);
 
 module.exports = router;

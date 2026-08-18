@@ -47,7 +47,47 @@ const adjustYears = async (req, res) => {
   }
 };
 
+const getQuestions = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM questions ORDER BY island_id ASC, sequence_number ASC');
+    return res.status(200).json({ status: 'success', data: result.rows });
+  } catch (err) {
+    console.error('Error fetching questions:', err);
+    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+};
+
+const addQuestion = async (req, res) => {
+  const { 
+    island_id, type, format, question_text, hint_text, 
+    options, correct_answer, hidden_wrong_answer, 
+    reward_years, penalty_years, difficulty_level, sequence_number
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO questions (
+        island_id, type, format, question_text, hint_text, options, 
+        correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+      [island_id, type, format, question_text, hint_text, options ? JSON.stringify(options) : null, 
+       correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number || 0]
+    );
+
+    return res.status(201).json({
+      status: 'success',
+      message: 'Question added successfully',
+      data: result.rows[0]
+    });
+  } catch (err) {
+    console.error('Error adding question:', err);
+    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+};
+
 module.exports = {
   getLeaderboard,
-  adjustYears
+  adjustYears,
+  getQuestions,
+  addQuestion
 };
