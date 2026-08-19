@@ -60,15 +60,29 @@ function IslandPage() {
 
   const preRoundMutation = useMutation({
     mutationFn: (payload) => submitPreRound(token, payload),
-    onSuccess: (payload) => onMutationSuccess('Pre-round processed', payload),
+    onSuccess: (payload) => {
+      const isCorrect = payload?.is_correct;
+      setFeedback({
+        kind: isCorrect ? 'success' : 'error',
+        title: isCorrect ? 'Ritual Sealed (Correct)' : 'Ritual Completed (Incorrect)',
+        message: payload?.message || (isCorrect ? 'You earned a divine artifact!' : 'Penalty applied, but the gateway has opened.'),
+      });
+      refreshState();
+    },
     onError: (error) => setFeedback({ kind: 'error', title: 'Pre-round failed', message: error.message }),
   });
 
   const answerMutation = useMutation({
     mutationFn: (payload) => submitAnswer(token, payload),
     onSuccess: (payload) => {
-      onMutationSuccess('Answer processed', payload);
-      if (island?.slug === 'witch' && payload.is_correct === false) {
+      const isCorrect = payload?.is_correct;
+      setFeedback({
+        kind: isCorrect ? 'success' : 'error',
+        title: isCorrect ? 'Trial Completed (Correct)' : 'Trial Sealed (Incorrect)',
+        message: payload?.message || (isCorrect ? 'Correct! Years deducted from your journey.' : 'Incorrect! Penalty applied to your voyage.'),
+      });
+      refreshState();
+      if (island?.slug === 'witch' && payload?.is_correct === false) {
         setSitOutRequired(true);
       }
     },
@@ -78,7 +92,12 @@ function IslandPage() {
   const nextIslandMutation = useMutation({
     mutationFn: () => nextIsland(token),
     onSuccess: (payload) => {
-      onMutationSuccess('Journey Continues', payload);
+      setFeedback({
+        kind: 'success',
+        title: 'Voyage Continues',
+        message: payload?.message || 'Setting sail to the next island!',
+      });
+      refreshState();
       setTimeout(() => {
         navigate('/journey', { state: { traveledFrom: currentIsland } });
       }, 1500);
@@ -87,12 +106,12 @@ function IslandPage() {
   });
 
   const hintMutation = useMutation({
-    mutationFn: () => useHint(token),
+    mutationFn: (payload) => useHint(token, payload),
     onSuccess: (payload) => {
       setFeedback({
         kind: 'info',
-        title: 'Hint received',
-        message: payload?.hint || payload?.message || 'A hint was returned by the backend.',
+        title: 'Divine Hint Received',
+        message: payload?.hint || payload?.message || 'A hint was revealed by the fates.',
       });
       refreshState();
     },
@@ -101,7 +120,14 @@ function IslandPage() {
 
   const rewardMutation = useMutation({
     mutationFn: (payload) => useReward(token, payload),
-    onSuccess: (payload) => onMutationSuccess('Reward activated', payload),
+    onSuccess: (payload) => {
+      setFeedback({
+        kind: 'info',
+        title: 'Artifact Invoked',
+        message: payload?.message || payload?.hint || 'The artifact has granted its power.',
+      });
+      refreshState();
+    },
     onError: (error) => setFeedback({ kind: 'error', title: 'Reward unavailable', message: error.message }),
   });
 
@@ -140,35 +166,47 @@ function IslandPage() {
 
   const questions = questionsQuery.data?.data?.questions || [];
   const preRoundQuestion = questions.find(q => q.type === 'PRE_ROUND');
-  const isPreRoundComplete = !preRoundQuestion || preRoundQuestion.is_correct || Number(preRoundQuestion.incorrect_attempts || 0) > 0;
+  const isPreRoundComplete = !preRoundQuestion || (preRoundQuestion.progress_status !== null && preRoundQuestion.progress_status !== undefined);
 
   const mainQuestions = questions.filter(q => q.type === 'MAIN');
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
   const penaltyQuestions = mainQuestions.filter(q => q.sequence_number >= 10);
 
-  const totalFailedAttempts = mainQuestions.reduce((acc, q) => acc + Number(q.incorrect_attempts || 0), 0);
+  const totalFailedAttempts = mainQuestions.reduce((acc, q) => acc + (q.progress_status === 'INCORRECT' ? 1 : 0), 0);
   const unlockedPenaltyQuestions = penaltyQuestions.slice(0, totalFailedAttempts);
 
   let activeMainQuestion = null;
   let isIslandCompleted = false;
 
-  if (baseQuestions.length > 0) {
-    if (island.slug === 'lotus' || island.slug === 'sirens') {
-      activeMainQuestion = mainQuestions.find(q => q.id === selectedQuestionId) || null;
-      isIslandCompleted = baseQuestions.every(q => q.is_correct) && unlockedPenaltyQuestions.every(q => q.is_correct);
-    } else {
-      activeMainQuestion = baseQuestions.find(q => !q.is_correct);
-      if (!activeMainQuestion && unlockedPenaltyQuestions.length > 0) {
-        activeMainQuestion = unlockedPenaltyQuestions.find(q => !q.is_correct);
+  if (mainQuestions.length > 0) {
+    if (island.slug === 'lotus') {
+      if (selectedQuestionId) {
+        activeMainQuestion = mainQuestions.find(q => q.id === selectedQuestionId) || null;
       }
-      isIslandCompleted = baseQuestions.every(q => q.is_correct) && unlockedPenaltyQuestions.every(q => q.is_correct);
+      if (!activeMainQuestion) {
+        activeMainQuestion = baseQuestions.find(q => q.progress_status === null) 
+          || unlockedPenaltyQuestions.find(q => q.progress_status === null) 
+          || baseQuestions[0] 
+          || null;
+      }
+      
+      const allBaseAttempted = baseQuestions.length > 0 && baseQuestions.every(q => q.progress_status !== null);
+      const allPenaltyAttempted = unlockedPenaltyQuestions.length === 0 || unlockedPenaltyQuestions.every(q => q.progress_status !== null);
+      isIslandCompleted = allBaseAttempted && allPenaltyAttempted;
+    } else {
+      if (selectedQuestionId) {
+        activeMainQuestion = mainQuestions.find(q => q.id === selectedQuestionId) || null;
+      }
+      if (!activeMainQuestion) {
+        activeMainQuestion = mainQuestions.find(q => q.progress_status === null) || mainQuestions[mainQuestions.length - 1] || null;
+      }
+
+      isIslandCompleted = mainQuestions.every(q => q.progress_status !== null);
     }
   }
 
-  // Override the local state if the user correctly answers the final question before the query refetches
-  const isCurrentlyCompleted = isIslandCompleted || (answerMutation.data?.is_correct && !activeMainQuestion && island.slug !== 'lotus');
-
-  // The user must manually click 'Sail to Next Island' in QuestionConsole to progress
+  // Allow sailing if completed
+  const isCurrentlyCompleted = isIslandCompleted;
 
   return (
     <main className={`page-shell island-page ${island.themeClass}`}>
@@ -192,48 +230,57 @@ function IslandPage() {
             </Link>
           </header>
 
-          <FeedbackBanner result={feedback} />
+          <FeedbackBanner result={feedback} onClose={() => setFeedback(null)} />
 
           <div style={{ display: 'flex', justifyContent: 'center', margin: '40px 0' }}>
-            {island.slug === 'lotus' && (
-              <LotusIslandUI 
-                mainQuestions={mainQuestions} 
-                activeMainQuestion={activeMainQuestion} 
-                onSelectQuestion={setSelectedQuestionId}
-                totalFailedAttempts={totalFailedAttempts}
-              />
-            )}
-            {island.slug === 'cyclops' && (
-              <CyclopsIslandUI
-                mainQuestions={mainQuestions}
-                activeMainQuestion={activeMainQuestion}
-                hasCyclopsEye={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'CYCLOPS_EYE' && !i.is_used)}
-                onEyeClick={() => handleRewardClick('CYCLOPS_EYE')}
-                totalFailedAttempts={totalFailedAttempts}
-              />
-            )}
-            {island.slug === 'sirens' && (
-              <SirensIslandUI 
-                mainQuestions={mainQuestions} 
-                activeMainQuestion={activeMainQuestion} 
-                onSelectQuestion={setSelectedQuestionId}
-                hasSandals={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'HERMES_SANDALS' && !i.is_used)}
-                onSandalsClick={() => handleRewardClick('HERMES_SANDALS')}
-              />
-            )}
-            {island.slug === 'witch' && (
-              <WitchIslandUI 
-                mainQuestions={mainQuestions} 
-                activeMainQuestion={activeMainQuestion} 
-                hasBlessing={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'THE_BLESSING' && !i.is_used)}
-                onBlessingClick={() => handleRewardClick('THE_BLESSING')}
-              />
-            )}
-            {island.slug === 'ithaca' && (
+            {!isPreRoundComplete ? (
               <div style={{ textAlign: 'center', color: 'var(--cloud-white)' }}>
-                <h2 style={{ fontFamily: 'var(--display)' }}>Welcome Home</h2>
-                <p>The journey is complete.</p>
+                <h2 style={{ fontFamily: 'var(--display)', color: 'var(--gold)' }}>The Gateway is Closed</h2>
+                <p>You must complete the Pre-Round Trial below to reveal the path ahead.</p>
               </div>
+            ) : (
+              <>
+                {island.slug === 'lotus' && (
+                  <LotusIslandUI 
+                    mainQuestions={mainQuestions} 
+                    activeMainQuestion={activeMainQuestion} 
+                    onSelectQuestion={setSelectedQuestionId}
+                    totalFailedAttempts={totalFailedAttempts}
+                  />
+                )}
+                {island.slug === 'cyclops' && (
+                  <CyclopsIslandUI
+                    mainQuestions={mainQuestions}
+                    activeMainQuestion={activeMainQuestion}
+                    hasCyclopsEye={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'CYCLOPS_EYE' && !i.is_used)}
+                    onEyeClick={() => handleRewardClick('CYCLOPS_EYE')}
+                    totalFailedAttempts={totalFailedAttempts}
+                  />
+                )}
+                {island.slug === 'sirens' && (
+                  <SirensIslandUI 
+                    mainQuestions={mainQuestions} 
+                    activeMainQuestion={activeMainQuestion} 
+                    onSelectQuestion={setSelectedQuestionId}
+                    hasSandals={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'HERMES_SANDALS' && !i.is_used)}
+                    onSandalsClick={() => handleRewardClick('HERMES_SANDALS')}
+                  />
+                )}
+                {island.slug === 'witch' && (
+                  <WitchIslandUI 
+                    mainQuestions={mainQuestions} 
+                    activeMainQuestion={activeMainQuestion} 
+                    hasBlessing={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'THE_BLESSING' && !i.is_used)}
+                    onBlessingClick={() => handleRewardClick('THE_BLESSING')}
+                  />
+                )}
+                {island.slug === 'ithaca' && (
+                  <div style={{ textAlign: 'center', color: 'var(--cloud-white)' }}>
+                    <h2 style={{ fontFamily: 'var(--display)' }}>Welcome Home</h2>
+                    <p>The journey is complete.</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -248,7 +295,6 @@ function IslandPage() {
                 onNextIsland={() => nextIslandMutation.mutate()}
                 onSubmitPreRound={(payload) => preRoundMutation.mutate(payload)}
                 onSubmitAnswer={(payload) => answerMutation.mutate(payload)}
-                disableRetry={island.slug === 'lotus' && activeMainQuestion?.sequence_number < 10}
                 eliminatedOption={eliminatedOption}
                 sitOutRequired={sitOutRequired}
                 onSitOutAcknowledge={() => setSitOutRequired(false)}
@@ -259,8 +305,10 @@ function IslandPage() {
           <RewardPanel
             inventory={stateQuery.data?.data?.inventory}
             loading={loading}
-            onUseHint={() => hintMutation.mutate()}
+            onUseHint={(payload) => hintMutation.mutate(payload)}
             onUseReward={(payload) => rewardMutation.mutate(payload)}
+            activeMainQuestion={activeMainQuestion}
+            questions={questions}
           />
         </section>
       </div>

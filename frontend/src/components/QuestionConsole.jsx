@@ -1,25 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const INITIAL_PRE_ROUND = {
-  question_id: '',
-  selected_option: '',
-};
-
-const INITIAL_MAIN = {
-  question_id: '',
-  answer_string: '',
-};
-
-function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, isCompleted, onNextIsland, preRoundQuestion, mainQuestion, disableRetry, eliminatedOption, sitOutRequired, onSitOutAcknowledge }) {
+function QuestionConsole({ 
+  island, 
+  onSubmitPreRound, 
+  onSubmitAnswer, 
+  loading, 
+  isCompleted, 
+  onNextIsland, 
+  preRoundQuestion, 
+  mainQuestion, 
+  eliminatedOption, 
+  sitOutRequired, 
+  onSitOutAcknowledge 
+}) {
   const [preRoundAnswer, setPreRoundAnswer] = useState('');
   const [mainAnswer, setMainAnswer] = useState('');
+
+  // Clear answers when switching questions
+  useEffect(() => {
+    setMainAnswer('');
+  }, [mainQuestion?.id]);
+
+  useEffect(() => {
+    setPreRoundAnswer('');
+  }, [preRoundQuestion?.id]);
+
+  const isMainAnswered = mainQuestion?.progress_status !== null && mainQuestion?.progress_status !== undefined;
+  const isMainCorrect = mainQuestion?.progress_status === 'CORRECT';
+  const isMainIncorrect = mainQuestion?.progress_status === 'INCORRECT';
 
   return (
     <div className="question-console-grid">
       {preRoundQuestion && (
         <section className="surface-panel console-card question-marker cinematic-panel">
           <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Pre-round Ritual</p>
-          <h3 style={{ fontFamily: 'var(--display)', fontSize: '1.5rem', marginBottom: '1rem' }}>{island.name} Trial</h3>
+          <h3 style={{ fontFamily: 'var(--display)', fontSize: '1.5rem', marginBottom: '1rem' }}>{island?.name} Trial</h3>
           <p style={{ opacity: 0.9, fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--cloud-white)' }}>
             {preRoundQuestion.question_text}
           </p>
@@ -57,7 +72,7 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                 />
               </div>
             )}
-            <button className="action-button cinematic-button" type="submit" disabled={loading}>
+            <button className="action-button cinematic-button" type="submit" disabled={loading || !preRoundAnswer}>
               {loading ? 'Communing...' : 'Seal Choice'}
             </button>
           </form>
@@ -73,30 +88,36 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
         </section>
       )}
 
-      {(mainQuestion || isCompleted) && (
+      {(!preRoundQuestion && (mainQuestion || isCompleted)) && (
         <section className="surface-panel console-card question-marker cinematic-panel">
           <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Main Trial Console</p>
-          <h3 style={{ fontFamily: 'var(--display)', fontSize: '1.5rem', marginBottom: '1rem' }}>{island.pathLabel}</h3>
+          <h3 style={{ fontFamily: 'var(--display)', fontSize: '1.5rem', marginBottom: '1rem' }}>
+            {mainQuestion ? `Question ${mainQuestion.sequence_number || ''}` : (island?.pathLabel || 'Island Trials')}
+          </h3>
 
           {isCompleted ? (
-            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-              <p style={{ color: 'var(--success)', marginBottom: '1.5rem', fontSize: '1.2rem' }}>
-                The guardians are appeased. The path is clear.
+            <div style={{ marginTop: '1rem', textAlign: 'center', padding: '1.5rem', background: 'rgba(7, 21, 38, 0.6)', borderRadius: '12px', border: '1px solid rgba(137, 171, 118, 0.5)' }}>
+              <div style={{ color: 'var(--success)', fontSize: '2rem', marginBottom: '0.5rem' }}>✓</div>
+              <h4 style={{ fontFamily: 'var(--display)', color: 'var(--success)', fontSize: '1.4rem', margin: '0 0 0.5rem 0' }}>
+                All Island Trials Completed
+              </h4>
+              <p style={{ color: 'var(--cloud-white)', marginBottom: '1.5rem', fontSize: '1.05rem' }}>
+                The trials of this island are fulfilled. The tides are in your favor to continue the voyage.
               </p>
               <button
                 className="action-button cinematic-button"
                 onClick={onNextIsland}
                 disabled={loading}
-                style={{ width: '100%', borderColor: 'var(--success)', color: 'var(--success)' }}
+                style={{ width: '100%', borderColor: 'var(--success)', color: 'var(--success)', fontSize: '1.1rem', padding: '14px' }}
               >
-                {loading ? 'Sailing...' : 'Sail to Next Island'}
+                {loading ? 'Sailing to Next Island...' : '⛵ Sail to Next Island'}
               </button>
             </div>
           ) : (
             <>
-              {mainQuestion.sequence_number >= 10 && (
+              {mainQuestion?.sequence_number >= 10 && (
                 <p style={{ color: 'var(--danger)', marginBottom: '1rem', fontWeight: 'bold' }}>
-                  PENALTY TRIAL ACTIVE
+                  ⚠️ PENALTY TRIAL ACTIVE
                 </p>
               )}
               {sitOutRequired && (
@@ -110,29 +131,33 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                   </button>
                 </div>
               )}
-              <p style={{ opacity: 0.9, fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--cloud-white)' }}>
-                {mainQuestion.question_text}
+              
+              <p style={{ opacity: 0.95, fontSize: '1.15rem', marginBottom: '1.5rem', color: 'var(--cloud-white)', lineHeight: '1.6' }}>
+                {mainQuestion?.question_text}
               </p>
-              {mainQuestion.is_correct ? (
-                <div style={{ padding: '20px', background: 'rgba(7, 21, 38, 0.5)', borderRadius: '8px', border: '1px solid var(--success)', textAlign: 'center' }}>
-                  <p style={{ color: 'var(--success)', margin: 0 }}>This trial has already been completed successfully.</p>
+
+              {isMainCorrect ? (
+                <div style={{ padding: '20px', background: 'rgba(7, 21, 38, 0.6)', borderRadius: '8px', border: '1px solid var(--success)', textAlign: 'center' }}>
+                  <span style={{ color: 'var(--success)', fontSize: '1.5rem', display: 'block', marginBottom: '5px' }}>✓</span>
+                  <p style={{ color: 'var(--success)', margin: 0, fontWeight: 'bold' }}>This trial has been completed successfully.</p>
                 </div>
-              ) : disableRetry && Number(mainQuestion.incorrect_attempts || 0) > 0 ? (
-                <div style={{ textAlign: 'center', marginTop: '2rem', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', borderRadius: '8px' }}>
-                  <p style={{ color: 'var(--gold)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '1.2rem' }}>Attempt Sealed</p>
-                  <p style={{ color: 'var(--cloud)', fontSize: '0.9rem' }}>The fates have recorded your answer for this trial.</p>
+              ) : isMainIncorrect ? (
+                <div style={{ textAlign: 'center', padding: '20px', border: '1px solid rgba(255, 60, 60, 0.4)', background: 'rgba(255, 60, 60, 0.1)', borderRadius: '8px' }}>
+                  <span style={{ color: 'var(--danger)', fontSize: '1.5rem', display: 'block', marginBottom: '5px' }}>✕</span>
+                  <p style={{ color: 'var(--danger)', marginBottom: '0.3rem', fontWeight: 'bold', fontSize: '1.1rem' }}>Attempt Sealed (Incorrect)</p>
+                  <p style={{ color: 'var(--cloud)', fontSize: '0.9rem', margin: 0 }}>This trial has already been attempted. Move on to the remaining trials.</p>
                 </div>
               ) : (
                 <form
                   className="form-grid cinematic-form"
                   onSubmit={(event) => {
                     event.preventDefault();
-                    if (!sitOutRequired) {
+                    if (!sitOutRequired && mainAnswer) {
                       onSubmitAnswer({ question_id: mainQuestion.id, answer_string: mainAnswer });
                     }
                   }}
                 >
-                  {mainQuestion.options ? (
+                  {mainQuestion?.options ? (
                     <div className="field">
                       <label>Select your answer</label>
                       <select
@@ -140,7 +165,7 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                         value={mainAnswer}
                         onChange={(e) => setMainAnswer(e.target.value)}
                         required
-                        disabled={sitOutRequired}
+                        disabled={sitOutRequired || loading}
                       >
                         <option value="" disabled>Choose wisely...</option>
                         {mainQuestion.options.map((opt, i) => (
@@ -164,11 +189,11 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                         onChange={(e) => setMainAnswer(e.target.value)}
                         placeholder="Enter the team's response"
                         required
-                        disabled={sitOutRequired}
+                        disabled={sitOutRequired || loading}
                       />
                     </div>
                   )}
-                  <button className="action-button cinematic-button" type="submit" disabled={loading || sitOutRequired}>
+                  <button className="action-button cinematic-button" type="submit" disabled={loading || sitOutRequired || !mainAnswer}>
                     {loading ? 'Submitting...' : 'Offer Answer'}
                   </button>
                 </form>

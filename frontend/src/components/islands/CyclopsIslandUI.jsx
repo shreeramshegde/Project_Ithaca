@@ -33,9 +33,9 @@ function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye
       }}>
         {allNodes.map((q, index) => {
           let statusClass = '';
-          if (q.is_correct) statusClass = 'completed';
+          if (q.progress_status === 'CORRECT') statusClass = 'completed';
           else if (q.id === activeMainQuestion?.id) statusClass = 'selected active';
-          else if (Number(q.incorrect_attempts || 0) > 0) statusClass = 'failed';
+          else if (q.progress_status === 'INCORRECT') statusClass = 'failed';
 
           const isPenalty = q.sequence_number >= 10;
 
@@ -54,10 +54,10 @@ function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye
                 justifyContent: 'center',
                 background: statusClass === 'selected active' ? 'rgba(198,165,106,0.1)' : 'rgba(0,0,0,0.4)',
                 boxShadow: statusClass === 'selected active' ? '0 0 15px rgba(198,165,106,0.4)' : 'none',
-                opacity: (statusClass === '' && !hasCyclopsEye && index > 0 && !allNodes[index-1].is_correct) ? 0.3 : 1
+                opacity: (statusClass === '' && !hasCyclopsEye && index > 0 && allNodes[index-1].progress_status !== 'CORRECT') ? 0.3 : 1
               }}
             >
-              {hasCyclopsEye && !q.is_correct && statusClass !== 'failed' ? (
+              {hasCyclopsEye && q.progress_status !== 'CORRECT' && statusClass !== 'failed' ? (
                 <div style={{ color: '#00f0ff', fontSize: '1.5rem', marginBottom: '5px' }}>👁</div>
               ) : (
                 <div style={{ color: statusClass === 'completed' ? 'var(--success)' : statusClass === 'failed' ? 'var(--danger)' : '#888', fontSize: '1.5rem', marginBottom: '5px' }}>

@@ -19,9 +19,9 @@ function LotusIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
     }}>
       {allNodes.map((q, index) => {
         let statusClass = '';
-        if (q.is_correct) statusClass = 'completed';
+        if (q.progress_status === 'CORRECT') statusClass = 'completed';
         else if (q.id === activeMainQuestion?.id) statusClass = 'selected active';
-        else if (q.incorrect_attempts > 0) statusClass = 'failed';
+        else if (q.progress_status === 'INCORRECT') statusClass = 'failed';
 
         const isPenalty = q.sequence_number >= 10;
 

@@ -34,10 +34,11 @@ export function submitAnswer(token, payload) {
   });
 }
 
-export function useHint(token) {
+export function useHint(token, payload) {
   return request('/api/game/use-hint', {
     method: 'POST',
     headers: withToken(token),
+    body: JSON.stringify(payload || {}),
   });
 }
 
