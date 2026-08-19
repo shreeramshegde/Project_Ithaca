@@ -137,7 +137,7 @@ function IslandPage() {
 
   const handleRewardClick = (rewardType) => {
     const payload = { reward_type: rewardType };
-    if (rewardType === 'CYCLOPS_EYE' && activeMainQuestion) {
+    if ((rewardType === 'CYCLOPS_EYE' || rewardType === 'ATHENAS_SCROLL') && activeMainQuestion) {
       payload.target_question_id = activeMainQuestion.id;
     }
     rewardMutation.mutate(payload);
@@ -169,8 +169,8 @@ function IslandPage() {
   const isPreRoundComplete = !preRoundQuestion || (preRoundQuestion.progress_status !== null && preRoundQuestion.progress_status !== undefined);
 
   const mainQuestions = questions.filter(q => q.type === 'MAIN');
-  const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
-  const penaltyQuestions = mainQuestions.filter(q => q.sequence_number >= 10);
+  const baseQuestions = mainQuestions.filter(q => q.sequence_number <= 4);
+  const penaltyQuestions = mainQuestions.filter(q => q.sequence_number > 4);
 
   const totalFailedAttempts = mainQuestions.reduce((acc, q) => acc + (q.progress_status === 'INCORRECT' ? 1 : 0), 0);
   const unlockedPenaltyQuestions = penaltyQuestions.slice(0, totalFailedAttempts);
@@ -220,23 +220,51 @@ function IslandPage() {
         />
 
         <section className="journey-main">
-          <header className="island-hero">
-            <div>
-              <h1 className="display-title">{island.title}</h1>
-              <p className="eyebrow">Island {island.id} of 5</p>
+          <header className="island-hero-cinematic">
+            <div className="island-hero-content">
+              <div>
+                <div className="island-hero-meta">
+                  <span className="island-badge-pill">
+                    🔱 Island {island.id} of 5
+                  </span>
+                  <span className={`island-status-pill ${isCurrentlyCompleted ? 'completed' : 'active'}`}>
+                    {isCurrentlyCompleted ? '✓ Conquered' : '⚔ In Progress'}
+                  </span>
+                </div>
+                <h1 className="island-hero-title">{island.title}</h1>
+                <p className="island-hero-lore">
+                  {island.summary || island.subtitle || 'Solve the sacred inscriptions and trials to shorten your voyage.'}
+                </p>
+              </div>
+
+              <div className="island-hero-actions">
+                <button 
+                  type="button"
+                  className="hero-action-btn"
+                  onClick={() => setShowRules(true)}
+                  title="Review the laws and lore of this island"
+                >
+                  📜 Island Rules
+                </button>
+                <Link to="/journey" className="hero-action-btn">
+                  🗺️ Voyage Map
+                </Link>
+              </div>
             </div>
-            <Link to="/journey" className="ghost-button cinematic-button">
-              ← View Map
-            </Link>
           </header>
 
           <FeedbackBanner result={feedback} onClose={() => setFeedback(null)} />
 
-          <div style={{ display: 'flex', justifyContent: 'center', margin: '40px 0' }}>
+          <div style={{ margin: '10px 0 20px 0' }}>
             {!isPreRoundComplete ? (
-              <div style={{ textAlign: 'center', color: 'var(--cloud-white)' }}>
-                <h2 style={{ fontFamily: 'var(--display)', color: 'var(--gold)' }}>The Gateway is Closed</h2>
-                <p>You must complete the Pre-Round Trial below to reveal the path ahead.</p>
+              <div className="trials-chamber" style={{ textAlign: 'center', padding: '36px 20px' }}>
+                <div style={{ fontSize: '2.5rem', color: 'var(--gold)', marginBottom: '8px' }}>⛩️</div>
+                <h3 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', fontSize: '1.4rem', margin: '0 0 8px 0' }}>
+                  The Gateway to {island.title} is Sealed
+                </h3>
+                <p style={{ color: 'rgba(231, 229, 221, 0.8)', maxWidth: '520px', margin: '0 auto', fontSize: '0.95rem' }}>
+                  Complete the Oracle's Pre-Round Ritual in the console below to earn a divine artifact and reveal the main trials.
+                </p>
               </div>
             ) : (
               <>
@@ -246,12 +274,15 @@ function IslandPage() {
                     activeMainQuestion={activeMainQuestion} 
                     onSelectQuestion={setSelectedQuestionId}
                     totalFailedAttempts={totalFailedAttempts}
+                    hasAthenasScroll={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'ATHENAS_SCROLL' && !i.is_used)}
+                    onScrollClick={() => handleRewardClick('ATHENAS_SCROLL')}
                   />
                 )}
                 {island.slug === 'cyclops' && (
                   <CyclopsIslandUI
                     mainQuestions={mainQuestions}
                     activeMainQuestion={activeMainQuestion}
+                    onSelectQuestion={setSelectedQuestionId}
                     hasCyclopsEye={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'CYCLOPS_EYE' && !i.is_used)}
                     onEyeClick={() => handleRewardClick('CYCLOPS_EYE')}
                     totalFailedAttempts={totalFailedAttempts}
@@ -270,6 +301,7 @@ function IslandPage() {
                   <WitchIslandUI 
                     mainQuestions={mainQuestions} 
                     activeMainQuestion={activeMainQuestion} 
+                    onSelectQuestion={setSelectedQuestionId}
                     hasBlessing={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'THE_BLESSING' && !i.is_used)}
                     onBlessingClick={() => handleRewardClick('THE_BLESSING')}
                   />

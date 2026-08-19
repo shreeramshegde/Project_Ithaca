@@ -1,8 +1,34 @@
 import { useEffect, useMemo, useState } from 'react';
 import { REWARD_LABELS } from '../data/islands.js';
 
-function RewardPanel({ inventory, onUseHint, onUseReward, loading, activeMainQuestion, questions = [] }) {
-  const [rewardType, setRewardType] = useState(inventory?.[0]?.reward_type || 'ATHENAS_SCROLL');
+const ARTIFACT_INFO = {
+  ATHENAS_SCROLL: {
+    icon: '📜',
+    title: "Athena's Scroll",
+    description: 'Bestows divine strategic wisdom upon your chosen trial.',
+    targetRequired: true,
+  },
+  CYCLOPS_EYE: {
+    icon: '👁',
+    title: "Cyclops' Eye",
+    description: 'Pierces through illusions to eliminate one wrong path on a multiple-choice trial.',
+    targetRequired: true,
+  },
+  HERMES_SANDALS: {
+    icon: '🪽',
+    title: "Hermes' Sandals",
+    description: 'Fleet-footed talismans that bypass Sirens delays, deducting 2 years from your voyage.',
+    targetRequired: false,
+  },
+  THE_BLESSING: {
+    icon: '✨',
+    title: 'The Blessing of Troy',
+    description: 'Divine grace that shields your crew from Circe and deducts 3 years.',
+    targetRequired: false,
+  },
+};
+
+function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMainQuestion, questions = [] }) {
   const [selectedTargetId, setSelectedTargetId] = useState(activeMainQuestion?.id || '');
 
   const availableMainQuestions = useMemo(() => {
@@ -17,24 +43,9 @@ function RewardPanel({ inventory, onUseHint, onUseReward, loading, activeMainQue
     }
   }, [activeMainQuestion, availableMainQuestions, selectedTargetId]);
 
-  const options = useMemo(() => {
-    if (!inventory?.length) {
-      return [];
-    }
-
-    return inventory.map((item) => ({
-      value: item.reward_type,
-      label: REWARD_LABELS[item.reward_type] || item.reward_type,
-    }));
+  const activeInventory = useMemo(() => {
+    return inventory.filter(item => !item.is_used);
   }, [inventory]);
-
-  useEffect(() => {
-    if (options.length > 0 && !options.some((option) => option.value === rewardType)) {
-      setRewardType(options[0]?.value);
-    }
-  }, [options, rewardType]);
-
-  const needsTargetQuestion = rewardType === 'ATHENAS_SCROLL' || rewardType === 'CYCLOPS_EYE';
 
   const handleHintClick = () => {
     const targetId = activeMainQuestion?.id || selectedTargetId || availableMainQuestions[0]?.id;
@@ -45,12 +56,11 @@ function RewardPanel({ inventory, onUseHint, onUseReward, loading, activeMainQue
     }
   };
 
-  const handleRewardSubmit = (event) => {
-    event.preventDefault();
-    const payload = {
-      reward_type: rewardType,
-    };
-    if (needsTargetQuestion) {
+  const handleInvokeArtifact = (rewardType) => {
+    const info = ARTIFACT_INFO[rewardType];
+    const payload = { reward_type: rewardType };
+
+    if (info?.targetRequired) {
       const targetId = activeMainQuestion?.id || selectedTargetId || availableMainQuestions[0]?.id;
       if (targetId) {
         payload.target_question_id = targetId;
@@ -60,67 +70,101 @@ function RewardPanel({ inventory, onUseHint, onUseReward, loading, activeMainQue
   };
 
   return (
-    <section className="surface-panel reward-panel cinematic-panel">
-      <div style={{ marginBottom: '20px' }}>
-        <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Hints and Artifacts</p>
-        <h3 style={{ fontFamily: 'var(--display)' }}>Use Divine Favor</h3>
+    <section className="console-card-cinematic" style={{ marginTop: '20px' }}>
+      <div className="console-header-badge">
+        <span className="console-kind-pill">Divine Reliquary & Auguries</span>
+        <span className="trials-stats-badge">
+          {activeInventory.length} Artifact{activeInventory.length !== 1 ? 's' : ''} Ready
+        </span>
       </div>
-      <div className="reward-actions cinematic-form">
-        <button 
-          type="button" 
-          className="secondary-button cinematic-button" 
-          onClick={handleHintClick} 
-          disabled={loading || (!activeMainQuestion && availableMainQuestions.length === 0)}
-        >
-          {loading ? 'Requesting...' : `Use Standard Hint ${activeMainQuestion ? `(Q${activeMainQuestion.sequence_number || 1})` : ''}`}
-        </button>
-        
-        <div style={{ margin: '20px 0', borderTop: '1px solid rgba(198,165,106,0.1)' }} />
 
-        {options.length === 0 ? (
-          <p style={{ color: 'var(--cloud)', fontSize: '0.9rem', fontStyle: 'italic' }}>
-            No divine artifacts currently in your inventory. Complete pre-round trials to earn artifacts.
-          </p>
-        ) : (
-          <form className="reward-form" onSubmit={handleRewardSubmit}>
-            <div className="field">
-              <label htmlFor="reward-type">Artifact to use</label>
-              <select 
-                id="reward-type" 
-                className="cinematic-input"
-                value={rewardType} 
-                onChange={(event) => setRewardType(event.target.value)}
-              >
-                {options.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '16px' }}>
+        {/* ORACLE HINT CARD */}
+        <div style={{
+          background: 'linear-gradient(145deg, rgba(10, 25, 45, 0.85) 0%, rgba(5, 15, 26, 0.95) 100%)',
+          border: '1.5px solid rgba(198, 165, 106, 0.35)',
+          borderRadius: '14px',
+          padding: '22px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          gap: '14px'
+        }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '1.6rem' }}>🔮</span>
+              <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: 0, fontSize: '1.1rem' }}>
+                Seek Oracle's Hint
+              </h4>
             </div>
+            <p style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.88rem', lineHeight: '1.45', margin: 0 }}>
+              Consult Athena and the fates for an illuminating clue on your active trial ({activeMainQuestion ? `Trial ${activeMainQuestion.sequence_number}` : 'Current Trial'}).
+            </p>
+          </div>
 
-            {needsTargetQuestion && (
-              <div className="field">
-                <label htmlFor="reward-target-question">Target Question</label>
-                <select
-                  id="reward-target-question"
-                  className="cinematic-input"
-                  value={selectedTargetId}
-                  onChange={(event) => setSelectedTargetId(event.target.value)}
-                >
-                  {availableMainQuestions.map((q, idx) => (
-                    <option key={q.id} value={q.id}>
-                      Question {q.sequence_number || idx + 1} {q.progress_status === 'CORRECT' ? '(Completed)' : q.progress_status === 'INCORRECT' ? '(Attempted)' : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+          <button 
+            type="button" 
+            className="spoken-submit-btn"
+            onClick={handleHintClick} 
+            disabled={loading || (!activeMainQuestion && availableMainQuestions.length === 0)}
+            style={{ padding: '10px', fontSize: '0.9rem' }}
+          >
+            {loading ? 'Consulting...' : `Invoke Oracle Clue ${activeMainQuestion ? `(Trial ${activeMainQuestion.sequence_number || 1})` : ''}`}
+          </button>
+        </div>
 
-            <button className="action-button cinematic-button" type="submit" disabled={loading}>
-              Unleash Artifact
-            </button>
-          </form>
+        {/* ACTIVE ARTIFACTS OR EMPTY STATE */}
+        {activeInventory.length === 0 ? (
+          <div style={{
+            background: 'rgba(5, 11, 20, 0.5)',
+            border: '1px dashed rgba(198, 165, 106, 0.25)',
+            borderRadius: '14px',
+            padding: '22px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center'
+          }}>
+            <span style={{ fontSize: '2rem', opacity: 0.4, marginBottom: '8px' }}>🏺</span>
+            <p style={{ color: 'rgba(231, 229, 221, 0.6)', fontSize: '0.9rem', margin: 0 }}>
+              The sacred reliquary is empty. Conquer the Pre-Round Rituals on each island to earn mythical divine artifacts.
+            </p>
+          </div>
+        ) : (
+          <div className="artifacts-grid" style={{ gridTemplateColumns: '1fr', margin: 0 }}>
+            {activeInventory.map((item) => {
+              const info = ARTIFACT_INFO[item.reward_type] || {
+                icon: '⚡',
+                title: REWARD_LABELS[item.reward_type] || item.reward_type,
+                description: 'Divine mythical artifact.',
+                targetRequired: false,
+              };
+
+              return (
+                <div key={item.id} className="artifact-card-item">
+                  <div className="artifact-card-header">
+                    <span className="artifact-icon">{info.icon}</span>
+                    <div>
+                      <h5 className="artifact-name">{info.title}</h5>
+                      <span style={{ color: 'rgba(231, 229, 221, 0.7)', fontSize: '0.8rem' }}>
+                        {info.description}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button 
+                    type="button"
+                    className="artifact-invoke-btn"
+                    onClick={() => handleInvokeArtifact(item.reward_type)}
+                    disabled={loading}
+                  >
+                    {loading ? 'Channeling...' : `⚡ Invoke ${info.title}`}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </section>
