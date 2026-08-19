@@ -222,18 +222,11 @@ function IslandPage() {
               />
             )}
             {island.slug === 'witch' && (
-<<<<<<< HEAD
               <WitchIslandUI 
                 mainQuestions={mainQuestions} 
                 activeMainQuestion={activeMainQuestion} 
                 hasBlessing={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'THE_BLESSING' && !i.is_used)}
                 onBlessingClick={() => handleRewardClick('THE_BLESSING')}
-=======
-              <WitchIslandUI
-                mainQuestions={mainQuestions}
-                activeMainQuestion={activeMainQuestion}
-                hasSitOutPenalty={false}
->>>>>>> b300d09cf164acd71c835e813985b4e7fdc08f74
               />
             )}
             {island.slug === 'ithaca' && (
