@@ -137,7 +137,7 @@ function IslandPage() {
 
   const handleRewardClick = (rewardType) => {
     const payload = { reward_type: rewardType };
-    if (rewardType === 'CYCLOPS_EYE' && activeMainQuestion) {
+    if ((rewardType === 'CYCLOPS_EYE' || rewardType === 'ATHENAS_SCROLL') && activeMainQuestion) {
       payload.target_question_id = activeMainQuestion.id;
     }
     rewardMutation.mutate(payload);
@@ -274,6 +274,8 @@ function IslandPage() {
                     activeMainQuestion={activeMainQuestion} 
                     onSelectQuestion={setSelectedQuestionId}
                     totalFailedAttempts={totalFailedAttempts}
+                    hasAthenasScroll={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'ATHENAS_SCROLL' && !i.is_used)}
+                    onScrollClick={() => handleRewardClick('ATHENAS_SCROLL')}
                   />
                 )}
                 {island.slug === 'cyclops' && (
