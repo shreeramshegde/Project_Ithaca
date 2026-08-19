@@ -1,71 +1,69 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye, onEyeClick }) {
+function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye, onEyeClick, onSelectQuestion }) {
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
-  const penaltyQuestions = mainQuestions.filter(q => q.sequence_number >= 10);
-  const unlockedPenaltyQuestions = penaltyQuestions; // Not applicable on Cyclops really, but keep logic
-  
-  const allNodes = [...baseQuestions, ...unlockedPenaltyQuestions];
 
   return (
-    <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+    <div className="trials-chamber" style={{ width: '100%' }}>
+      <div className="trials-chamber-header">
+        <h4 className="trials-chamber-title">
+          <span>👁</span> Polyphemus' Cave · Stepping Path
+        </h4>
+        <span className="trials-stats-badge">
+          {baseQuestions.filter(q => q.progress_status === 'CORRECT').length} of {baseQuestions.length} Steps Conquered
+        </span>
+      </div>
+
       {hasCyclopsEye && (
-        <div className="cyclops-eye-action" style={{ marginBottom: '2rem' }}>
+        <div className="cyclops-artifact-banner">
+          <div className="cyclops-artifact-info">
+            <span style={{ fontSize: '1.8rem' }}>👁</span>
+            <div>
+              <strong style={{ color: '#00f0ff', display: 'block', fontSize: '0.95rem' }}>Cyclops' Eye Active in Inventory</strong>
+              <span style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.82rem' }}>
+                Invoke to eliminate one treacherous wrong path on the current challenge.
+              </span>
+            </div>
+          </div>
           <button 
-            className="action-button cinematic-button" 
+            type="button"
+            className="cyclops-artifact-btn" 
             onClick={onEyeClick}
-            style={{ 
-              borderColor: '#00f0ff', 
-              color: '#00f0ff' 
-            }}
           >
-            Use Cyclops Eye to Reveal Path
+            ⚡ Invoke Eye
           </button>
         </div>
       )}
 
-      <div className="cyclops-path" style={{ 
-        display: 'flex', 
-        flexWrap: 'wrap', 
-        justifyContent: 'center', 
-        gap: '20px',
-        alignItems: 'center'
-      }}>
-        {allNodes.map((q, index) => {
-          let statusClass = '';
-          if (q.progress_status === 'CORRECT') statusClass = 'completed';
-          else if (q.id === activeMainQuestion?.id) statusClass = 'selected active';
-          else if (q.progress_status === 'INCORRECT') statusClass = 'failed';
+      <div className="cyclops-stepping-row">
+        {baseQuestions.map((q, index) => {
+          const isSelected = q.id === activeMainQuestion?.id;
+          const isCompleted = q.progress_status === 'CORRECT';
+          const isFailed = q.progress_status === 'INCORRECT';
 
-          const isPenalty = q.sequence_number >= 10;
+          let stateClass = '';
+          if (isCompleted) stateClass = 'completed';
+          else if (isFailed) stateClass = 'failed';
+          else if (isSelected) stateClass = 'active';
 
           return (
             <div 
               key={q.id} 
-              className={`cyclops-stone ${statusClass}`}
-              style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '8px',
-                border: isPenalty ? '2px dashed var(--danger)' : `2px solid ${statusClass === 'completed' ? 'var(--success)' : statusClass === 'failed' ? 'var(--danger)' : statusClass === 'selected active' ? 'var(--gold)' : '#333'}`,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: statusClass === 'selected active' ? 'rgba(198,165,106,0.1)' : 'rgba(0,0,0,0.4)',
-                boxShadow: statusClass === 'selected active' ? '0 0 15px rgba(198,165,106,0.4)' : 'none',
-                opacity: (statusClass === '' && !hasCyclopsEye && index > 0 && allNodes[index-1].progress_status !== 'CORRECT') ? 0.3 : 1
-              }}
+              className={`cyclops-runic-slab ${stateClass}`}
+              onClick={() => onSelectQuestion && onSelectQuestion(q.id)}
             >
-              {hasCyclopsEye && q.progress_status !== 'CORRECT' && statusClass !== 'failed' ? (
-                <div style={{ color: '#00f0ff', fontSize: '1.5rem', marginBottom: '5px' }}>👁</div>
-              ) : (
-                <div style={{ color: statusClass === 'completed' ? 'var(--success)' : statusClass === 'failed' ? 'var(--danger)' : '#888', fontSize: '1.5rem', marginBottom: '5px' }}>
-                  {statusClass === 'completed' ? '✓' : statusClass === 'failed' ? '✕' : '•'}
-                </div>
-              )}
-              <span style={{ fontSize: '0.8rem', color: 'var(--cloud)', fontWeight: 'bold' }}>
-                {isPenalty ? 'Penalty' : `Step ${index + 1}`}
+              <div style={{
+                color: isCompleted ? 'var(--success)' : isFailed ? '#f87171' : isSelected ? 'var(--gold)' : '#888',
+                fontSize: '1.5rem',
+                marginBottom: '4px'
+              }}>
+                {isCompleted ? '✓' : isFailed ? '✕' : (isSelected ? '◈' : '•')}
+              </div>
+              <span style={{ fontFamily: 'var(--display)', fontSize: '0.88rem', color: 'var(--cloud-white)', fontWeight: 'bold' }}>
+                Step {index + 1}
+              </span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--gold)' }}>
+                -1.0y
               </span>
             </div>
           );

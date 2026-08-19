@@ -1,205 +1,752 @@
-/* Island UI Architecture CSS */
+/* ============================================================================
+   PROJECT ITHACA: CINEMATIC GAME & ISLAND ARCHITECTURE STYLING
+   ============================================================================ */
 
-/* --- LOTUS ISLAND (Grid) --- */
-.lotus-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
-  max-width: 800px;
-  margin: 0 auto 50px auto;
+/* --- GENERAL ISLAND HERO & PROGRESSION HEADER --- */
+.island-hero-cinematic {
+  position: relative;
+  background: linear-gradient(135deg, rgba(10, 26, 44, 0.85) 0%, rgba(5, 11, 20, 0.95) 100%);
+  border: 1px solid rgba(198, 165, 106, 0.35);
+  border-radius: 16px;
+  padding: 28px 36px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  margin-bottom: 24px;
 }
 
-.lotus-marker {
-  background: rgba(7, 21, 38, 0.85);
+.island-hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.island-hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.island-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(198, 165, 106, 0.15);
   border: 1px solid rgba(198, 165, 106, 0.4);
+  color: var(--gold);
+  font-family: var(--display);
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.island-status-pill {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.island-status-pill.active {
+  background: rgba(198, 165, 106, 0.2);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  animation: pulseActive 2s infinite;
+}
+
+.island-status-pill.completed {
+  background: rgba(137, 171, 118, 0.2);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.island-hero-title {
+  font-family: var(--display);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  color: var(--cloud-white);
+  margin: 0 0 6px 0;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.island-hero-lore {
+  color: rgba(231, 229, 221, 0.75);
+  font-size: 1rem;
+  margin: 0;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.island-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(7, 21, 38, 0.6);
+  border: 1px solid rgba(198, 165, 106, 0.4);
+  color: var(--cloud-white);
+  padding: 10px 18px;
   border-radius: 8px;
-  padding: 30px 20px;
-  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.hero-action-btn:hover {
+  background: rgba(198, 165, 106, 0.2);
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* --- TRIAL SELECTOR CAROUSEL / NODE VISUALIZERS --- */
+.trials-chamber {
+  background: radial-gradient(circle at 50% 0%, rgba(198, 165, 106, 0.08) 0%, rgba(5, 11, 20, 0.8) 100%);
+  border: 1px solid rgba(198, 165, 106, 0.25);
+  border-radius: 16px;
+  padding: 28px 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.trials-chamber-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(198, 165, 106, 0.15);
+}
+
+.trials-chamber-title {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trials-stats-badge {
+  font-size: 0.85rem;
+  color: rgba(231, 229, 221, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* --- LOTUS ISLAND: RUNIC PETAL GRID --- */
+.lotus-nodes-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.lotus-runic-node {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(10, 30, 48, 0.9), rgba(5, 15, 26, 0.95));
+  border: 2px solid rgba(198, 165, 106, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  user-select: none;
 }
 
-.lotus-marker:hover {
-  transform: translateY(-4px);
-  background: rgba(11, 36, 56, 0.9);
-  border-color: rgba(198, 165, 106, 0.8);
-  box-shadow: 0 10px 30px rgba(198, 165, 106, 0.1);
+.lotus-runic-node:hover {
+  transform: translateY(-6px) scale(1.04);
+  border-color: var(--gold);
+  box-shadow: 0 10px 30px rgba(198, 165, 106, 0.3);
 }
 
-.lotus-marker.selected {
-  background: linear-gradient(180deg, rgba(198, 165, 106, 0.15), rgba(7, 21, 38, 0.9));
-  border-color: #c6a56a;
-  box-shadow: 0 0 20px rgba(198, 165, 106, 0.2);
+.lotus-runic-node.active {
+  border-color: var(--gold);
+  background: linear-gradient(145deg, rgba(40, 30, 15, 0.9), rgba(10, 25, 40, 0.95));
+  box-shadow: 0 0 25px rgba(198, 165, 106, 0.45), inset 0 0 15px rgba(198, 165, 106, 0.2);
+  animation: pulseLotus 2.5s infinite;
 }
 
-/* --- CYCLOPS ISLAND (Vertical Path & Eye) --- */
-.cyclops-path {
+.lotus-runic-node.completed {
+  border-color: var(--success);
+  background: linear-gradient(145deg, rgba(15, 35, 20, 0.9), rgba(5, 15, 10, 0.95));
+  box-shadow: 0 0 15px rgba(137, 171, 118, 0.25);
+}
+
+.lotus-runic-node.failed {
+  border-color: rgba(255, 80, 80, 0.6);
+  background: linear-gradient(145deg, rgba(40, 15, 15, 0.9), rgba(20, 5, 5, 0.95));
+}
+
+.lotus-runic-node.penalty {
+  border: 2px dashed #ff4d4d;
+  animation: pulsePenalty 3s infinite;
+}
+
+.node-emblem {
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.node-label {
+  font-family: var(--display);
+  font-size: 0.85rem;
+  color: var(--cloud-white);
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.node-reward-tag {
+  font-size: 0.68rem;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* --- CYCLOPS ISLAND: STEPPING LEYLINE PATH --- */
+.cyclops-nodes-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  max-width: 600px;
-  margin: 0 auto 50px auto;
-  position: relative;
+  width: 100%;
 }
 
-.cyclops-path::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 2px;
-  background: rgba(198, 165, 106, 0.2);
-  transform: translateX(-50%);
-  z-index: 0;
+.cyclops-artifact-banner {
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.08) 0%, rgba(7, 21, 38, 0.9) 50%, rgba(0, 240, 255, 0.08) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 12px;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  max-width: 680px;
+  margin-bottom: 15px;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.15);
 }
 
-.cyclops-node {
-  position: relative;
-  z-index: 1;
-  background: #15191B; /* Dark rock */
-  border: 2px solid rgba(198, 165, 106, 0.3);
-  border-radius: 30px;
-  padding: 15px 40px;
+.cyclops-artifact-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.cyclops-artifact-btn {
+  background: rgba(0, 240, 255, 0.15);
+  border: 1.5px solid #00f0ff;
+  color: #00f0ff;
+  font-family: var(--display);
+  font-size: 0.88rem;
+  letter-spacing: 0.1em;
+  padding: 8px 18px;
+  border-radius: 20px;
   cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.cyclops-artifact-btn:hover {
+  background: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+  transform: scale(1.04);
+}
+
+.cyclops-stepping-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.cyclops-runic-slab {
+  width: 130px;
+  height: 90px;
+  background: linear-gradient(180deg, #182026 0%, #0d1217 100%);
+  border: 2px solid rgba(198, 165, 106, 0.3);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.cyclops-runic-slab:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+}
+
+.cyclops-runic-slab.active {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(35, 45, 55, 0.95), rgba(15, 20, 25, 0.95));
+  box-shadow: 0 0 20px rgba(198, 165, 106, 0.35);
+}
+
+.cyclops-runic-slab.completed {
+  border-color: var(--success);
+  box-shadow: 0 0 15px rgba(137, 171, 118, 0.2);
+}
+
+/* --- SIRENS ISLAND: HARMONIC SOUNDWAVE PORTALS --- */
+.sirens-nodes-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.sirens-portals-row {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.sirens-portal-arch {
+  width: 140px;
+  height: 170px;
+  border-radius: 70px 70px 14px 14px;
+  border: 2px solid rgba(198, 165, 106, 0.35);
+  background: linear-gradient(180deg, rgba(20, 40, 65, 0.7) 0%, rgba(6, 15, 26, 0.95) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.sirens-portal-arch:hover {
+  transform: translateY(-8px);
+  border-color: var(--gold);
+  box-shadow: 0 15px 35px rgba(198, 165, 106, 0.25);
+}
+
+.sirens-portal-arch.active {
+  border-color: #60a5fa;
+  background: linear-gradient(180deg, rgba(30, 60, 95, 0.85) 0%, rgba(8, 20, 36, 0.98) 100%);
+  box-shadow: 0 0 30px rgba(96, 165, 250, 0.4), inset 0 0 20px rgba(96, 165, 250, 0.2);
+  animation: pulseSirens 2.5s infinite;
+}
+
+.sirens-portal-arch.completed {
+  border-color: var(--success);
+}
+
+/* --- WITCH'S ISLAND: ARCANE CAULDRON ALTARS --- */
+.witch-nodes-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.witch-altars-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.witch-altar-card {
+  width: 140px;
+  height: 120px;
+  border-radius: 14px 14px 28px 28px;
+  border: 2px solid rgba(198, 165, 106, 0.3);
+  border-top: 3px solid #b91c1c;
+  background: linear-gradient(180deg, rgba(25, 15, 30, 0.9) 0%, rgba(8, 6, 12, 0.95) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+.witch-altar-card:hover {
+  transform: translateY(-6px);
+  border-color: #f87171;
+  box-shadow: 0 12px 35px rgba(185, 28, 28, 0.3);
+}
+
+.witch-altar-card.active {
+  border-color: #f59e0b;
+  border-top: 4px solid #ef4444;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.35);
+  animation: pulseWitch 2.5s infinite;
+}
+
+.witch-altar-card.completed {
+  border-color: var(--success);
+  border-top-color: var(--success);
+}
+
+/* --- QUESTION CONSOLE PREMIUM CARD --- */
+.console-card-cinematic {
+  background: linear-gradient(145deg, rgba(8, 22, 38, 0.9) 0%, rgba(4, 12, 22, 0.96) 100%);
+  border: 1px solid rgba(198, 165, 106, 0.35);
+  border-radius: 18px;
+  padding: 32px 36px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  margin-bottom: 24px;
+}
+
+.console-header-badge {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.console-kind-pill {
+  font-family: var(--display);
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(198, 165, 106, 0.12);
+  border: 1px solid rgba(198, 165, 106, 0.35);
+  padding: 4px 12px;
+  border-radius: 14px;
+}
+
+.console-rewards-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.console-reward-val {
+  font-size: 0.78rem;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.console-reward-val.deduct {
+  background: rgba(137, 171, 118, 0.18);
+  border: 1px solid rgba(137, 171, 118, 0.4);
+  color: var(--success);
+}
+
+.console-reward-val.penalty {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+.console-title-text {
+  font-family: var(--display);
+  font-size: 1.6rem;
+  color: var(--cloud-white);
+  margin: 0 0 18px 0;
+  letter-spacing: 0.04em;
+}
+
+.question-text-box {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(198, 165, 106, 0.2);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 24px;
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: rgba(245, 242, 232, 0.95);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Monospace Code Block inside questions */
+.code-snippet-box {
+  background: #03080f;
+  border: 1px solid rgba(198, 165, 106, 0.3);
+  border-left: 4px solid var(--gold);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 14px 0;
+  font-family: 'Fira Code', 'Courier New', Courier, monospace;
+  font-size: 0.95rem;
+  color: #60a5fa;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+/* --- INTERACTIVE MCQ OPTION CARDS --- */
+.mcq-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.mcq-option-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(7, 21, 38, 0.7);
+  border: 1.5px solid rgba(198, 165, 106, 0.25);
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-align: left;
+  position: relative;
+  user-select: none;
+}
+
+.mcq-option-card:hover:not(.eliminated):not(:disabled) {
+  background: rgba(198, 165, 106, 0.12);
+  border-color: var(--gold);
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.mcq-option-card.selected {
+  background: linear-gradient(90deg, rgba(198, 165, 106, 0.22) 0%, rgba(7, 21, 38, 0.85) 100%);
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgba(198, 165, 106, 0.25);
+}
+
+.mcq-option-card.eliminated {
+  opacity: 0.35;
+  border-color: rgba(239, 68, 68, 0.3);
+  text-decoration: line-through;
+  cursor: not-allowed;
+  background: rgba(20, 10, 10, 0.4);
+}
+
+.mcq-option-letter {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1.5px solid rgba(198, 165, 106, 0.4);
+  color: var(--gold);
+  font-family: var(--display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.mcq-option-card.selected .mcq-option-letter {
+  background: var(--gold);
+  color: #050b14;
+  border-color: var(--gold);
+}
+
+.mcq-option-text {
+  font-size: 1.02rem;
+  color: var(--cloud-white);
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* --- TEXT INPUT FOR NON-MCQ --- */
+.spoken-input-wrapper {
+  margin-bottom: 22px;
+}
+
+.spoken-input-wrapper label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.spoken-textarea-cinematic {
+  width: 100%;
+  min-height: 100px;
+  background: rgba(3, 10, 20, 0.85);
+  border: 1.5px solid rgba(198, 165, 106, 0.35);
+  border-radius: 10px;
+  padding: 16px;
+  color: #ffffff;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  outline: none;
+  resize: vertical;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+.spoken-textarea-cinematic:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgba(198, 165, 106, 0.3);
+  background: rgba(5, 15, 28, 0.95);
+}
+
+.spoken-submit-btn {
+  width: 100%;
+  padding: 16px;
+  font-family: var(--display);
+  font-size: 1.08rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, rgba(198, 165, 106, 0.25) 0%, rgba(198, 165, 106, 0.1) 100%);
+  border: 1.5px solid var(--gold);
+  color: var(--gold);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.spoken-submit-btn:hover:not(:disabled) {
+  background: var(--gold);
+  color: #050b14;
+  box-shadow: 0 6px 25px rgba(198, 165, 106, 0.4);
+  transform: translateY(-2px);
+}
+
+.spoken-submit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --- REWARD & ARTIFACT PANEL IMPROVEMENT --- */
+.artifacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.artifact-card-item {
+  background: linear-gradient(145deg, rgba(12, 28, 48, 0.8) 0%, rgba(6, 14, 24, 0.9) 100%);
+  border: 1.5px solid rgba(198, 165, 106, 0.35);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
   transition: all 0.3s ease;
 }
 
-.cyclops-node:hover {
-  background: #1c2225;
-  border-color: rgba(198, 165, 106, 0.6);
-  transform: scale(1.05);
+.artifact-card-item:hover {
+  border-color: var(--gold);
+  box-shadow: 0 8px 24px rgba(198, 165, 106, 0.2);
+  transform: translateY(-3px);
 }
 
-.cyclops-node.selected {
-  border-color: #c6a56a;
-  box-shadow: 0 0 25px rgba(198, 165, 106, 0.15);
+.artifact-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.cyclops-eye-action {
-  margin: 30px auto;
-  text-align: center;
+.artifact-icon {
+  font-size: 1.8rem;
 }
 
-.cyclops-eye-btn {
-  background: rgba(198, 165, 106, 0.1);
-  border: 1px solid #c6a56a;
-  color: #c6a56a;
-  padding: 10px 25px;
-  border-radius: 50px;
+.artifact-name {
   font-family: var(--display);
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  transition: all 0.3s;
+  font-size: 1rem;
+  color: var(--cloud-white);
+  margin: 0;
 }
 
-.cyclops-eye-btn:hover {
-  background: rgba(198, 165, 106, 0.3);
-  box-shadow: 0 0 20px rgba(198, 165, 106, 0.4);
-}
-
-.cyclops-eye-btn.active {
-  animation: eyeOpen 1s forwards;
-}
-
-@keyframes eyeOpen {
-  0% { transform: scale(1); filter: brightness(1); }
-  50% { transform: scale(1.1); filter: brightness(1.5); }
-  100% { transform: scale(1); filter: brightness(0.5); opacity: 0.5; pointer-events: none; }
-}
-
-/* --- SIRENS ISLAND (Arches/Portals) --- */
-.sirens-portals {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  max-width: 900px;
-  margin: 0 auto 50px auto;
-}
-
-.sirens-portal {
-  width: 200px;
-  height: 280px;
-  border-radius: 100px 100px 0 0;
-  border: 2px solid rgba(198, 165, 106, 0.2);
-  background: linear-gradient(180deg, rgba(7, 21, 38, 0.6) 0%, rgba(5, 11, 20, 0.9) 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  backdrop-filter: blur(5px);
-}
-
-.sirens-portal:hover {
-  transform: translateY(-10px);
-  border-color: rgba(198, 165, 106, 0.5);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.6);
-}
-
-.sirens-portal.selected {
-  border-color: #c6a56a;
-  background: linear-gradient(180deg, rgba(41, 69, 90, 0.6) 0%, rgba(5, 11, 20, 0.9) 100%);
-  box-shadow: inset 0 20px 50px rgba(198, 165, 106, 0.1), 0 15px 30px rgba(0,0,0,0.6);
-}
-
-/* --- WITCH'S ISLAND (Dark Structures) --- */
-.witch-structures {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  margin: 0 auto 50px auto;
-}
-
-.witch-altar {
-  background: rgba(5, 11, 20, 0.9);
-  border: 1px solid rgba(198, 165, 106, 0.2);
-  border-top: 3px solid #8c2a2a; /* subtle dark red hint for danger */
-  padding: 25px 50px;
+.artifact-invoke-btn {
   width: 100%;
-  max-width: 500px;
-  text-align: center;
+  padding: 8px 12px;
+  background: rgba(198, 165, 106, 0.15);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 6px;
+  font-family: var(--display);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
 }
 
-.witch-altar:hover {
-  background: rgba(15, 20, 30, 0.95);
-  border-color: rgba(198, 165, 106, 0.5);
+.artifact-invoke-btn:hover:not(:disabled) {
+  background: var(--gold);
+  color: #050b14;
 }
 
-.witch-altar.selected {
-  border-color: #c6a56a;
-  box-shadow: 0 10px 40px rgba(140, 42, 42, 0.2);
+/* --- ANIMATION KEYFRAMES --- */
+@keyframes pulseLotus {
+  0%, 100% { box-shadow: 0 0 20px rgba(198, 165, 106, 0.35); }
+  50% { box-shadow: 0 0 35px rgba(198, 165, 106, 0.65), 0 0 10px rgba(255, 255, 255, 0.2); }
 }
 
-/* Penalty Modal */
-.witch-penalty-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(5, 11, 20, 0.9);
-  backdrop-filter: blur(10px);
-  animation: fadeIn 0.5s ease forwards;
+@keyframes pulseSirens {
+  0%, 100% { box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(96, 165, 250, 0.65); }
 }
 
-.witch-penalty-content {
-  background: #071526;
-  border: 1px solid #8c2a2a;
-  padding: 50px;
-  text-align: center;
-  max-width: 500px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+@keyframes pulseWitch {
+  0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.25); }
+  50% { box-shadow: 0 0 35px rgba(239, 68, 68, 0.5); }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes pulseActive {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
+@keyframes pulsePenalty {
+  0%, 100% { border-color: #ff4d4d; }
+  50% { border-color: #ff9999; box-shadow: 0 0 15px rgba(255, 77, 77, 0.4); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .island-hero-cinematic {
+    padding: 20px 22px;
+  }
+  .console-card-cinematic {
+    padding: 22px 20px;
+  }
+  .lotus-runic-node {
+    width: 90px;
+    height: 90px;
+  }
+  .node-emblem {
+    font-size: 1.4rem;
+  }
 }
