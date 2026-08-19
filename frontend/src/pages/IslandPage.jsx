@@ -140,7 +140,7 @@ function IslandPage() {
 
   const questions = questionsQuery.data?.data?.questions || [];
   const preRoundQuestion = questions.find(q => q.type === 'PRE_ROUND');
-  const isPreRoundComplete = preRoundQuestion?.is_correct || Number(preRoundQuestion?.incorrect_attempts || 0) > 0;
+  const isPreRoundComplete = !preRoundQuestion || preRoundQuestion.is_correct || Number(preRoundQuestion.incorrect_attempts || 0) > 0;
 
   const mainQuestions = questions.filter(q => q.type === 'MAIN');
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);

@@ -64,19 +64,28 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
         </section>
       )}
 
+      {(!preRoundQuestion && !mainQuestion && !isCompleted) && (
+        <section className="surface-panel console-card question-marker cinematic-panel" style={{ textAlign: 'center', padding: '3rem' }}>
+          <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)', marginBottom: '1rem' }}>Awaiting Selection</p>
+          <h3 style={{ fontFamily: 'var(--display)', fontSize: '1.5rem', color: 'var(--cloud-white)' }}>
+            Select a trial from the markers above to continue your journey.
+          </h3>
+        </section>
+      )}
+
       {(mainQuestion || isCompleted) && (
         <section className="surface-panel console-card question-marker cinematic-panel">
           <p className="eyebrow" style={{ color: 'rgba(198,165,106,0.8)' }}>Main Trial Console</p>
           <h3 style={{ fontFamily: 'var(--display)', fontSize: '1.5rem', marginBottom: '1rem' }}>{island.pathLabel}</h3>
-          
+
           {isCompleted ? (
             <div style={{ marginTop: '2rem', textAlign: 'center' }}>
               <p style={{ color: 'var(--success)', marginBottom: '1.5rem', fontSize: '1.2rem' }}>
                 The guardians are appeased. The path is clear.
               </p>
-              <button 
-                className="action-button cinematic-button" 
-                onClick={onNextIsland} 
+              <button
+                className="action-button cinematic-button"
+                onClick={onNextIsland}
                 disabled={loading}
                 style={{ width: '100%', borderColor: 'var(--success)', color: 'var(--success)' }}
               >
@@ -123,46 +132,46 @@ function QuestionConsole({ island, onSubmitPreRound, onSubmitAnswer, loading, is
                     }
                   }}
                 >
-                {mainQuestion.options ? (
-                  <div className="field">
-                    <label>Select your answer</label>
-                    <select
-                      className="cinematic-input"
-                      value={mainAnswer}
-                      onChange={(e) => setMainAnswer(e.target.value)}
-                      required
-                      disabled={sitOutRequired}
-                    >
-                      <option value="" disabled>Choose wisely...</option>
-                      {mainQuestion.options.map((opt, i) => (
-                        <option 
-                          key={i} 
-                          value={opt} 
-                          disabled={opt === eliminatedOption}
-                          style={{ textDecoration: opt === eliminatedOption ? 'line-through' : 'none', color: opt === eliminatedOption ? '#666' : 'inherit' }}
-                        >
-                          {opt} {opt === eliminatedOption ? '(Eliminated)' : ''}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ) : (
-                  <div className="field">
-                    <label>Spoken Answer</label>
-                    <textarea
-                      className="cinematic-textarea"
-                      value={mainAnswer}
-                      onChange={(e) => setMainAnswer(e.target.value)}
-                      placeholder="Enter the team's response"
-                      required
-                      disabled={sitOutRequired}
-                    />
-                  </div>
-                )}
-                <button className="action-button cinematic-button" type="submit" disabled={loading || sitOutRequired}>
-                  {loading ? 'Submitting...' : 'Offer Answer'}
-                </button>
-              </form>
+                  {mainQuestion.options ? (
+                    <div className="field">
+                      <label>Select your answer</label>
+                      <select
+                        className="cinematic-input"
+                        value={mainAnswer}
+                        onChange={(e) => setMainAnswer(e.target.value)}
+                        required
+                        disabled={sitOutRequired}
+                      >
+                        <option value="" disabled>Choose wisely...</option>
+                        {mainQuestion.options.map((opt, i) => (
+                          <option
+                            key={i}
+                            value={opt}
+                            disabled={opt === eliminatedOption}
+                            style={{ textDecoration: opt === eliminatedOption ? 'line-through' : 'none', color: opt === eliminatedOption ? '#666' : 'inherit' }}
+                          >
+                            {opt} {opt === eliminatedOption ? '(Eliminated)' : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="field">
+                      <label>Spoken Answer</label>
+                      <textarea
+                        className="cinematic-textarea"
+                        value={mainAnswer}
+                        onChange={(e) => setMainAnswer(e.target.value)}
+                        placeholder="Enter the team's response"
+                        required
+                        disabled={sitOutRequired}
+                      />
+                    </div>
+                  )}
+                  <button className="action-button cinematic-button" type="submit" disabled={loading || sitOutRequired}>
+                    {loading ? 'Submitting...' : 'Offer Answer'}
+                  </button>
+                </form>
               )}
             </>
           )}
