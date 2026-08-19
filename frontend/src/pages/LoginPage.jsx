@@ -60,11 +60,7 @@ function LoginPage() {
         <section className="login-ambient ocean-copy">
           <p className="eyebrow">Embarkation</p>
           <h1 className="display-title">Mark the Crew and Step Into the Waterline</h1>
-          <p className="ambient-copy">
-            The current backend supports team registration plus JWT session restoration, not a separate login endpoint.
-            This page therefore starts a new team session exactly as the backend expects and preserves it locally for
-            refresh-safe gameplay.
-          </p>
+
           <div className="ambient-stateline">
             <span />
             <span />
