@@ -153,6 +153,26 @@ const submitAnswer = async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Question already correctly answered' });
     }
 
+    // 2.5 For Islands 2, 3, 4, enforce strict sequential progression
+    if (question.island_id > 1) {
+      const prevUnattempted = await client.query(
+        `SELECT q.id FROM questions q
+         WHERE q.island_id = $1 AND q.type = 'MAIN' AND q.sequence_number < $2
+         AND NOT EXISTS (
+           SELECT 1 FROM team_progress tp 
+           WHERE tp.question_id = q.id AND tp.team_id = $3
+         )`,
+        [question.island_id, question.sequence_number, teamId]
+      );
+      if (prevUnattempted.rows.length > 0) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ 
+          status: 'error', 
+          message: 'Trials on this island must be solved sequentially! Complete the previous stages first.' 
+        });
+      }
+    }
+
     // 3. Verify answer
     const normalizeString = (str) => {
       return str ? str.replace(/\s+/g, ' ').trim().toLowerCase() : '';
