@@ -7,7 +7,7 @@ function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye
     <div className="trials-chamber" style={{ width: '100%' }}>
       <div className="trials-chamber-header">
         <h4 className="trials-chamber-title">
-          <span>👁</span> Polyphemus' Cave · Stepping Path
+          <span>👁</span> Polyphemus' Cave · Sequential Stepping Path
         </h4>
         <span className="trials-stats-badge">
           {baseQuestions.filter(q => q.progress_status === 'CORRECT').length} of {baseQuestions.length} Steps Conquered
@@ -40,30 +40,47 @@ function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye
           const isSelected = q.id === activeMainQuestion?.id;
           const isCompleted = q.progress_status === 'CORRECT';
           const isFailed = q.progress_status === 'INCORRECT';
+          const isUnlocked = index === 0 || baseQuestions.slice(0, index).every(prev => prev.progress_status !== null);
 
           let stateClass = '';
-          if (isCompleted) stateClass = 'completed';
-          else if (isFailed) stateClass = 'failed';
-          else if (isSelected) stateClass = 'active';
+          if (!isUnlocked) {
+            stateClass = 'locked';
+          } else if (isCompleted) {
+            stateClass = 'completed';
+          } else if (isFailed) {
+            stateClass = 'failed';
+          } else if (isSelected) {
+            stateClass = 'active';
+          }
 
           return (
             <div 
               key={q.id} 
               className={`cyclops-runic-slab ${stateClass}`}
-              onClick={() => onSelectQuestion && onSelectQuestion(q.id)}
+              onClick={() => {
+                if (isUnlocked && onSelectQuestion) {
+                  onSelectQuestion(q.id);
+                }
+              }}
+              style={{
+                opacity: !isUnlocked ? 0.42 : 1,
+                cursor: !isUnlocked ? 'not-allowed' : 'pointer',
+                borderColor: !isUnlocked ? 'rgba(255, 255, 255, 0.1)' : undefined
+              }}
+              title={!isUnlocked ? 'Complete previous steps sequentially to unlock' : `Step ${index + 1}`}
             >
               <div style={{
-                color: isCompleted ? 'var(--success)' : isFailed ? '#f87171' : isSelected ? 'var(--gold)' : '#888',
+                color: !isUnlocked ? '#666' : isCompleted ? 'var(--success)' : isFailed ? '#f87171' : isSelected ? 'var(--gold)' : '#888',
                 fontSize: '1.5rem',
                 marginBottom: '4px'
               }}>
-                {isCompleted ? '✓' : isFailed ? '✕' : (isSelected ? '◈' : '•')}
+                {!isUnlocked ? '🔒' : isCompleted ? '✓' : isFailed ? '✕' : (isSelected ? '◈' : '•')}
               </div>
-              <span style={{ fontFamily: 'var(--display)', fontSize: '0.88rem', color: 'var(--cloud-white)', fontWeight: 'bold' }}>
+              <span style={{ fontFamily: 'var(--display)', fontSize: '0.88rem', color: !isUnlocked ? 'rgba(231,229,221,0.5)' : 'var(--cloud-white)', fontWeight: 'bold' }}>
                 Step {index + 1}
               </span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--gold)' }}>
-                -1.0y
+              <span style={{ fontSize: '0.7rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
+                {!isUnlocked ? 'Locked' : '-1.0y'}
               </span>
             </div>
           );

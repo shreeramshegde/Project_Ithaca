@@ -180,6 +180,7 @@ function IslandPage() {
 
   if (mainQuestions.length > 0) {
     if (island.slug === 'lotus') {
+      // Island 1 (Lotus): Free choice - any question can be selected in any order
       if (selectedQuestionId) {
         activeMainQuestion = mainQuestions.find(q => q.id === selectedQuestionId) || null;
       }
@@ -194,11 +195,22 @@ function IslandPage() {
       const allPenaltyAttempted = unlockedPenaltyQuestions.length === 0 || unlockedPenaltyQuestions.every(q => q.progress_status !== null);
       isIslandCompleted = allBaseAttempted && allPenaltyAttempted;
     } else {
+      // Islands 2, 3, 4 (Cyclops, Sirens, Witch): Strictly sequential progression!
+      // Must solve question 1 before question 2, and so on.
+      const firstUnattempted = mainQuestions.find(q => q.progress_status === null);
+      
       if (selectedQuestionId) {
-        activeMainQuestion = mainQuestions.find(q => q.id === selectedQuestionId) || null;
+        const selectedQ = mainQuestions.find(q => q.id === selectedQuestionId);
+        const selectedIndex = mainQuestions.findIndex(q => q.id === selectedQuestionId);
+        // Only allow selecting questions whose previous stages have already been attempted
+        const isUnlocked = selectedIndex === 0 || mainQuestions.slice(0, selectedIndex).every(q => q.progress_status !== null);
+        if (isUnlocked && selectedQ) {
+          activeMainQuestion = selectedQ;
+        }
       }
+
       if (!activeMainQuestion) {
-        activeMainQuestion = mainQuestions.find(q => q.progress_status === null) || mainQuestions[mainQuestions.length - 1] || null;
+        activeMainQuestion = firstUnattempted || mainQuestions[mainQuestions.length - 1] || null;
       }
 
       isIslandCompleted = mainQuestions.every(q => q.progress_status !== null);

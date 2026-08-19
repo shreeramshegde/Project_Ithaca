@@ -7,7 +7,7 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
     <div className="trials-chamber" style={{ width: '100%' }}>
       <div className="trials-chamber-header">
         <h4 className="trials-chamber-title">
-          <span>🌊</span> Sirens' Straight · Harmonic Portals
+          <span>🌊</span> Sirens' Straight · Sequential Harmonic Portals
         </h4>
         <span className="trials-stats-badge">
           {baseQuestions.filter(q => q.progress_status === 'CORRECT').length} of {baseQuestions.length} Melodies Decoded
@@ -44,30 +44,47 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
           const isSelected = q.id === activeMainQuestion?.id;
           const isCompleted = q.progress_status === 'CORRECT';
           const isFailed = q.progress_status === 'INCORRECT';
+          const isUnlocked = index === 0 || baseQuestions.slice(0, index).every(prev => prev.progress_status !== null);
 
           let stateClass = '';
-          if (isCompleted) stateClass = 'completed';
-          else if (isFailed) stateClass = 'failed';
-          else if (isSelected) stateClass = 'active';
+          if (!isUnlocked) {
+            stateClass = 'locked';
+          } else if (isCompleted) {
+            stateClass = 'completed';
+          } else if (isFailed) {
+            stateClass = 'failed';
+          } else if (isSelected) {
+            stateClass = 'active';
+          }
 
           return (
             <div 
               key={q.id}
               className={`sirens-portal-arch ${stateClass}`}
-              onClick={() => onSelectQuestion && onSelectQuestion(q.id)}
+              onClick={() => {
+                if (isUnlocked && onSelectQuestion) {
+                  onSelectQuestion(q.id);
+                }
+              }}
+              style={{
+                opacity: !isUnlocked ? 0.4 : 1,
+                cursor: !isUnlocked ? 'not-allowed' : 'pointer',
+                borderColor: !isUnlocked ? 'rgba(255, 255, 255, 0.1)' : undefined
+              }}
+              title={!isUnlocked ? 'Decode previous songs sequentially to unlock' : `Song ${index + 1}`}
             >
               <div style={{
                 fontSize: '1.8rem',
-                color: isCompleted ? 'var(--success)' : isFailed ? '#f87171' : isSelected ? '#60a5fa' : 'rgba(198,165,106,0.6)',
+                color: !isUnlocked ? '#666' : isCompleted ? 'var(--success)' : isFailed ? '#f87171' : isSelected ? '#60a5fa' : 'rgba(198,165,106,0.6)',
                 marginBottom: '8px'
               }}>
-                {isCompleted ? '✓' : isFailed ? '✕' : 'Ω'}
+                {!isUnlocked ? '🔒' : isCompleted ? '✓' : isFailed ? '✕' : 'Ω'}
               </div>
-              <h4 style={{ fontFamily: 'var(--display)', color: 'var(--cloud-white)', margin: '0 0 4px 0', fontSize: '0.92rem' }}>
+              <h4 style={{ fontFamily: 'var(--display)', color: !isUnlocked ? 'rgba(231,229,221,0.5)' : 'var(--cloud-white)', margin: '0 0 4px 0', fontSize: '0.92rem' }}>
                 Song {index + 1}
               </h4>
-              <span style={{ fontSize: '0.72rem', color: 'var(--gold)' }}>
-                -1.5y
+              <span style={{ fontSize: '0.72rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
+                {!isUnlocked ? 'Locked' : '-1.5y'}
               </span>
             </div>
           );
