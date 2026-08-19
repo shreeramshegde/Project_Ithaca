@@ -53,7 +53,7 @@ function JourneyPage() {
       />
       
       {stateQuery.isError && (
-        <div style={{ position: 'absolute', top: 100, left: 40, right: 40, zIndex: 10 }}>
+        <div style={{ position: 'fixed', top: 100, left: 40, right: 40, zIndex: 100 }}>
           <FeedbackBanner
             result={{
               kind: 'error',

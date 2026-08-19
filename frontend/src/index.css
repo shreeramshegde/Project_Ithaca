@@ -58,10 +58,45 @@ a {
   min-height: 100vh;
 }
 
+/* Odyssey Thematic Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--midnight);
+  border-left: 1px solid rgba(198, 165, 106, 0.15);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c6a56a 0%, #7c5c28 100%);
+  border-radius: 5px;
+  border: 2px solid var(--midnight);
+  box-shadow: 0 0 8px rgba(198, 165, 106, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #dfbe80 0%, #997334 100%);
+  box-shadow: 0 0 12px rgba(198, 165, 106, 0.6);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c6a56a #050b14;
+}
+
 .page-shell {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
+}
+
+.page-shell.journey-page-cinematic {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100vh;
+  scroll-behavior: smooth;
 }
 
 .page-shell::before {
