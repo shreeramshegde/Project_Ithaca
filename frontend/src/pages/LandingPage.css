@@ -43,36 +43,74 @@
   mix-blend-mode: multiply;
 }
 
-.watermark-cover {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  z-index: 2;
-  pointer-events: none;
-  padding: 30px 30px 25px 40px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-}
-
-.ieee-watermark-logo {
-  width: 90px;
-  height: auto;
-  opacity: 0.9;
-  /* Convert the blue SVG to white to match the center text */
-  filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-}
-
 .landing-content {
   position: relative;
   z-index: 2;
   color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Ensure header and actions are visible */
+/* Landing Topbar positioned across the top corners */
 .landing-topbar {
-  padding: 20px 28px;
-  color: rgba(255, 255, 255, 0.92);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 36px;
+  width: 100%;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.landing-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nie-ieee-logo {
+  width: 66px;
+  height: 66px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 2px solid rgba(198, 165, 106, 0.45);
+  background: #ffffff;
+  padding: 3px;
+  box-shadow: 0 0 18px rgba(198, 165, 106, 0.3), 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.landing-topbar .topbar-brand {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 242, 232, 0.98);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.landing-topbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.ieee-topbar-logo {
+  height: 52px;
+  width: auto;
+  opacity: 0.95;
+  filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
+  transition: all 0.25s ease;
+}
+
+.ieee-topbar-logo:hover {
+  opacity: 1;
+  transform: scale(1.06);
 }
 
 .landing-stage {
@@ -109,5 +147,39 @@
   .landing-video {
     transition: none;
     animation: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-topbar {
+    padding: 18px 20px;
+  }
+  .nie-ieee-logo {
+    width: 52px;
+    height: 52px;
+  }
+  .landing-topbar .topbar-brand {
+    font-size: 1.15rem;
+    letter-spacing: 0.12em;
+  }
+  .ieee-topbar-logo {
+    height: 42px;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-topbar {
+    padding: 14px 16px;
+  }
+  .nie-ieee-logo {
+    width: 42px;
+    height: 42px;
+  }
+  .landing-topbar .topbar-brand {
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+  }
+  .ieee-topbar-logo {
+    height: 32px;
   }
 }

@@ -55,21 +55,28 @@ function LandingPage() {
         </div>
         <div className="landing-overlay" ref={overlayRef} />
         <div className="landing-vignette" ref={vignetteRef} />
-        
-        {/* Cover for Gemini watermark */}
-        <div className="watermark-cover">
-          <img src="/assets/landing/ieee_logo.svg" alt="IEEE" className="ieee-watermark-logo" />
-        </div>
       </div>
 
-      <div className="page-content landing-content">
-        <header className="landing-topbar">
-          <div>
-            <p className="topbar-brand">NIE IEEE Student Branch</p>
-            <p className="topbar-title">Odyssey Event Experience</p>
-          </div>
-        </header>
+      <header className="landing-topbar">
+        <div className="landing-topbar-left">
+          <img
+            src="/assets/landing/nie_ieee_branch.svg"
+            alt="NIE IEEE Student Branch"
+            className="nie-ieee-logo"
+          />
+          <p className="topbar-brand">NIE IEEE Student Branch</p>
+        </div>
 
+        <div className="landing-topbar-right">
+          <img
+            src="/assets/landing/ieee_logo.svg"
+            alt="IEEE"
+            className="ieee-topbar-logo"
+          />
+        </div>
+      </header>
+
+      <div className="page-content landing-content">
         <section className="landing-stage">
           <div className="landing-copy">
             <p ref={subtitleRef} className="landing-kicker">
