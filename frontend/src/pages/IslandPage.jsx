@@ -202,7 +202,7 @@ function IslandPage() {
               <WitchIslandUI
                 mainQuestions={mainQuestions}
                 activeMainQuestion={activeMainQuestion}
-                hasSitOutPenalty={hasOutstandingPenalty}
+                hasSitOutPenalty={false}
               />
             )}
             {island.slug === 'ithaca' && (
