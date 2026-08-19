@@ -169,8 +169,8 @@ function IslandPage() {
   const isPreRoundComplete = !preRoundQuestion || (preRoundQuestion.progress_status !== null && preRoundQuestion.progress_status !== undefined);
 
   const mainQuestions = questions.filter(q => q.type === 'MAIN');
-  const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
-  const penaltyQuestions = mainQuestions.filter(q => q.sequence_number >= 10);
+  const baseQuestions = mainQuestions.filter(q => q.sequence_number <= 4);
+  const penaltyQuestions = mainQuestions.filter(q => q.sequence_number > 4);
 
   const totalFailedAttempts = mainQuestions.reduce((acc, q) => acc + (q.progress_status === 'INCORRECT' ? 1 : 0), 0);
   const unlockedPenaltyQuestions = penaltyQuestions.slice(0, totalFailedAttempts);

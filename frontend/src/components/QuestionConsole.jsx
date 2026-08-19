@@ -192,7 +192,7 @@ function QuestionConsole({
         <section className="console-card-cinematic">
           <div className="console-header-badge">
             <span className="console-kind-pill">
-              {mainQuestion?.sequence_number >= 10 ? '⚠️ Penalty Trial' : `Main Trial ${mainQuestion?.sequence_number ? `· Stage ${mainQuestion.sequence_number}` : ''}`}
+              {mainQuestion?.sequence_number > 4 ? `⚠️ Penalty Inscription ${mainQuestion.sequence_number - 4}` : `Main Trial ${mainQuestion?.sequence_number ? `· Stage ${mainQuestion.sequence_number}` : ''}`}
             </span>
             {mainQuestion && (
               <div className="console-rewards-pills">
@@ -205,8 +205,8 @@ function QuestionConsole({
           <h3 className="console-title-text">
             {isCompleted 
               ? 'All Island Trials Fulfilled' 
-              : (mainQuestion?.sequence_number >= 10 
-                  ? 'Redemption Inscription' 
+              : (mainQuestion?.sequence_number > 4 
+                  ? `Penalty Inscription ${mainQuestion.sequence_number - 4}` 
                   : `Trial ${mainQuestion?.sequence_number || 1}: ${island?.title || 'Island Stage'}`)}
           </h3>
 

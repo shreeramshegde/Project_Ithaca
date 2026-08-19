@@ -1,8 +1,8 @@
 import React from 'react';
 
 function LotusIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestion, totalFailedAttempts = 0 }) {
-  const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
-  const penaltyQuestions = mainQuestions.filter(q => q.sequence_number >= 10);
+  const baseQuestions = mainQuestions.filter(q => q.sequence_number <= 4);
+  const penaltyQuestions = mainQuestions.filter(q => q.sequence_number > 4);
   const unlockedPenaltyQuestions = penaltyQuestions.slice(0, totalFailedAttempts);
   
   const allNodes = [...baseQuestions, ...unlockedPenaltyQuestions];
@@ -11,17 +11,17 @@ function LotusIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
     <div className="trials-chamber" style={{ width: '100%' }}>
       <div className="trials-chamber-header">
         <h4 className="trials-chamber-title">
-          <span>⚜</span> The Garden of Distortions · Inscriptions
+          <span>⚜</span> The Garden of Distortions · 4 Inscriptions
         </h4>
         <span className="trials-stats-badge">
           {baseQuestions.filter(q => q.progress_status === 'CORRECT').length} of {baseQuestions.length} Cleared
-          {totalFailedAttempts > 0 && ` · ${totalFailedAttempts} Penalty Active`}
+          {totalFailedAttempts > 0 && ` · ${totalFailedAttempts} Penalty Inscription${totalFailedAttempts > 1 ? 's' : ''} Active`}
         </span>
       </div>
 
       <div className="lotus-nodes-container">
         {allNodes.map((q, index) => {
-          const isPenalty = q.sequence_number >= 10;
+          const isPenalty = q.sequence_number > 4;
           const isSelected = q.id === activeMainQuestion?.id;
           const isCompleted = q.progress_status === 'CORRECT';
           const isFailed = q.progress_status === 'INCORRECT';
@@ -38,7 +38,7 @@ function LotusIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
               key={q.id} 
               className={`lotus-runic-node ${stateClass}`}
               onClick={() => onSelectQuestion(q.id)}
-              title={isPenalty ? 'Redemption Inscription' : `Trial ${q.sequence_number || index + 1}`}
+              title={isPenalty ? `Penalty Inscription ${q.sequence_number - 4}` : `Trial ${q.sequence_number || index + 1}`}
             >
               <div className="node-emblem" style={{
                 color: isCompleted ? 'var(--success)' : isPenalty ? '#f87171' : isSelected ? 'var(--gold)' : 'rgba(198,165,106,0.6)'
@@ -46,7 +46,7 @@ function LotusIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
                 {isCompleted ? '✓' : isPenalty ? '⚠' : (isSelected ? '⚜' : '◈')}
               </div>
               <span className="node-label">
-                {isPenalty ? `P-${q.sequence_number - 9}` : `Trial ${q.sequence_number || index + 1}`}
+                {isPenalty ? `Penalty ${q.sequence_number - 4}` : `Trial ${q.sequence_number || index + 1}`}
               </span>
               <span className="node-reward-tag">
                 {isPenalty ? '+2.0y' : '-0.5y'}
