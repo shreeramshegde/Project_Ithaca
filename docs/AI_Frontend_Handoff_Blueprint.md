@@ -10,9 +10,10 @@
 - **No Login System:** Teams register once at the venue via `POST /api/auth/register` (providing `team_name` and `auth_code`). 
 - **JWT Storage & Routing Flow:** 
   1. The app MUST start on a Registration/Welcome Screen.
-  2. Upon successful registration, store the returned JWT securely in `localStorage` or `sessionStorage`.
-  3. Only AFTER the token is saved should you redirect the user to the main Game Dashboard route.
-  4. There is no traditional "login" screen for returning users. If a JWT exists in storage on page load, automatically bypass the registration screen. The JWT must be attached as a Bearer token in the `Authorization` header for EVERY subsequent request.
+  2. Upon successful registration, store the returned JWT securely in `localStorage`. 
+  3. **SESSION PERSISTENCE (CRITICAL):** Because the JWT is in `localStorage`, it survives tab closures and browser restarts! There is no need for actual HTTP cookies. If the user accidentally closes the tab and reopens the site, your React app MUST check `localStorage` on mount. If the token is there, automatically bypass the registration screen and fetch the game state. They should never have to re-register.
+  4. Only AFTER the token is saved should you redirect the user to the main Game Dashboard route.
+  5. The JWT must be attached as a Bearer token in the `Authorization` header for EVERY subsequent request.
 - **HUD Synchronization:** The main Game Dashboard must call `GET /api/game/state` on mount to populate the Heads-Up Display (HUD) showing `remaining_years`, `standard_hints_left` (starts at 3), and active inventory. Almost every game endpoint returns updated team stats. You must sync the React Context/State HUD with this fresh data after every API call.
 
 ---
@@ -190,7 +191,9 @@ Use this when a team arrives at an island to fetch the securely-sorted questions
           "options": ["1", "2", "3", "4"],
           "reward_years": "0.50",
           "penalty_years": "2.00",
-          "difficulty_level": 1
+          "difficulty_level": 1,
+          "sequence_number": 1,
+          "progress_status": "CORRECT" // Can be "CORRECT", "INCORRECT", or null
         }
       ]
     }
