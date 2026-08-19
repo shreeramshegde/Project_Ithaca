@@ -26,9 +26,9 @@ const getQuestions = async (req, res) => {
     const currentIsland = teamRes.rows[0].current_island;
 
     const qRes = await pool.query(
-      `SELECT q.id, q.type, q.format, q.question_text, q.options, q.reward_years, q.penalty_years, q.difficulty_level, q.sequence_number, tp.status as progress_status 
+      `SELECT q.id, q.type, q.format, q.question_text, q.options, q.reward_years, q.penalty_years, q.difficulty_level, q.sequence_number, 
+       (SELECT status FROM team_progress tp WHERE tp.question_id = q.id AND tp.team_id = $1 ORDER BY attempted_at DESC LIMIT 1) as progress_status 
        FROM questions q
-       LEFT JOIN team_progress tp ON q.id = tp.question_id AND tp.team_id = $1
        WHERE q.island_id = $2 
        ORDER BY q.type DESC, q.sequence_number ASC`,
       [teamId, currentIsland]
