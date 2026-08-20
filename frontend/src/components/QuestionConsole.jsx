@@ -85,15 +85,16 @@ function QuestionConsole({
   revealedHint,
   eliminatedOption, 
   sitOutRequired, 
-  onSitOutAcknowledge 
+  onSitOutAcknowledge,
+  autoFillAnswer
 }) {
   const [preRoundAnswer, setPreRoundAnswer] = useState('');
   const [mainAnswer, setMainAnswer] = useState('');
 
   // Clear answers when switching questions
   useEffect(() => {
-    setMainAnswer('');
-  }, [mainQuestion?.id]);
+    setMainAnswer(autoFillAnswer || '');
+  }, [mainQuestion?.id, autoFillAnswer]);
 
   useEffect(() => {
     setPreRoundAnswer('');
