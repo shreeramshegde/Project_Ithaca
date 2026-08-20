@@ -135,12 +135,20 @@ function IslandPage() {
   const inventory = stateQuery.data?.data?.inventory || [];
   const eliminatedOption = rewardMutation.data?.eliminated_option;
 
+  const [confirmReward, setConfirmReward] = useState(null);
+
   const handleRewardClick = (rewardType) => {
-    const payload = { reward_type: rewardType };
-    if ((rewardType === 'CYCLOPS_EYE' || rewardType === 'ATHENAS_SCROLL') && activeMainQuestion) {
+    setConfirmReward(rewardType);
+  };
+
+  const confirmAndExecuteReward = () => {
+    if (!confirmReward) return;
+    const payload = { reward_type: confirmReward };
+    if ((confirmReward === 'CYCLOPS_EYE' || confirmReward === 'ATHENAS_SCROLL') && activeMainQuestion) {
       payload.target_question_id = activeMainQuestion.id;
     }
     rewardMutation.mutate(payload);
+    setConfirmReward(null);
   };
 
   const isLocked = useMemo(() => {
@@ -357,6 +365,72 @@ function IslandPage() {
             />
           )}
         </section>
+
+        {/* REWARD CONFIRMATION MODAL FOR ISLAND BANNERS */}
+        {confirmReward && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(3, 7, 18, 0.85)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}>
+            <div style={{
+              background: 'linear-gradient(145deg, rgba(13, 27, 42, 0.98) 0%, rgba(5, 12, 22, 0.98) 100%)',
+              border: '2px solid var(--gold)',
+              borderRadius: '16px',
+              padding: '28px',
+              maxWidth: '440px',
+              width: '100%',
+              textAlign: 'center',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8)'
+            }}>
+              <span style={{ fontSize: '3rem', display: 'block', marginBottom: '12px' }}>
+                {confirmReward === 'ATHENAS_SCROLL' ? '📜' : confirmReward === 'CYCLOPS_EYE' ? '👁' : confirmReward === 'HERMES_SANDALS' ? '🪽' : '✨'}
+              </span>
+              <h3 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: '0 0 10px 0', fontSize: '1.4rem' }}>
+                Invoke {confirmReward === 'ATHENAS_SCROLL' ? "Athena's Scroll" : confirmReward === 'CYCLOPS_EYE' ? "Cyclops' Eye" : confirmReward === 'HERMES_SANDALS' ? "Hermes' Sandals" : 'The Blessing'}?
+              </h3>
+              <p style={{ color: 'rgba(231, 229, 221, 0.85)', fontSize: '0.92rem', lineHeight: '1.5', margin: '0 0 24px 0' }}>
+                {confirmReward === 'ATHENAS_SCROLL' && "Reveal an illuminating Oracle clue on the active trial without deducting standard hints."}
+                {confirmReward === 'CYCLOPS_EYE' && "Eliminate one treacherous wrong option on this multiple-choice trial."}
+                {confirmReward === 'HERMES_SANDALS' && "Instantly bypass Sirens delays and deduct 2 years from your journey."}
+                {confirmReward === 'THE_BLESSING' && "Divine grace that shields your crew from Circe and deducts 3 years."}
+                <br />
+                <strong style={{ color: '#f87171', display: 'block', marginTop: '8px' }}>
+                  This artifact can only be used once on this island!
+                </strong>
+              </p>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => setConfirmReward(null)}
+                  className="hero-action-btn"
+                  style={{ flex: 1, justifyContent: 'center' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmAndExecuteReward}
+                  className="spoken-submit-btn"
+                  style={{ flex: 1, margin: 0, padding: '10px' }}
+                  disabled={loading}
+                >
+                  {loading ? 'Channeling...' : 'Confirm & Invoke'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

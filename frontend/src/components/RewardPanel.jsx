@@ -56,6 +56,8 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
     }
   };
 
+  const [confirmArtifact, setConfirmArtifact] = useState(null);
+
   const handleInvokeArtifact = (rewardType) => {
     const info = ARTIFACT_INFO[rewardType];
     const payload = { reward_type: rewardType };
@@ -67,6 +69,7 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
       }
     }
     onUseReward(payload);
+    setConfirmArtifact(null);
   };
 
   return (
@@ -179,7 +182,7 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
                   <button 
                     type="button"
                     className="artifact-invoke-btn"
-                    onClick={() => handleInvokeArtifact(item.reward_type)}
+                    onClick={() => setConfirmArtifact(item.reward_type)}
                     disabled={loading}
                   >
                     {loading ? 'Channeling...' : `⚡ Invoke ${info.title}`}
@@ -190,6 +193,69 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
           </div>
         )}
       </div>
+
+      {/* REWARD CONFIRMATION MODAL */}
+      {confirmArtifact && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(3, 7, 18, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(145deg, rgba(13, 27, 42, 0.98) 0%, rgba(5, 12, 22, 0.98) 100%)',
+            border: '2px solid var(--gold)',
+            borderRadius: '16px',
+            padding: '28px',
+            maxWidth: '440px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8)'
+          }}>
+            <span style={{ fontSize: '3rem', display: 'block', marginBottom: '12px' }}>
+              {ARTIFACT_INFO[confirmArtifact]?.icon || '⚡'}
+            </span>
+            <h3 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: '0 0 10px 0', fontSize: '1.4rem' }}>
+              Invoke {ARTIFACT_INFO[confirmArtifact]?.title || confirmArtifact}?
+            </h3>
+            <p style={{ color: 'rgba(231, 229, 221, 0.85)', fontSize: '0.92rem', lineHeight: '1.5', margin: '0 0 24px 0' }}>
+              {ARTIFACT_INFO[confirmArtifact]?.description}
+              <br />
+              <strong style={{ color: '#f87171', display: 'block', marginTop: '8px' }}>
+                This artifact can only be used once on this island!
+              </strong>
+            </p>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={() => setConfirmArtifact(null)}
+                className="hero-action-btn"
+                style={{ flex: 1, justifyContent: 'center' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleInvokeArtifact(confirmArtifact)}
+                className="spoken-submit-btn"
+                style={{ flex: 1, margin: 0, padding: '10px' }}
+                disabled={loading}
+              >
+                {loading ? 'Channeling...' : 'Confirm & Invoke'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

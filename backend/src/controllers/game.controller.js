@@ -326,13 +326,11 @@ const useReward = async (req, res) => {
 
     // 3. Apply specific reward effect
     if (reward_type === 'ATHENAS_SCROLL') {
-      if (question && question.hint_text) {
-        resultData.hint = question.hint_text;
-        resultData.message = "Athena's Scroll reveals a free Oracle hint without deducting your standard hints!";
-      } else {
-        await client.query('UPDATE teams SET standard_hints_left = standard_hints_left + 1 WHERE id = $1', [teamId]);
-        resultData.message = "Athena's Scroll invoked! +1 Extra Divine Hint granted to your hold.";
-      }
+      if (!question) throw new Error("Target trial required for Athena's Scroll. Please select an active trial first.");
+      if (!question.hint_text) throw new Error("No Oracle hint available for this trial.");
+      
+      resultData.hint = question.hint_text;
+      resultData.message = `Athena's Scroll reveals: "${question.hint_text}"`;
     } 
     else if (reward_type === 'CYCLOPS_EYE') {
       if (!question || question.format !== 'MCQ') throw new Error('Target MCQ question required for Cyclops Eye');
