@@ -300,31 +300,37 @@ function QuestionConsole({
               {isMainCorrect ? (
                 <div style={{
                   padding: '24px',
-                  background: 'rgba(137, 171, 118, 0.12)',
+                  background: 'linear-gradient(135deg, rgba(137, 171, 118, 0.2) 0%, rgba(7, 21, 38, 0.95) 100%)',
                   borderRadius: '12px',
-                  border: '1.5px solid var(--success)',
+                  border: '2px solid #89ab76',
                   textAlign: 'center',
-                  boxShadow: '0 0 20px rgba(137, 171, 118, 0.2)'
+                  boxShadow: '0 0 25px rgba(137, 171, 118, 0.35)',
+                  margin: '16px 0'
                 }}>
-                  <span style={{ color: 'var(--success)', fontSize: '2rem', display: 'block', marginBottom: '6px' }}>✓</span>
-                  <p style={{ color: 'var(--success)', margin: 0, fontWeight: 'bold', fontSize: '1.1rem' }}>
-                    This trial has been conquered and recorded.
+                  <span style={{ color: '#89ab76', fontSize: '2.5rem', display: 'block', marginBottom: '6px' }}>✓</span>
+                  <p style={{ color: '#89ab76', margin: 0, fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'var(--display)' }}>
+                    Correct Answer Recorded!
                   </p>
+                  <span style={{ color: 'rgba(231, 229, 221, 0.8)', fontSize: '0.9rem', display: 'block', marginTop: '6px' }}>
+                    Years have been deducted from your voyage.
+                  </span>
                 </div>
               ) : isMainIncorrect ? (
                 <div style={{
                   textAlign: 'center',
                   padding: '24px',
-                  border: '1.5px solid rgba(239, 68, 68, 0.5)',
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  borderRadius: '12px'
+                  border: '2px solid #ef4444',
+                  background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(7, 21, 38, 0.95) 100%)',
+                  borderRadius: '12px',
+                  boxShadow: '0 0 25px rgba(239, 68, 68, 0.35)',
+                  margin: '16px 0'
                 }}>
-                  <span style={{ color: '#f87171', fontSize: '2rem', display: 'block', marginBottom: '6px' }}>✕</span>
-                  <p style={{ color: '#f87171', marginBottom: '0.4rem', fontWeight: 'bold', fontSize: '1.15rem' }}>
-                    Attempt Sealed (Incorrect)
+                  <span style={{ color: '#ef4444', fontSize: '2.5rem', display: 'block', marginBottom: '6px' }}>✕</span>
+                  <p style={{ color: '#ef4444', marginBottom: '0.4rem', fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'var(--display)' }}>
+                    Incorrect Answer (Penalty Incurred)
                   </p>
-                  <p style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.92rem', margin: 0 }}>
-                    This trial has been finalized. Proceed to solve the remaining trials or penalty inscriptions.
+                  <p style={{ color: 'rgba(231, 229, 221, 0.8)', fontSize: '0.9rem', margin: 0 }}>
+                    Penalty years added to your voyage. Continue to solve remaining trials.
                   </p>
                 </div>
               ) : (

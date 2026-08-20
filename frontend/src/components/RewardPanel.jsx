@@ -28,7 +28,14 @@ const ARTIFACT_INFO = {
   },
 };
 
-function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMainQuestion, questions = [] }) {
+const REWARD_ISLAND_MAP = {
+  ATHENAS_SCROLL: 1,
+  CYCLOPS_EYE: 2,
+  HERMES_SANDALS: 3,
+  THE_BLESSING: 4,
+};
+
+function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMainQuestion, questions = [], currentIslandId = 1 }) {
   const [selectedTargetId, setSelectedTargetId] = useState(activeMainQuestion?.id || '');
 
   const availableMainQuestions = useMemo(() => {
@@ -43,9 +50,10 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
     }
   }, [activeMainQuestion, availableMainQuestions, selectedTargetId]);
 
+  // Only show rewards that are NOT used AND belong strictly to the current island
   const activeInventory = useMemo(() => {
-    return inventory.filter(item => !item.is_used);
-  }, [inventory]);
+    return inventory.filter(item => !item.is_used && REWARD_ISLAND_MAP[item.reward_type] === currentIslandId);
+  }, [inventory, currentIslandId]);
 
   const handleHintClick = () => {
     const targetId = activeMainQuestion?.id || selectedTargetId || availableMainQuestions[0]?.id;

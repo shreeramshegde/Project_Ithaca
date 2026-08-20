@@ -62,12 +62,6 @@ function IslandPage() {
   const preRoundMutation = useMutation({
     mutationFn: (payload) => submitPreRound(token, payload),
     onSuccess: (payload) => {
-      const isCorrect = payload?.is_correct;
-      setFeedback({
-        kind: isCorrect ? 'success' : 'error',
-        title: isCorrect ? 'Ritual Sealed (Correct)' : 'Ritual Completed (Incorrect)',
-        message: payload?.message || (isCorrect ? 'You earned a divine artifact!' : 'Penalty applied, but the gateway has opened.'),
-      });
       refreshState();
     },
     onError: (error) => setFeedback({ kind: 'error', title: 'Pre-round failed', message: error.message }),
@@ -76,12 +70,6 @@ function IslandPage() {
   const answerMutation = useMutation({
     mutationFn: (payload) => submitAnswer(token, payload),
     onSuccess: (payload) => {
-      const isCorrect = payload?.is_correct;
-      setFeedback({
-        kind: isCorrect ? 'success' : 'error',
-        title: isCorrect ? 'Trial Completed (Correct)' : 'Trial Sealed (Incorrect)',
-        message: payload?.message || (isCorrect ? 'Correct! Years deducted from your journey.' : 'Incorrect! Penalty applied to your voyage.'),
-      });
       refreshState();
       if (island?.slug === 'witch' && payload?.is_correct === false) {
         setSitOutRequired(true);
@@ -371,6 +359,7 @@ function IslandPage() {
               onUseReward={(payload) => rewardMutation.mutate(payload)}
               activeMainQuestion={activeMainQuestion}
               questions={questions}
+              currentIslandId={island.id}
             />
           )}
         </section>
