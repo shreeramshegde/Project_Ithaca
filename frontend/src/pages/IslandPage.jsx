@@ -28,10 +28,12 @@ function IslandPage() {
   const [feedback, setFeedback] = useState(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
   const [showRules, setShowRules] = useState(true);
+  const [sitOutRequired, setSitOutRequired] = useState(false);
   const [revealedHints, setRevealedHints] = useState({});
   const [previousYears, setPreviousYears] = useState(team?.remaining_years ?? null);
   const [sirensPuzzleSolved, setSirensPuzzleSolved] = useState(false);
   const [witchSudokuSolved, setWitchSudokuSolved] = useState(false);
+  const [terminalPasswordFound, setTerminalPasswordFound] = useState('');
 
   const isPuzzlePending = (island.slug === 'sirens' && !sirensPuzzleSolved) || (island.slug === 'witch' && !witchSudokuSolved);
 
@@ -284,14 +286,16 @@ function IslandPage() {
 
           <div style={{ margin: '10px 0 20px 0' }}>
             {!isPreRoundComplete ? (
-              <div className="trials-chamber" style={{ textAlign: 'center', padding: '36px 20px' }}>
-                <div style={{ fontSize: '2.5rem', color: 'var(--gold)', marginBottom: '8px' }}>⛩️</div>
-                <h3 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', fontSize: '1.4rem', margin: '0 0 8px 0' }}>
-                  The Gateway to {island.title} is Sealed
-                </h3>
-                <p style={{ color: 'rgba(231, 229, 221, 0.8)', maxWidth: '520px', margin: '0 auto', fontSize: '0.95rem' }}>
-                  Complete the Oracle's Pre-Round Ritual in the console below to earn a divine artifact and reveal the main trials.
-                </p>
+              <div className="preround-lockout-banner">
+                <div className="preround-lockout-icon">⚡</div>
+                <div>
+                  <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: '0 0 4px 0', fontSize: '1.1rem' }}>
+                    Oracle's Seal is Active
+                  </h4>
+                  <p style={{ margin: 0, color: 'rgba(231, 229, 221, 0.8)', fontSize: '0.9rem' }}>
+                    Complete the gateway ritual below to dispel the mist, claim your divine artifact, and reveal this island's trials.
+                  </p>
+                </div>
               </div>
             ) : (
               <>
@@ -313,6 +317,7 @@ function IslandPage() {
                     hasCyclopsEye={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'CYCLOPS_EYE' && !i.is_used)}
                     onEyeClick={() => handleRewardClick('CYCLOPS_EYE')}
                     totalFailedAttempts={totalFailedAttempts}
+                    onKeyFound={(pwd) => setTerminalPasswordFound(pwd)}
                   />
                 )}
                 {island.slug === 'sirens' && (
@@ -362,6 +367,7 @@ function IslandPage() {
                 eliminatedOption={eliminatedOption}
                 sitOutRequired={sitOutRequired}
                 onSitOutAcknowledge={() => setSitOutRequired(false)}
+                autoFillAnswer={activeMainQuestion?.sequence_number === 2 && island.slug === 'cyclops' ? terminalPasswordFound : ''}
               />
             </div>
           )}
