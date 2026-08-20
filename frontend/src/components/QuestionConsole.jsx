@@ -82,6 +82,7 @@ function QuestionConsole({
   onNextIsland, 
   preRoundQuestion, 
   mainQuestion, 
+  revealedHint,
   eliminatedOption, 
   sitOutRequired, 
   onSitOutAcknowledge 
@@ -271,6 +272,30 @@ function QuestionConsole({
               )}
 
               <QuestionTextRenderer text={mainQuestion?.question_text} />
+
+              {revealedHint && (
+                <div style={{
+                  margin: '16px 0',
+                  padding: '16px 20px',
+                  background: 'linear-gradient(135deg, rgba(198, 165, 106, 0.15) 0%, rgba(7, 21, 38, 0.95) 100%)',
+                  border: '1.5px solid var(--gold)',
+                  borderRadius: '12px',
+                  boxShadow: '0 0 25px rgba(198, 165, 106, 0.25)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px'
+                }}>
+                  <span style={{ fontSize: '1.8rem' }}>🔮</span>
+                  <div>
+                    <strong style={{ color: 'var(--gold)', display: 'block', fontSize: '0.95rem', marginBottom: '4px' }}>
+                      Oracle's Revealed Clue:
+                    </strong>
+                    <span style={{ color: 'rgba(245, 242, 232, 0.95)', fontSize: '0.95rem', fontStyle: 'italic', lineHeight: '1.5' }}>
+                      "{revealedHint}"
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {isMainCorrect ? (
                 <div style={{

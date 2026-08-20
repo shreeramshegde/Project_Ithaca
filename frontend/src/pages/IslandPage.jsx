@@ -29,6 +29,7 @@ function IslandPage() {
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
   const [showRules, setShowRules] = useState(true);
   const [sitOutRequired, setSitOutRequired] = useState(false);
+  const [revealedHints, setRevealedHints] = useState({});
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],
@@ -107,11 +108,15 @@ function IslandPage() {
 
   const hintMutation = useMutation({
     mutationFn: (payload) => useHint(token, payload),
-    onSuccess: (payload) => {
+    onSuccess: (payload, variables) => {
+      const hintText = payload?.hint || payload?.message;
+      if (variables?.question_id && payload?.hint) {
+        setRevealedHints(prev => ({ ...prev, [variables.question_id]: payload.hint }));
+      }
       setFeedback({
         kind: 'info',
         title: 'Divine Hint Received',
-        message: payload?.hint || payload?.message || 'A hint was revealed by the fates.',
+        message: hintText || 'A hint was revealed by the fates.',
       });
       refreshState();
     },
@@ -120,7 +125,10 @@ function IslandPage() {
 
   const rewardMutation = useMutation({
     mutationFn: (payload) => useReward(token, payload),
-    onSuccess: (payload) => {
+    onSuccess: (payload, variables) => {
+      if (variables?.target_question_id && payload?.hint) {
+        setRevealedHints(prev => ({ ...prev, [variables.target_question_id]: payload.hint }));
+      }
       setFeedback({
         kind: 'info',
         title: 'Artifact Invoked',
@@ -342,6 +350,7 @@ function IslandPage() {
                 island={island}
                 preRoundQuestion={!isPreRoundComplete ? preRoundQuestion : null}
                 mainQuestion={isPreRoundComplete ? activeMainQuestion : null}
+                revealedHint={activeMainQuestion ? revealedHints[activeMainQuestion.id] : null}
                 loading={loading}
                 isCompleted={isCurrentlyCompleted}
                 onNextIsland={() => nextIslandMutation.mutate()}
