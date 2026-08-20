@@ -101,13 +101,8 @@ const submitPreRound = async (req, res) => {
       await client.query('INSERT INTO team_inventory (team_id, reward_type) VALUES ($1, $2)', [teamId, rewardType]);
       await client.query('INSERT INTO team_progress (team_id, question_id, status) VALUES ($1, $2, $3)', [teamId, question_id, 'CORRECT']);
       
-      // If Athena's Scroll is awarded, grant an extra standard hint to the team
-      if (rewardType === 'ATHENAS_SCROLL') {
-        await client.query('UPDATE teams SET standard_hints_left = standard_hints_left + 1 WHERE id = $1', [teamId]);
-      }
-      
       await client.query('COMMIT');
-      return res.status(200).json({ status: 'success', message: `Correct! You earned ${rewardType} and +1 Divine Hint.`, is_correct: true, reward: rewardType });
+      return res.status(200).json({ status: 'success', message: `Correct! You earned ${rewardType}.`, is_correct: true, reward: rewardType });
     } else {
       let penaltyMessage = 'Incorrect answer.';
       if (isHiddenWrong) {
