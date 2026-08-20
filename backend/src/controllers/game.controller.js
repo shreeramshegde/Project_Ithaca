@@ -370,8 +370,12 @@ const useReward = async (req, res) => {
     }
     else if (reward_type === 'HERMES_SANDALS' || reward_type === 'THE_BLESSING') {
       const yearsToDeduct = reward_type === 'THE_BLESSING' ? 3 : 2;
-      await client.query('UPDATE teams SET remaining_years = remaining_years - $1 WHERE id = $2', [yearsToDeduct, teamId]);
-      resultData.message = `${reward_type} applied! Deducted ${yearsToDeduct} years.`;
+      const teamUpd = await client.query(
+        'UPDATE teams SET remaining_years = remaining_years - $1 WHERE id = $2 RETURNING remaining_years', 
+        [yearsToDeduct, teamId]
+      );
+      resultData.remaining_years = teamUpd.rows[0].remaining_years;
+      resultData.message = `${reward_type === 'HERMES_SANDALS' ? "Hermes' Sandals" : "The Blessing"} applied! Deducted ${yearsToDeduct} years from your voyage.`;
     }
 
     // 4. Mark as used

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 
 function FacePuzzle({ onSolve, isSolved = false }) {
   const [tiles, setTiles] = useState([4, 1, 3, 7, 2, 6, 5, 8, 9]);
-  const [selectedIdx, setSelectedIdx] = useState(null);
+  const [draggedIdx, setDraggedIdx] = useState(null);
+  const [dragOverIdx, setDragOverIdx] = useState(null);
 
   const TILE_DATA = {
     1: { label: 'Forehead & Crest', glyph: '🪖', bg: '#3a2312' },
@@ -20,19 +21,55 @@ function FacePuzzle({ onSolve, isSolved = false }) {
     return currentTiles.every((val, idx) => val === idx + 1);
   };
 
+  const handleDragStart = (e, idx) => {
+    if (isSolved) return;
+    setDraggedIdx(idx);
+    e.dataTransfer.setData('text/plain', idx);
+  };
+
+  const handleDragOver = (e, idx) => {
+    e.preventDefault();
+    if (isSolved) return;
+    setDragOverIdx(idx);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIdx(null);
+  };
+
+  const handleDrop = (e, targetIdx) => {
+    e.preventDefault();
+    if (isSolved || draggedIdx === null) return;
+
+    if (draggedIdx !== targetIdx) {
+      const newTiles = [...tiles];
+      const temp = newTiles[draggedIdx];
+      newTiles[draggedIdx] = newTiles[targetIdx];
+      newTiles[targetIdx] = temp;
+
+      setTiles(newTiles);
+      if (checkSolved(newTiles)) {
+        if (onSolve) onSolve();
+      }
+    }
+    setDraggedIdx(null);
+    setDragOverIdx(null);
+  };
+
+  // Also support click-to-swap as fallback for mobile touch devices
   const handleTileClick = (idx) => {
     if (isSolved) return;
 
-    if (selectedIdx === null) {
-      setSelectedIdx(idx);
+    if (draggedIdx === null) {
+      setDraggedIdx(idx);
     } else {
       const newTiles = [...tiles];
-      const temp = newTiles[selectedIdx];
-      newTiles[selectedIdx] = newTiles[idx];
+      const temp = newTiles[draggedIdx];
+      newTiles[draggedIdx] = newTiles[idx];
       newTiles[idx] = temp;
 
       setTiles(newTiles);
-      setSelectedIdx(null);
+      setDraggedIdx(null);
 
       if (checkSolved(newTiles)) {
         if (onSolve) onSolve();
@@ -59,7 +96,7 @@ function FacePuzzle({ onSolve, isSolved = false }) {
         </h4>
       </div>
       <p style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.88rem', margin: '0 0 16px 0' }}>
-        Click any two shards to swap their positions until Odysseus's facial mosaic is restored (1 through 9).
+        Drag and drop shards onto each other to reconstruct Odysseus's face (Shards 1 through 9).
       </p>
 
       <div style={{
@@ -74,35 +111,47 @@ function FacePuzzle({ onSolve, isSolved = false }) {
         border: '1px solid rgba(198, 165, 106, 0.3)'
       }}>
         {tiles.map((num, idx) => {
-          const isSelected = selectedIdx === idx;
+          const isDragging = draggedIdx === idx;
+          const isOver = dragOverIdx === idx;
           const isCorrectPos = num === idx + 1;
           const data = TILE_DATA[num] || { glyph: '◈', label: `Shard ${num}`, bg: '#333' };
 
           return (
             <div
               key={idx}
+              draggable={!solved}
+              onDragStart={(e) => handleDragStart(e, idx)}
+              onDragOver={(e) => handleDragOver(e, idx)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, idx)}
               onClick={() => handleTileClick(idx)}
               style={{
                 aspectRatio: '1',
-                background: isSelected 
-                  ? 'linear-gradient(135deg, rgba(198, 165, 106, 0.4) 0%, rgba(7, 21, 38, 0.95) 100%)' 
-                  : isCorrectPos && solved
-                    ? 'linear-gradient(135deg, rgba(137, 171, 118, 0.3) 0%, rgba(7, 21, 38, 0.95) 100%)'
-                    : `linear-gradient(135deg, ${data.bg} 0%, #150d06 100%)`,
-                border: isSelected 
-                  ? '2px solid #00f0ff' 
-                  : isCorrectPos && solved
-                    ? '2px solid var(--success)'
-                    : '1.5px solid rgba(198, 165, 106, 0.4)',
+                background: isOver
+                  ? 'linear-gradient(135deg, rgba(0, 240, 255, 0.3) 0%, rgba(7, 21, 38, 0.95) 100%)'
+                  : isDragging
+                    ? 'rgba(198, 165, 106, 0.2)'
+                    : isCorrectPos && solved
+                      ? 'linear-gradient(135deg, rgba(137, 171, 118, 0.3) 0%, rgba(7, 21, 38, 0.95) 100%)'
+                      : `linear-gradient(135deg, ${data.bg} 0%, #150d06 100%)`,
+                border: isOver
+                  ? '2px dashed #00f0ff'
+                  : isDragging
+                    ? '2px solid var(--gold)'
+                    : isCorrectPos && solved
+                      ? '2px solid var(--success)'
+                      : '1.5px solid rgba(198, 165, 106, 0.4)',
                 borderRadius: '8px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: solved ? 'default' : 'pointer',
-                transition: 'all 0.2s ease',
-                transform: isSelected ? 'scale(1.05)' : 'scale(1)',
-                boxShadow: isSelected ? '0 0 15px rgba(0, 240, 255, 0.5)' : 'none'
+                cursor: solved ? 'default' : 'grab',
+                opacity: isDragging ? 0.6 : 1,
+                transform: isOver ? 'scale(1.06)' : 'scale(1)',
+                transition: 'all 0.15s ease',
+                userSelect: 'none',
+                boxShadow: isOver ? '0 0 18px rgba(0, 240, 255, 0.5)' : 'none'
               }}
             >
               <span style={{ fontSize: '1.6rem', marginBottom: '2px' }}>{data.glyph}</span>
@@ -120,7 +169,7 @@ function FacePuzzle({ onSolve, isSolved = false }) {
         </div>
       ) : (
         <div style={{ fontSize: '0.82rem', color: 'var(--gold)', opacity: 0.8 }}>
-          {selectedIdx !== null ? `Shard ${tiles[selectedIdx]} selected — now click another shard to swap` : 'Click a shard to begin swap'}
+          {draggedIdx !== null ? `Dragging Shard ${tiles[draggedIdx]} — Drop onto another shard` : 'Drag and drop any shard to swap'}
         </div>
       )}
     </div>

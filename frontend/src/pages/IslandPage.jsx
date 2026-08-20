@@ -28,9 +28,12 @@ function IslandPage() {
   const [feedback, setFeedback] = useState(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
   const [showRules, setShowRules] = useState(true);
-  const [sitOutRequired, setSitOutRequired] = useState(false);
   const [revealedHints, setRevealedHints] = useState({});
   const [previousYears, setPreviousYears] = useState(team?.remaining_years ?? null);
+  const [sirensPuzzleSolved, setSirensPuzzleSolved] = useState(false);
+  const [witchSudokuSolved, setWitchSudokuSolved] = useState(false);
+
+  const isPuzzlePending = (island.slug === 'sirens' && !sirensPuzzleSolved) || (island.slug === 'witch' && !witchSudokuSolved);
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],
@@ -319,6 +322,8 @@ function IslandPage() {
                     onSelectQuestion={setSelectedQuestionId}
                     hasSandals={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'HERMES_SANDALS' && !i.is_used)}
                     onSandalsClick={() => handleRewardClick('HERMES_SANDALS')}
+                    isPuzzleSolved={sirensPuzzleSolved}
+                    onSolvePuzzle={() => setSirensPuzzleSolved(true)}
                   />
                 )}
                 {island.slug === 'witch' && (
@@ -328,6 +333,8 @@ function IslandPage() {
                     onSelectQuestion={setSelectedQuestionId}
                     hasBlessing={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'THE_BLESSING' && !i.is_used)}
                     onBlessingClick={() => handleRewardClick('THE_BLESSING')}
+                    isPuzzleSolved={witchSudokuSolved}
+                    onSolvePuzzle={() => setWitchSudokuSolved(true)}
                   />
                 )}
                 {island.slug === 'ithaca' && (
@@ -345,7 +352,7 @@ function IslandPage() {
               <QuestionConsole
                 island={island}
                 preRoundQuestion={!isPreRoundComplete ? preRoundQuestion : null}
-                mainQuestion={isPreRoundComplete ? activeMainQuestion : null}
+                mainQuestion={isPreRoundComplete && !isPuzzlePending ? activeMainQuestion : null}
                 revealedHint={activeMainQuestion ? revealedHints[activeMainQuestion.id] : null}
                 loading={loading}
                 isCompleted={isCurrentlyCompleted}

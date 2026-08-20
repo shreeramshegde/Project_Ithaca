@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import RunicSudoku from '../games/RunicSudoku.jsx';
 
-function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestion, hasBlessing, onBlessingClick }) {
+function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestion, hasBlessing, onBlessingClick, isPuzzleSolved = false, onSolvePuzzle }) {
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
-  const [sudokuSolved, setSudokuSolved] = useState(false);
 
   return (
     <div className="trials-chamber" style={{ width: '100%' }}>
@@ -16,7 +15,7 @@ function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
         </span>
       </div>
 
-      <RunicSudoku onSolve={() => setSudokuSolved(true)} isSolved={sudokuSolved} />
+      <RunicSudoku onSolve={onSolvePuzzle} isSolved={isPuzzleSolved} />
 
       {hasBlessing && (
         <div className="cyclops-artifact-banner" style={{
@@ -43,58 +42,73 @@ function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
         </div>
       )}
 
-      <div className="witch-altars-row">
-        {baseQuestions.map((q, index) => {
-          const isSelected = q.id === activeMainQuestion?.id;
-          const isCompleted = q.progress_status === 'CORRECT';
-          const isFailed = q.progress_status === 'INCORRECT';
-          const isUnlocked = index === 0 || baseQuestions.slice(0, index).every(prev => prev.progress_status !== null);
+      {/* Hide the altars until Circe's Runic Sudoku is solved */}
+      {isPuzzleSolved ? (
+        <div className="witch-altars-row">
+          {baseQuestions.map((q, index) => {
+            const isSelected = q.id === activeMainQuestion?.id;
+            const isCompleted = q.progress_status === 'CORRECT';
+            const isFailed = q.progress_status === 'INCORRECT';
+            const isUnlocked = index === 0 || baseQuestions.slice(0, index).every(prev => prev.progress_status !== null);
 
-          let stateClass = '';
-          if (!isUnlocked) {
-            stateClass = 'locked';
-          } else if (isCompleted) {
-            stateClass = 'completed';
-          } else if (isFailed) {
-            stateClass = 'failed';
-          } else if (isSelected) {
-            stateClass = 'active';
-          }
+            let stateClass = '';
+            if (!isUnlocked) {
+              stateClass = 'locked';
+            } else if (isCompleted) {
+              stateClass = 'completed';
+            } else if (isFailed) {
+              stateClass = 'failed';
+            } else if (isSelected) {
+              stateClass = 'active';
+            }
 
-          return (
-            <div 
-              key={q.id}
-              className={`witch-altar-card ${stateClass}`}
-              onClick={() => {
-                if (isUnlocked && onSelectQuestion) {
-                  onSelectQuestion(q.id);
-                }
-              }}
-              style={{
-                opacity: !isUnlocked ? 0.4 : 1,
-                cursor: !isUnlocked ? 'not-allowed' : 'pointer',
-                borderColor: !isUnlocked ? 'rgba(255, 255, 255, 0.1)' : undefined,
-                borderTopColor: !isUnlocked ? '#444' : undefined
-              }}
-              title={!isUnlocked ? 'Cast previous incantations sequentially to unlock' : `Spell ${index + 1}`}
-            >
-              <div style={{
-                fontSize: '1.6rem',
-                color: !isUnlocked ? '#666' : isCompleted ? 'var(--success)' : isFailed ? '#f87171' : isSelected ? '#f59e0b' : 'rgba(198,165,106,0.6)',
-                marginBottom: '4px'
-              }}>
-                {!isUnlocked ? '🔒' : isCompleted ? '✓' : isFailed ? '✕' : '✧'}
+            return (
+              <div 
+                key={q.id}
+                className={`witch-altar-card ${stateClass}`}
+                onClick={() => {
+                  if (isUnlocked && onSelectQuestion) {
+                    onSelectQuestion(q.id);
+                  }
+                }}
+                style={{
+                  opacity: !isUnlocked ? 0.4 : 1,
+                  cursor: !isUnlocked ? 'not-allowed' : 'pointer',
+                  borderColor: !isUnlocked ? 'rgba(255, 255, 255, 0.1)' : undefined,
+                  borderTopColor: !isUnlocked ? '#444' : undefined
+                }}
+                title={!isUnlocked ? 'Cast previous incantations sequentially to unlock' : `Spell ${index + 1}`}
+              >
+                <div style={{
+                  fontSize: '1.6rem',
+                  color: !isUnlocked ? '#666' : isCompleted ? 'var(--success)' : isFailed ? '#f87171' : isSelected ? '#f59e0b' : 'rgba(198,165,106,0.6)',
+                  marginBottom: '4px'
+                }}>
+                  {!isUnlocked ? '🔒' : isCompleted ? '✓' : isFailed ? '✕' : '✧'}
+                </div>
+                <h4 style={{ fontFamily: 'var(--display)', color: !isUnlocked ? 'rgba(231,229,221,0.5)' : 'var(--cloud-white)', margin: '0 0 2px 0', fontSize: '0.88rem' }}>
+                  Spell {index + 1}
+                </h4>
+                <span style={{ fontSize: '0.7rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
+                  {!isUnlocked ? 'Locked' : '-2.0y'}
+                </span>
               </div>
-              <h4 style={{ fontFamily: 'var(--display)', color: !isUnlocked ? 'rgba(231,229,221,0.5)' : 'var(--cloud-white)', margin: '0 0 2px 0', fontSize: '0.88rem' }}>
-                Spell {index + 1}
-              </h4>
-              <span style={{ fontSize: '0.7rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
-                {!isUnlocked ? 'Locked' : '-2.0y'}
-              </span>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{
+          textAlign: 'center',
+          padding: '16px',
+          background: 'rgba(3, 8, 16, 0.6)',
+          borderRadius: '12px',
+          border: '1px dashed rgba(168, 85, 247, 0.4)',
+          color: 'rgba(231, 229, 221, 0.6)',
+          fontSize: '0.9rem'
+        }}>
+          🔒 Balance Circe's Runic Sudoku above to break the sorcery and unlock the Arcane Altars.
+        </div>
+      )}
     </div>
   );
 }
