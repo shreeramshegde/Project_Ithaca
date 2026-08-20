@@ -630,7 +630,8 @@
 
 .map-hud-top-center .years-value {
   font-size: 3.2rem;
-  text-shadow: 0 0 24px rgba(198,165,106,0.3);
+  color: #f5f2e8;
+  text-shadow: 0 0 24px rgba(198,165,106,0.5), 0 2px 8px rgba(0,0,0,0.8);
 }
 
 .map-hud-top-center .years-card::before { display: none; }

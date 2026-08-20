@@ -30,12 +30,20 @@ function IslandPage() {
   const [showRules, setShowRules] = useState(true);
   const [sitOutRequired, setSitOutRequired] = useState(false);
   const [revealedHints, setRevealedHints] = useState({});
+  const [previousYears, setPreviousYears] = useState(team?.remaining_years ?? null);
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],
     queryFn: () => getGameState(token),
     refetchInterval: 10000,
   });
+
+  useEffect(() => {
+    const currentYears = stateQuery.data?.data?.team?.remaining_years;
+    if (currentYears !== undefined && currentYears !== null) {
+      setPreviousYears((prev) => (prev === null ? currentYears : prev));
+    }
+  }, [stateQuery.data?.data?.team?.remaining_years]);
 
   const currentIsland = stateQuery.data?.data?.team?.current_island;
 
@@ -231,7 +239,7 @@ function IslandPage() {
         <GameHud
           teamName={team?.team_name}
           state={stateQuery.data?.data}
-          previousYears={team?.remaining_years}
+          previousYears={previousYears}
           onLogout={clearSession}
         />
 

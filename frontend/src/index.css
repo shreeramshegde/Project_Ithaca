@@ -611,6 +611,8 @@ a {
   font-family: var(--display);
   font-size: clamp(2.4rem, 7vw, 4.1rem);
   line-height: 1;
+  color: #f5f2e8;
+  text-shadow: 0 0 20px rgba(198, 165, 106, 0.4), 0 2px 4px rgba(0,0,0,0.8);
 }
 
 .years-label {

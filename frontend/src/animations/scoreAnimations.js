@@ -7,10 +7,10 @@ export function animateScoreChange(node, direction) {
 
   gsap.fromTo(
     node,
-    { scale: 0.94, color: direction === 'positive' ? '#203113' : '#541d15' },
+    { scale: 0.94, color: direction === 'positive' ? '#89ab76' : '#f87171' },
     {
       scale: 1,
-      color: '#231813',
+      color: '#f5f2e8',
       duration: 0.85,
       ease: 'power2.out',
     }
