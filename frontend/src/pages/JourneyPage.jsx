@@ -37,10 +37,10 @@ function JourneyPage() {
 
   const handleIslandClick = (slug) => {
     animateMapCamera(slug);
-    // Allow the camera animation to begin, then navigate reliably
+    // Allow the 0.5s camera pan and water transition to complete smoothly
     setTimeout(() => {
       navigate(`/journey/${slug}`);
-    }, 300);
+    }, 500);
   };
 
   return (

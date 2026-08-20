@@ -19,66 +19,104 @@ function FeedbackBanner({ result, onClose }) {
     setIsOpen(false);
     setTimeout(() => {
       if (onClose) onClose();
-    }, 400);
+    }, 350);
   };
 
   const isSuccess = result?.kind === 'success';
   const isError = result?.kind === 'error';
-  const isHint = result?.title?.toLowerCase().includes('hint') || result?.title?.toLowerCase().includes('scroll') || result?.title?.toLowerCase().includes('oracle');
+  
+  // Check if this notification is an Oracle Hint, Athena's Scroll, or Mythical Artifact
+  const titleLower = (result?.title || '').toLowerCase();
+  const msgLower = (result?.message || '').toLowerCase();
+  const isScrollRewardOrHint = 
+    titleLower.includes('hint') || 
+    titleLower.includes('scroll') || 
+    titleLower.includes('oracle') || 
+    titleLower.includes('artifact') || 
+    titleLower.includes('cyclops') || 
+    titleLower.includes('sandals') || 
+    titleLower.includes('blessing') ||
+    msgLower.includes('scroll') ||
+    msgLower.includes('oracle');
 
-  const icon = isSuccess ? '📜 ✓' : isError ? '📜 ✕' : '📜 ✦';
-  const themeClass = isSuccess ? 'parchment-success' : isError ? 'parchment-error' : 'parchment-gold';
+  // Standard Popup Colors & Icons (for answers and general feedback)
+  const stdIcon = isSuccess ? '✓' : isError ? '⚠' : '✦';
+  const stdColor = isSuccess ? 'var(--success)' : isError ? 'var(--danger)' : 'var(--gold)';
 
   return (
-    <div className={`parchment-overlay ${isOpen ? 'open' : ''}`} onClick={handleClose}>
-      <div className={`parchment-wrapper ${isOpen ? 'unrolled' : ''} ${themeClass}`} onClick={(e) => e.stopPropagation()}>
-        {/* Left Wooden Scroll Roller Rod */}
-        <div className="scroll-rod rod-left">
-          <div className="rod-finial top" />
-          <div className="rod-shaft" />
-          <div className="rod-finial bottom" />
-        </div>
-
-        {/* Unrolling Parchment Body */}
-        <div className="parchment-paper">
-          <div className="parchment-crease top" />
-          
-          <div className="parchment-content-inner">
-            <div className="parchment-header-seal">
-              <span className="seal-glyph">{icon}</span>
-              <h3 className="parchment-title">
-                {result?.title || 'Divine Revelation'}
-              </h3>
-            </div>
-
-            <div className="parchment-divider" />
-
-            <p className="parchment-text">
-              {result?.message}
-            </p>
-
-            <button 
-              type="button"
-              className="parchment-seal-btn" 
-              onClick={handleClose}
-            >
-              Seal Parchment & Continue
-            </button>
+    <div className={`feedback-modal-overlay ${isOpen ? 'open' : ''}`} onClick={handleClose}>
+      {isScrollRewardOrHint ? (
+        /* 1. HORIZONTAL PARCHMENT SCROLL (For Hints & Rewards Only) */
+        <div className={`parchment-wrapper ${isOpen ? 'unrolled' : ''} parchment-gold`} onClick={(e) => e.stopPropagation()}>
+          <div className="scroll-rod rod-left">
+            <div className="rod-finial top" />
+            <div className="rod-shaft" />
+            <div className="rod-finial bottom" />
           </div>
 
-          <div className="parchment-crease bottom" />
-        </div>
+          <div className="parchment-paper">
+            <div className="parchment-crease top" />
+            
+            <div className="parchment-content-inner">
+              <div className="parchment-header-seal">
+                <span className="seal-glyph">📜 🔮</span>
+                <h3 className="parchment-title">
+                  {result?.title || 'Oracle Revelation'}
+                </h3>
+              </div>
 
-        {/* Right Wooden Scroll Roller Rod */}
-        <div className="scroll-rod rod-right">
-          <div className="rod-finial top" />
-          <div className="rod-shaft" />
-          <div className="rod-finial bottom" />
+              <div className="parchment-divider" />
+
+              <p className="parchment-text">
+                {result?.message}
+              </p>
+
+              <button 
+                type="button"
+                className="parchment-seal-btn" 
+                onClick={handleClose}
+              >
+                Seal Parchment & Continue
+              </button>
+            </div>
+
+            <div className="parchment-crease bottom" />
+          </div>
+
+          <div className="scroll-rod rod-right">
+            <div className="rod-finial top" />
+            <div className="rod-shaft" />
+            <div className="rod-finial bottom" />
+          </div>
         </div>
-      </div>
+      ) : (
+        /* 2. ORIGINAL CLEAN POPUP MODAL (For Answer Submissions / Success / Error) */
+        <div 
+          className={`feedback-modal-content ${isOpen ? 'open' : ''} ${result?.kind || 'info'}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="feedback-icon" style={{ color: stdColor, fontSize: '2.5rem', marginBottom: '10px' }}>
+            {stdIcon}
+          </div>
+          <h3 style={{ fontFamily: 'var(--display)', color: stdColor, margin: '0 0 10px 0', fontSize: '1.4rem' }}>
+            {result?.title || 'Divine Revelation'}
+          </h3>
+          <p style={{ color: 'var(--cloud-white)', fontSize: '1.05rem', lineHeight: '1.6', margin: '0 0 20px 0', whiteSpace: 'pre-wrap' }}>
+            {result?.message}
+          </p>
+          <button 
+            type="button"
+            className="ghost-button cinematic-button" 
+            onClick={handleClose}
+            style={{ width: '100%', borderColor: stdColor, color: stdColor }}
+          >
+            Acknowledge
+          </button>
+        </div>
+      )}
 
       <style>{`
-        .parchment-overlay {
+        .feedback-modal-overlay {
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
           background: rgba(3, 8, 16, 0.88);
@@ -92,12 +130,41 @@ function FeedbackBanner({ result, onClose }) {
           pointer-events: none;
           padding: 20px;
         }
-        .parchment-overlay.open {
+        .feedback-modal-overlay.open {
           opacity: 1;
           pointer-events: all;
         }
 
-        /* The Scroll Structure */
+        /* --- STANDARD CLEAN MODAL DESIGN (Answers/Errors) --- */
+        .feedback-modal-content {
+          background: rgba(7, 21, 38, 0.98);
+          border: 1px solid rgba(198, 165, 106, 0.4);
+          border-radius: 12px;
+          padding: 28px;
+          max-width: 480px;
+          width: 90%;
+          text-align: center;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+          transform: translateY(20px) scale(0.95);
+          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .feedback-modal-content.open {
+          transform: translateY(0) scale(1);
+        }
+        .feedback-modal-content.success {
+          border-color: rgba(137, 171, 118, 0.6);
+          box-shadow: 0 0 30px rgba(137, 171, 118, 0.2);
+        }
+        .feedback-modal-content.error {
+          border-color: rgba(188, 120, 101, 0.6);
+          box-shadow: 0 0 30px rgba(188, 120, 101, 0.2);
+        }
+        .feedback-modal-content.info {
+          border-color: rgba(198, 165, 106, 0.6);
+          box-shadow: 0 0 30px rgba(198, 165, 106, 0.2);
+        }
+
+        /* --- PARCHMENT SCROLL DESIGN (Hints & Rewards) --- */
         .parchment-wrapper {
           position: relative;
           display: flex;
@@ -112,7 +179,6 @@ function FeedbackBanner({ result, onClose }) {
           transform: scale(1);
         }
 
-        /* Roller Rods (Left & Right Handles) */
         .scroll-rod {
           position: relative;
           width: 24px;
@@ -139,7 +205,6 @@ function FeedbackBanner({ result, onClose }) {
         .rod-finial.top { margin-bottom: -4px; }
         .rod-finial.bottom { margin-top: -4px; }
 
-        /* Parchment Paper Unrolling Animation */
         .parchment-paper {
           flex: 1;
           position: relative;
@@ -160,7 +225,6 @@ function FeedbackBanner({ result, onClose }) {
           opacity: 1;
         }
 
-        /* Aged Creases on Edges */
         .parchment-crease {
           position: absolute;
           left: 0; right: 0;
@@ -177,7 +241,6 @@ function FeedbackBanner({ result, onClose }) {
           background: linear-gradient(0deg, rgba(82, 53, 19, 0.4) 0%, transparent 100%);
         }
 
-        /* Text & Content inside the Scroll */
         .parchment-content-inner {
           padding: 32px 36px;
           min-width: 320px;
@@ -231,7 +294,6 @@ function FeedbackBanner({ result, onClose }) {
           font-weight: 500;
         }
 
-        /* Mythic Wax Seal Action Button */
         .parchment-seal-btn {
           font-family: var(--display);
           background: linear-gradient(180deg, #4a2411 0%, #2e1407 100%);
@@ -255,11 +317,6 @@ function FeedbackBanner({ result, onClose }) {
         .parchment-seal-btn:active {
           transform: translateY(1px);
         }
-
-        /* State Variations */
-        .parchment-success .seal-glyph { color: #2d5a1e; }
-        .parchment-error .seal-glyph { color: #782216; }
-        .parchment-gold .seal-glyph { color: #805b10; }
 
         @media (max-width: 480px) {
           .parchment-content-inner {

@@ -33,9 +33,11 @@ function LandingPage() {
   const handleEnter = () => {
     setIsDeparting(true);
     const timeline = runDepartureAnimation(refs, reducedMotion);
-    timeline.eventCallback('onComplete', () => navigate('/login'));
+    timeline.eventCallback('onComplete', () => {
+      setTimeout(() => navigate('/login'), 500);
+    });
     if (reducedMotion) {
-      navigate('/login');
+      setTimeout(() => navigate('/login'), 500);
     }
   };
 
