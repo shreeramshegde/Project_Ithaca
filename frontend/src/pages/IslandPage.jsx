@@ -346,14 +346,16 @@ function IslandPage() {
             </div>
           )}
 
-          <RewardPanel
-            inventory={stateQuery.data?.data?.inventory}
-            loading={loading}
-            onUseHint={(payload) => hintMutation.mutate(payload)}
-            onUseReward={(payload) => rewardMutation.mutate(payload)}
-            activeMainQuestion={activeMainQuestion}
-            questions={questions}
-          />
+          {isPreRoundComplete && island.slug !== 'ithaca' && (
+            <RewardPanel
+              inventory={stateQuery.data?.data?.inventory}
+              loading={loading}
+              onUseHint={(payload) => hintMutation.mutate(payload)}
+              onUseReward={(payload) => rewardMutation.mutate(payload)}
+              activeMainQuestion={activeMainQuestion}
+              questions={questions}
+            />
+          )}
         </section>
       </div>
     </main>

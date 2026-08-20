@@ -250,11 +250,16 @@ const useHint = async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'No standard hints remaining' });
     }
 
-    // Get the hint
-    const qRes = await client.query('SELECT hint_text FROM questions WHERE id = $1', [question_id]);
+    // Get the question
+    const qRes = await client.query('SELECT hint_text, type FROM questions WHERE id = $1', [question_id]);
     if (qRes.rows.length === 0 || !qRes.rows[0].hint_text) {
       await client.query('ROLLBACK');
       return res.status(404).json({ status: 'error', message: 'No hint available for this question' });
+    }
+
+    if (qRes.rows[0].type === 'PRE_ROUND') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ status: 'error', message: 'Hints cannot be used for Pre-Round questions' });
     }
 
     // Deduct hint
