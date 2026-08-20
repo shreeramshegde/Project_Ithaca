@@ -5,26 +5,27 @@ function RulesModal({ islandSlug, onClose }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Small delay for entrance animation
-    const timer = setTimeout(() => setIsOpen(true), 100);
+    const timer = setTimeout(() => setIsOpen(true), 80);
     return () => clearTimeout(timer);
   }, []);
 
   const handleClose = () => {
     setIsOpen(false);
-    setTimeout(onClose, 300); // Wait for exit animation
+    setTimeout(onClose, 400);
   };
 
   const getRulesContent = () => {
     if (islandSlug === 'lotus') {
       return (
         <>
-          <h3>Island 1: The Lotus Eaters</h3>
-          <ul>
-            <li>You must answer the <strong>4 Base Questions</strong> in any order by selecting them on the map.</li>
-            <li>If you answer incorrectly, you will receive a time penalty and must try again.</li>
-            <li>For every wrong answer, a <strong>Penalty Question</strong> will spawn on the map.</li>
-            <li>You cannot sail to the next island until all Base Questions <strong>and</strong> all spawned Penalty Questions are correctly answered.</li>
+          <h4 style={{ fontFamily: 'var(--display)', color: '#3b1e08', margin: '0 0 10px 0', fontSize: '1.25rem', textAlign: 'center' }}>
+            Island 1: The Lotus Eaters
+          </h4>
+          <ul style={{ paddingLeft: '22px', margin: 0 }}>
+            <li style={{ marginBottom: '10px' }}>You must answer the <strong>4 Base Questions</strong> in any order by selecting them on the map.</li>
+            <li style={{ marginBottom: '10px' }}>If you answer incorrectly, you will receive a time penalty and must try again.</li>
+            <li style={{ marginBottom: '10px' }}>For every wrong answer, an extra <strong>Penalty Inscription</strong> will spawn on the map.</li>
+            <li>You cannot sail to the next island until all Base Questions <strong>and</strong> all spawned Penalty Inscriptions are correctly solved.</li>
           </ul>
         </>
       );
@@ -32,75 +33,123 @@ function RulesModal({ islandSlug, onClose }) {
     
     return (
       <>
-        <h3>The Journey Continues</h3>
-        <ul>
-          <li>Questions must be answered in strict sequential order.</li>
-          <li>Failing a question applies a time penalty, but no penalty questions will spawn.</li>
+        <h4 style={{ fontFamily: 'var(--display)', color: '#3b1e08', margin: '0 0 10px 0', fontSize: '1.25rem', textAlign: 'center' }}>
+          The Odyssey Continues
+        </h4>
+        <ul style={{ paddingLeft: '22px', margin: 0 }}>
+          <li style={{ marginBottom: '10px' }}>Questions on this island must be conquered in <strong>strict sequential order</strong>.</li>
+          <li style={{ marginBottom: '10px' }}>Failing a trial applies an immediate time penalty to your voyage.</li>
+          <li>Solve each stage to unlock the path forward and navigate closer to Ithaca.</li>
         </ul>
       </>
     );
   };
 
   return (
-    <div className={`rules-modal-overlay ${isOpen ? 'open' : ''}`}>
-      <div className={`rules-modal-content ${isOpen ? 'open' : ''}`}>
-        <h2 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', borderBottom: '1px solid rgba(198, 165, 106, 0.3)', paddingBottom: '10px' }}>
-          Island Rules
-        </h2>
-        
-        <div className="rules-body" style={{ color: 'var(--cloud-white)', lineHeight: '1.6', textAlign: 'left', margin: '20px 0' }}>
-          {getRulesContent()}
+    <div className={`parchment-rules-overlay ${isOpen ? 'open' : ''}`} onClick={handleClose}>
+      <div className={`parchment-rules-wrapper ${isOpen ? 'unrolled' : ''}`} onClick={(e) => e.stopPropagation()}>
+        {/* Left Wooden Scroll Roller Rod */}
+        <div className="scroll-rod rod-left">
+          <div className="rod-finial top" />
+          <div className="rod-shaft" />
+          <div className="rod-finial bottom" />
         </div>
 
-        <button 
-          onClick={handleClose}
-          className="ghost-button cinematic-button"
-          style={{ width: '100%', marginTop: '15px' }}
-        >
-          Acknowledge & Begin
-        </button>
+        {/* Unrolling Parchment Body */}
+        <div className="parchment-paper">
+          <div className="parchment-crease top" />
+          
+          <div className="parchment-content-inner">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: '1.8rem' }}>📜</span>
+              <h3 style={{ fontFamily: 'var(--display)', color: '#3b1e08', margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>
+                Sacred Laws of the Island
+              </h3>
+            </div>
+
+            <div style={{ height: '2px', width: '80%', margin: '12px auto 16px auto', background: 'linear-gradient(90deg, transparent, #8c6d3b, transparent)' }} />
+
+            <div style={{ color: '#2b180a', lineHeight: '1.6', textAlign: 'left', margin: '14px 0', fontSize: '1rem', fontFamily: 'var(--display)' }}>
+              {getRulesContent()}
+            </div>
+
+            <button 
+              type="button"
+              onClick={handleClose}
+              className="parchment-seal-btn"
+              style={{ width: '100%', marginTop: '16px' }}
+            >
+              Acknowledge & Begin Voyage
+            </button>
+          </div>
+
+          <div className="parchment-crease bottom" />
+        </div>
+
+        {/* Right Wooden Scroll Roller Rod */}
+        <div className="scroll-rod rod-right">
+          <div className="rod-finial top" />
+          <div className="rod-shaft" />
+          <div className="rod-finial bottom" />
+        </div>
       </div>
 
       <style>{`
-        .rules-modal-overlay {
+        .parchment-rules-overlay {
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(7, 21, 38, 0.85);
-          backdrop-filter: blur(8px);
+          background: rgba(3, 8, 16, 0.88);
+          backdrop-filter: blur(10px);
           display: flex;
           justify-content: center;
           align-items: center;
-          z-index: 1000;
+          z-index: 2500;
           opacity: 0;
-          transition: opacity 0.3s ease;
+          transition: opacity 0.35s ease;
           pointer-events: none;
+          padding: 20px;
         }
-        .rules-modal-overlay.open {
+        .parchment-rules-overlay.open {
           opacity: 1;
           pointer-events: all;
         }
-        .rules-modal-content {
-          background: rgba(7, 21, 38, 0.95);
-          border: 1px solid rgba(198, 165, 106, 0.4);
-          border-radius: 12px;
-          padding: 30px;
-          max-width: 500px;
-          width: 90%;
-          box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(198, 165, 106, 0.1);
-          transform: translateY(20px) scale(0.95);
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        .parchment-rules-wrapper {
+          position: relative;
+          display: flex;
+          align-items: stretch;
+          max-width: 580px;
+          width: 95%;
+          filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95));
+          transform: scale(0.92);
+          transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .rules-modal-content.open {
-          transform: translateY(0) scale(1);
+        .parchment-rules-wrapper.unrolled {
+          transform: scale(1);
         }
-        .rules-body ul {
-          padding-left: 20px;
+
+        .parchment-rules-wrapper .parchment-paper {
+          flex: 1;
+          position: relative;
+          background: 
+            radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.12) 100%),
+            linear-gradient(180deg, #dfc698 0%, #f4e4be 15%, #ebd7ab 50%, #edd8ad 85%, #cfb380 100%);
+          border-top: 2px solid #a6844b;
+          border-bottom: 2px solid #8c6d3b;
+          margin: 6px -4px;
+          overflow: hidden;
+          max-width: 0;
+          opacity: 0;
+          transition: max-width 0.55s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+          box-shadow: inset 0 0 40px rgba(115, 75, 28, 0.45), inset 0 2px 10px rgba(0,0,0,0.25);
         }
-        .rules-body li {
-          margin-bottom: 12px;
+        .parchment-rules-wrapper.unrolled .parchment-paper {
+          max-width: 560px;
+          opacity: 1;
         }
-        .rules-body strong {
-          color: var(--gold);
+
+        .parchment-rules-wrapper strong {
+          color: #592e10;
         }
       `}</style>
     </div>
