@@ -223,14 +223,18 @@ What is the total OSPF metric cost of the final remaining route (R1 -> R2 -> R3 
 '25', 
 '15', 1.0, 1.5, 2, 1);
 
--- Question 2: Boulder Mechanics Projectile Range
+-- Question 2: Linux Shell Archive Extraction Challenge
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (2, 'MAIN', 'NON_MCQ', 
-'Polyphemus hurls a boulder at Odysseus''s ship with velocity v = 20 m/s at angle 30° (g = 10 m/s²).
-Using the range formula R = (v² * sin(2θ)) / g, where sin(60°) = 0.866:
-Calculate the horizontal distance in meters (e.g. 34.6):', 
-'Calculate (20 squared multiplied by sin(60 degrees)) divided by 10.', 
-'34.6', 1.0, 1.5, 2, 2);
+'Polyphemus''s ancient security terminal has locked the inner gate.
+Odysseus must use the interactive terminal above to locate the archives directory, extract the secret zip archive (cyclops_escape.zip), and read the clearance text file within.
+
+What is the secret clearance password inside the extracted file? (Paste or type the exact password):', 
+'Use Linux commands in the terminal above:
+1. Type "ls" or "cd archives" to inspect the directories.
+2. Type "unzip cyclops_escape.zip" to extract the archive.
+3. Type "cat clearance_password.txt" to view the password.', 
+'NOBODY-CYCLOPS-42', 1.0, 1.5, 2, 2);
 
 -- Question 3: Caesar Cipher Broadcast
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES

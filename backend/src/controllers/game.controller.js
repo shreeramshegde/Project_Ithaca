@@ -196,6 +196,7 @@ const submitAnswer = async (req, res) => {
       if (normIn === normExp) return true;
 
       // Smart synonyms for CS / DSA riddles and simulations
+      if (normExp === 'nobodycyclops42' && (normIn === 'nobodycyclops42' || normIn === 'nobody42')) return true;
       if (normExp === 'hope' && normIn === 'hope') return true;
       if (normExp === '3' && (normIn === '3' || normIn === '3steps' || normIn === 'three')) return true;
       if (normExp === '4' && (normIn === '4' || normIn === '4khz' || normIn === 'four')) return true;

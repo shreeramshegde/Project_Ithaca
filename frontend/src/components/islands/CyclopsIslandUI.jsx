@@ -1,7 +1,9 @@
 import React from 'react';
+import LinuxTerminal from '../games/LinuxTerminal.jsx';
 
-function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye, onEyeClick, onSelectQuestion }) {
+function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye, onEyeClick, onSelectQuestion, onKeyFound }) {
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
+  const isTerminalStep = activeMainQuestion?.sequence_number === 2;
 
   return (
     <div className="trials-chamber" style={{ width: '100%' }}>
@@ -13,6 +15,12 @@ function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye
           {baseQuestions.filter(q => q.progress_status === 'CORRECT').length} of {baseQuestions.length} Steps Conquered
         </span>
       </div>
+
+      {isTerminalStep && (
+        <div style={{ marginBottom: '16px' }}>
+          <LinuxTerminal onKeyFound={onKeyFound} />
+        </div>
+      )}
 
       {hasCyclopsEye && (
         <div className="cyclops-artifact-banner">
