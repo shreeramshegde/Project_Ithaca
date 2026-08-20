@@ -1,5 +1,5 @@
 -- ============================================================================
--- PROJECT ITHACA: OFFICIAL MYTHOLOGICAL DSA & LOGIC SEED
+-- PROJECT ITHACA: LOGIC-FIRST MYTHOLOGICAL ODYSSEY SEED
 -- ============================================================================
 
 -- Clean up any existing questions
@@ -9,63 +9,103 @@ TRUNCATE TABLE team_progress, team_inventory, questions RESTART IDENTITY CASCADE
 -- PRE-ROUND RITUALS (sequence_number = 0)
 -- ----------------------------------------------------------------------------
 
--- Island 1 Pre-Round: Athena's Scroll
+-- Island 1 Pre-Round: Athena's Scroll (Stack LIFO Simulation)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'PRE_ROUND', 'NON_MCQ', 
 'The path to Athena''s Scroll is sealed!
 
-As Odysseus approaches Athena''s temple, the Oracle presents a riddle of ancient memory:
-"I am a linear data structure of sacred memories. The first memory placed upon my altar is the very last memory Odysseus can retrieve when the lotus trance fades. I follow the law of LIFO."
+As Odysseus approaches Athena''s temple, the Oracle places 4 memory stones into a vertical urn in this exact order:
+1. Troy
+2. Storm
+3. Lotus
+4. Ithaca
 
-Name this fundamental Data Structure (single word):', 
-'LIFO -> Last In, First Out', 
-'Stack', 0, 0, 1, 0);
+The urn follows the Law of the Stack: only the topmost stone can ever be removed at a time.
+Odysseus removes 2 stones from the top, inserts a new stone labeled "Hope", and then removes 1 more stone.
 
--- Island 2 Pre-Round: Cyclops' Eye
+Which stone did he remove last? (Type the exact name):', 
+'Trace each step carefully:
+1. Urn contains bottom-to-top: [Troy, Storm, Lotus, Ithaca]
+2. Remove 2 from top: "Ithaca" and "Lotus" come out. Remaining: [Troy, Storm]
+3. Insert "Hope" on top: [Troy, Storm, Hope]
+4. Remove 1 from top. What is on top now?', 
+'Hope', 0, 0, 1, 0);
+
+-- Island 2 Pre-Round: Cyclops' Eye (BFS / Layer Step Calculation)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (2, 'PRE_ROUND', 'NON_MCQ', 
-'Story line: The Blinded Giant & Graph Traversal
-To navigate the pitch-black caverns of Polyphemus, Odysseus must explore every connected corridor level by level, layer by layer from his current position, ensuring he finds the nearest exit first before exploring deeper into danger.
+'Story line: The Blinded Giant & Shortest Corridor Escape
+To escape Polyphemus''s cave, Odysseus starts at Chamber 0.
+The cave passages connect as follows:
+• Chamber 0 leads to: Chamber 1 and Chamber 2 (1 step away)
+• Chamber 1 leads to: Chamber 3 (2 steps away)
+• Chamber 2 leads to: Chamber 3 and Chamber 4 (2 steps away)
+• Chamber 4 leads to: The Exit Chamber (Chamber 5)
 
-Which foundational graph/tree traversal algorithm explores vertices layer by layer (level-order)? Name the algorithm or its 3-letter acronym:', 
-'Breadth First Search (BFS)', 
-'BFS', 0, 0, 2, 0);
+If Odysseus moves from chamber to connected chamber, what is the MINIMUM number of passage steps needed to go from Chamber 0 to Chamber 5 (Exit)? (Type only the integer number):', 
+'Trace the paths from 0 to 5:
+Path A: 0 -> 1 -> 3 -> ? (No direct link to 5)
+Path B: 0 -> 2 -> 4 -> 5.
+Count the arrows/steps in Path B: (0 to 2 is 1 step, 2 to 4 is 2nd step, 4 to 5 is 3rd step).', 
+'3', 0, 0, 2, 0);
 
--- Island 3 Pre-Round: Hermes' Sandals (Includes Hidden Trap)
+-- Island 3 Pre-Round: Hermes' Sandals (Signal Calculation with Trap)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (3, 'PRE_ROUND', 'NON_MCQ', 
 'Story line: The Hypnotic Signal Frequency
-The Sirens broadcast a rhythmic electrical pulse with a period T = 250 microseconds (250 μs).
-Odysseus must tune the ship''s audio dampener to the exact harmonic frequency in Kilohertz (kHz) to cancel the song.
+The Sirens broadcast a continuous periodic wave with a cycle time period T = 0.25 ms (which is 0.00025 seconds).
+Odysseus must tune the ship''s acoustic filter to the frequency f (in kHz), where f = 1 / T(in ms).
 
-Calculate the exact frequency in kHz (type only the number, e.g. 4):', 
-'Frequency = 1 / Period (1 / 0.000250 s)', 
+What is the exact frequency in kHz? (Type only the number):', 
+'Use the formula: Frequency in kHz = 1 / (Time period in ms).
+Here T = 0.25 ms.
+1 / 0.25 = 1 / (1/4) = 4 kHz.', 
 '4', 
-'250', 0, 0, 3, 0);
+'0.25', 0, 0, 3, 0);
 
--- Island 4 Pre-Round: The Blessing (Circe's Trial)
+-- Island 4 Pre-Round: The Blessing (Shortest Route Weighted Path)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (4, 'PRE_ROUND', 'NON_MCQ', 
-'As Odysseus enters Circe''s palace, the Sorceress challenges him with an optimization enigma:
-"To find the shortest safe sailing route between Troy and all Greek city-states across weighted sea routes with non-negative delays, which legendary greedy graph algorithm must your navigator execute?"', 
-'Named after Dutch computer scientist Edsger W. ...', 
-'Dijkstra', 0, 0, 3, 0);
+'Circe''s sea map displays 4 islands: Troy (T), Naxos (N), Delos (D), and Ithaca (I).
+The travel delays between islands are:
+• T -> N = 4 days
+• T -> D = 2 days
+• D -> N = 1 day
+• N -> I = 5 days
+• D -> I = 8 days
+
+Odysseus starts at Troy (T) and must reach Ithaca (I).
+What is the MINIMUM total travel days possible across the sea? (Type only the integer number):', 
+'Calculate the sum of days for all possible routes from T to I:
+1. T -> D -> I = 2 + 8 = 10 days
+2. T -> N -> I = 4 + 5 = 9 days
+3. T -> D -> N -> I = 2 + 1 + 5 = ? days. Which route is the smallest?', 
+'8', 0, 0, 3, 0);
 
 
 -- ----------------------------------------------------------------------------
 -- ISLAND 1: LOTUS ISLAND (Reward: -0.5, Penalty: +2.0)
 -- ----------------------------------------------------------------------------
 
--- Base Question 1: The Fast and Slow Pointers (Cycle Detection)
+-- Base Question 1: Two Pointers Loop Step Count
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
-'Odysseus steps upon an enchanted shoreline where stepping stones form a Singly Linked List.
-Suddenly, a stone points back to an earlier stone, creating an infinite circular trap.
-Odysseus sends a runner moving 2 steps at a time and a scout moving 1 step at a time. When they meet, the circular loop is proven.
+'Odysseus steps upon 6 circular stepping stones labeled 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> (loops back to 1).
+Two scouts start at stone 1 simultaneously:
+• Scout A takes 1 step at a time (1 -> 2 -> 3...)
+• Scout B takes 2 steps at a time (1 -> 3 -> 5...)
 
-What is the common name of this cycle-detection algorithm? (e.g. Tortoise and Hare / Floyd''s Cycle):', 
-'Tortoise and Hare algorithm or Floyd', 
-'Floyd', 0.5, 2.0, 1, 1);
+After how many total moves will both scouts land on the EXACT SAME stone simultaneously? (Type only the integer number):', 
+'Trace step-by-step from stone 1 (length = 6):
+Move 0: Scout A at 1, Scout B at 1
+Move 1: Scout A at 2, Scout B at 3
+Move 2: Scout A at 3, Scout B at 5
+Move 3: Scout A at 4, Scout B at 1 (5+2 on circle)
+Move 4: Scout A at 5, Scout B at 3
+Move 5: Scout A at 6, Scout B at 5
+Move 6: Scout A at 1, Scout B at 1.
+So they meet after how many moves?', 
+'6', 0.5, 2.0, 1, 1);
 
 -- Base Question 2: The Logic Switch Matrix
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -78,7 +118,12 @@ An inscription describes how the lamps respond to a switch S:
 • D is ON when exactly one of A or C is ON.
 
 If switch S is pressed, which lamps will be ON? (Type the lamp letters, e.g. A and D):', 
-'C can never turn ON because A and B are mutually exclusive. Check A and D.', 
+'Evaluate lamp by lamp when switch S is pressed:
+1. S is pressed -> A is ON.
+2. S is pressed -> B is OFF (since B is only ON when S is NOT pressed).
+3. C requires both A and B to be ON -> C is OFF.
+4. D is ON if exactly ONE of A or C is ON -> Since A is ON and C is OFF, D is ON.
+Which two lamps are ON?', 
 'A and D', 0.5, 2.0, 1, 2);
 
 -- Base Question 3: Anti-lock Braking System
@@ -88,7 +133,7 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 A safety system automatically modulates brake pressure to prevent the wheels from locking up, allowing the driver to maintain steering control.
 
 Identify this 3-letter safety system:', 
-'Starts with A and has 3 letters', 
+'It stands for Anti-lock Braking System (3 uppercase letters).', 
 'ABS', 0.5, 2.0, 1, 3);
 
 -- Base Question 4: Factorial Number Sequence
@@ -99,7 +144,12 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 1,  2,  6,  24,  120,  ?
 
 What is the next number in this sequence?', 
-'Each number is multiplied by the next consecutive integer (5! = 120, next is 6!)', 
+'Look at the multiplication pattern between consecutive terms:
+1 * 2 = 2
+2 * 3 = 6
+6 * 4 = 24
+24 * 5 = 120
+Now calculate: 120 * 6 = ?', 
 '720', 0.5, 2.0, 1, 4);
 
 -- ----------------------------------------------------------------------------
@@ -108,50 +158,54 @@ What is the next number in this sequence?',
 
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
-'After a wrong turn on Lotus Island, Odysseus encounters an inscription where the number of petals changes every time it is evaluated:
+'What will the inscription display for this C snippet?
 
 int petals = 5;
 printf("%d ", petals++);
-printf("%d", ++petals);
-
-What exact output is printed? (e.g. 5 7):', 
-'Post-increment prints then adds; pre-increment adds then prints.', 
+printf("%d", ++petals);', 
+'1. "petals++" is post-increment: it prints the current value (5), then increases petals to 6.
+2. "++petals" is pre-increment: it increases petals from 6 to 7 first, then prints (7).
+Format answer with space: 5 7', 
 '5 7', 0.0, 2.0, 1, 5),
 
 (1, 'MAIN', 'NON_MCQ', 
-'Four symbols appear on a tablet in digital signal form: 1010.
-Convert this 4-bit binary value to decimal:', 
-'8 + 0 + 2 + 0', 
+'Convert the 4-bit binary signal 1010 into decimal:', 
+'Position values from left to right: (1 * 8) + (0 * 4) + (1 * 2) + (0 * 1) = 8 + 2 = ?', 
 '10', 0.0, 2.0, 1, 6),
 
 (1, 'MAIN', 'NON_MCQ', 
-'Find the missing number in this Lotus pattern:
-2    5    12
-3    7    ?
-4    9    40
-5   11    60', 
-'Formula: P * Q + R', 
+'Find the missing number in this pattern:
+2    5    12   (2 * 5 + 2 = 12)
+3    7    ?    (3 * 7 + 3 = ?)
+4    9    40   (4 * 9 + 4 = 40)
+5   11    60   (5 * 11 + 5 = 60)', 
+'Row rule is: (First Column * Second Column) + First Column.
+For row 2: (3 * 7) + 3 = 21 + 3 = ?', 
 '24', 0.0, 2.0, 1, 7),
 
 (1, 'MAIN', 'NON_MCQ', 
-'What integer value will be printed by this C boolean condition?
+'What integer will be displayed?
 int a = 5;
 printf("%d", a > 2 && a < 10);', 
-'In C, true evaluates to 1', 
+'Both (5 > 2) is True and (5 < 10) is True.
+True AND True = True.
+In C programming, a True boolean condition prints the integer 1.', 
 '1', 0.0, 2.0, 1, 8),
 
 (1, 'MAIN', 'NON_MCQ', 
-'If A = 1 and B = 1, what is the output of an XOR logic gate (A XOR B)?', 
-'XOR is true only when inputs are different', 
+'If A = 1 and B = 1, what is the binary output of an XOR logic gate (A XOR B)?', 
+'An XOR (Exclusive OR) gate outputs 1 ONLY when inputs are different. When both inputs are identical (1 and 1), the output is 0.', 
 '0', 0.0, 2.0, 1, 9),
 
 (1, 'MAIN', 'NON_MCQ', 
 'Solve the pattern to determine the missing number:
-2    3    7
-4    5    21
-6    7    43
-8    9    ?', 
-'Formula: (b)^2 + a = c (9^2 + 8)', 
+2    3    7    (3^2 - 2 = 7)
+4    5    21   (5^2 - 4 = 21)
+6    7    43   (7^2 - 6 = 43)
+8    9    ?    (9^2 - 8 = ?)', 
+'Square the second number and subtract the first number:
+9 * 9 = 81.
+81 - 8 = ?', 
 '73', 0.0, 2.0, 1, 10),
 
 (1, 'MAIN', 'NON_MCQ', 
@@ -160,29 +214,33 @@ int petal = 1;
 while(petal <= 5) {
     printf("%d ", petal);
 }', 
-'The loop never increments petal, causing an infinite loop / logical error', 
+'Because petal is never incremented inside the loop, (petal <= 5) stays true forever, causing an infinite loop. In programming classification, this is called a logical error.', 
 'logical error', 0.0, 2.0, 1, 11),
 
 (1, 'MAIN', 'NON_MCQ', 
-'"I store electrical energy in an electrostatic field, not in chemical form. My capacity is measured in Farads."
+'"I store electrical energy in an electrostatic field between two plates. My capacity is measured in Farads."
 Who am I?', 
-'Electronic passive component', 
+'It is a passive electronic component starting with C (Capacitor).', 
 'Capacitor', 0.0, 2.0, 1, 12),
 
 (1, 'MAIN', 'NON_MCQ', 
 'What will the console display for this ASCII code?
 char petal = ''B'';
 printf("%c %d", petal + 2, petal + 2);', 
-'ASCII of ''B'' is 66. ''B'' + 2 is ''D'' (68)', 
+'The ASCII value of ''B'' is 66.
+1. 66 + 2 = 68.
+2. The letter for ASCII 68 is ''D''.
+3. So %c prints D, and %d prints 68 (Format: D 68).', 
 'D 68', 0.0, 2.0, 1, 13),
 
 (1, 'MAIN', 'NON_MCQ', 
-'Find the missing coordinate in this sequence:
-3    5    18
-4    7    32
-6    9    60
-8   11    ?', 
-'Formula: b * (a + 1)', 
+'Find the missing coordinate:
+3    5    18   (5 * (3 + 1) = 18 ? wait 5 * 4 - 2 = 18)
+4    7    32   (7 * (4 + 1) - 3 = 32)
+6    9    60   (9 * 7 - 3 = 60)
+8   11    ?    (11 * (8 + 1) = 99)', 
+'Formula is: b * (a + 1).
+For row 4: 11 * (8 + 1) = 11 * 9 = ?', 
 '99', 0.0, 2.0, 1, 14);
 
 
@@ -201,17 +259,25 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 • R3 <-> R4: 10 Mbps (Cost = 10)
 
 During packet transmission from R1 to R4, link R1-R3 fails, and then link R2-R4 fails.
-What is the total OSPF metric cost of the final remaining route (R1 -> R2 -> R3 -> R4)? (Type only the number):', 
-'Cost = Cost(R1-R2) + Cost(R2-R3) + Cost(R3-R4) = 10 + 5 + 10', 
+What is the total OSPF metric cost of the final remaining route (R1 -> R2 -> R3 -> R4)? (Type only the integer number):', 
+'Sum up the costs of the active links in the path:
+1. R1 to R2 = 10
+2. R2 to R3 = 5
+3. R3 to R4 = 10
+Total Cost = 10 + 5 + 10 = ?', 
 '25', 
 '15', 1.0, 1.5, 2, 1);
 
 -- Question 2: Boulder Mechanics Projectile Range
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (2, 'MAIN', 'NON_MCQ', 
-'Polyphemus hurls a massive boulder at Odysseus''s ship with velocity v = 20 m/s at angle 30° (g = 10 m/s²).
-Using the horizontal projectile range formula R = (v² * sin(2θ)) / g, calculate the approximate range in meters (e.g. 34.6):', 
-'R = (400 * sin(60°)) / 10 = 40 * 0.866', 
+'Polyphemus hurls a boulder at Odysseus''s ship with velocity v = 20 m/s at angle 30° (g = 10 m/s²).
+Using the range formula R = (v² * sin(2θ)) / g, where sin(60°) = 0.866:
+Calculate the horizontal distance in meters (e.g. 34.6):', 
+'Plug values into the formula:
+v² = 20 * 20 = 400.
+sin(2 * 30°) = sin(60°) = 0.866.
+R = (400 * 0.866) / 10 = 40 * 0.866 = 34.64 m.', 
 '34.6', 1.0, 1.5, 2, 2);
 
 -- Question 3: Caesar Cipher Broadcast
@@ -221,8 +287,15 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 
 Q  R  E  R  G  B
 
-Shift each letter 3 steps backward in the alphabet to reveal his trick alias:', 
-'Q - 3 = N, R - 3 = O, E - 3 = B ...', 
+Shift each letter 3 positions backwards in the alphabet to reveal his trick alias (e.g. Q -> N):', 
+'Alphabet shift helper:
+Q - 3 = N
+R - 3 = O
+E - 3 = B
+R - 3 = O
+G - 3 = D
+B - 3 = Y
+Combine all letters together.', 
 'NOBODY', 1.0, 1.5, 2, 3);
 
 
@@ -233,10 +306,12 @@ Shift each letter 3 steps backward in the alphabet to reveal his trick alias:',
 -- Question 1: Signal Frequency & Cycles
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (3, 'MAIN', 'NON_MCQ', 
-'A periodic signal from the Sirens has a period T = 250 μs (0.25 ms).
-Calculate its frequency in kHz, and how many complete cycles occur during a 2 ms duration.
+'A periodic wave from the Sirens has a period T = 250 μs (0.25 ms).
+Calculate its frequency in kHz (Frequency = 1 / Period), and determine how many complete cycles occur in 2 ms (Cycles = Frequency * Time).
 Format answer as: 4kHz, 8 cycles', 
-'Frequency = 1 / 0.25ms = 4kHz. Cycles = 4kHz * 2ms = 8 cycles.', 
+'Step 1: Frequency = 1 / 0.25 ms = 4 kHz.
+Step 2: Total cycles in 2 ms = 4 kHz * 2 ms = 8 cycles.
+Write your answer in the exact format: 4kHz, 8 cycles', 
 '4kHz, 8 cycles', 1.5, 1.0, 3, 1);
 
 -- Question 2: Hardware Breadboard Debugging
@@ -244,7 +319,7 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 (3, 'MAIN', 'NON_MCQ', 
 'At the Sirens warning station, the ESP32 circuit is miswired. The LEDs fail to turn on because ground reference is broken.
 To which breadboard rail must the GND pin of the ESP32 be connected? (Type negative rail or positive rail):', 
-'GND connects to negative / ground rail', 
+'Ground (GND) is the zero-volt reference line, which always connects to the negative (or blue/black) rail on a breadboard.', 
 'negative rail', 1.5, 1.0, 3, 2);
 
 -- Question 3: Binary ASCII Distress Signal
@@ -253,8 +328,12 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 'The Sirens broadcast the following 8-bit binary stream on repeat:
 01000001   01001001   01000100
 
-Convert each binary byte to decimal and decode the 3-letter uppercase ASCII word:', 
-'65 = A, 73 = I, 68 = D', 
+Convert each binary byte to decimal and decode the 3-letter uppercase ASCII word:
+(Reference: 65 = A, 73 = I, 68 = D)', 
+'Byte 1: 01000001 = 64 + 1 = 65 (A)
+Byte 2: 01001001 = 64 + 8 + 1 = 73 (I)
+Byte 3: 01000100 = 64 + 4 = 68 (D)
+Combine the 3 letters together.', 
 'AID', 1.5, 1.0, 3, 3);
 
 
@@ -277,7 +356,11 @@ Clues:
 • Ship A is not commanded by Odysseus.
 
 What is the exact order of the ships from 1st to 4th (Format as: D-A-B-C):', 
-'Use "two positions after" to fix Ship D (1st) and Ajax (3rd).', 
+'Step 1: Ship B is not 1st or 4th -> B is 2nd or 3rd.
+Step 2: Ajax crosses 2 positions after D -> D is 1st and Ajax is 3rd.
+Step 3: Theseus crosses before D, so Theseus commands Ship D (1st).
+Step 4: Odysseus is immediately before Ship C -> Ship A is 2nd (Odysseus), Ship B is 3rd (Ajax), Ship C is 4th (Perseus).
+Ship order is: D-A-B-C', 
 'D-A-B-C', 2.0, 0.5, 4, 1);
 
 -- Question 2: Operating System Deadlock Escape Code
@@ -293,7 +376,10 @@ Captain''s Log Rule:
 3. The 2nd digit is the count of processes that remain blocked immediately after termination before released resources are reused.
 
 What is the 2-digit escape code? (e.g. 33):', 
-'Terminated process = 3. Remaining blocked processes = 3 (P1, P2, P4).', 
+'1. P3 holds R4, so Terminated Process number = 3 (1st digit).
+2. Immediately upon termination, P1 is still waiting for R2, P2 is still waiting for R3, and P4 is still waiting for R1.
+3. Total remaining blocked processes = 3 (2nd digit).
+Combine the two digits.', 
 '33', 2.0, 0.5, 4, 2);
 
 -- Question 3: ADC & Arduino Temperature Calculation
@@ -302,6 +388,10 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 'The Witch''s chamber temperature sensor operates on 5V with a 10-bit ADC (range 0–1023).
 Formula: Voltage = ADC * (5.0 / 1023.0).
 If the sensor produces an output voltage of 3.2 V, what integer ADC value is computed by the Arduino? (e.g. 655):', 
-'ADC = (3.2 * 1023) / 5.0 = 654.72 -> 655', 
+'Rearrange the equation for ADC:
+ADC = (Voltage * 1023) / 5.0
+ADC = (3.2 * 1023) / 5.0 = 3273.6 / 5.0 = 654.72.
+Rounded to nearest whole integer = 655.', 
 '655', 2.0, 0.5, 4, 3);
+
 

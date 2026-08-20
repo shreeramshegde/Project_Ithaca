@@ -102,10 +102,10 @@ const submitPreRound = async (req, res) => {
       const normExp = normalizeString(expected);
       if (normIn === normExp) return true;
 
-      if (normExp === 'stack' && (normIn === 'lifo' || normIn === 'astack')) return true;
-      if (normExp === 'bfs' && (normIn === 'breadthfirstsearch' || normIn === 'breadthfirst')) return true;
-      if (normExp === 'dijkstra' && (normIn === 'dijkstras' || normIn === 'dijkstraalgorithm')) return true;
-      if (normExp === '4' && (normIn === '4khz' || normIn === '4000hz')) return true;
+      if (normExp === 'hope' && normIn === 'hope') return true;
+      if (normExp === '3' && (normIn === '3' || normIn === '3steps' || normIn === 'three')) return true;
+      if (normExp === '4' && (normIn === '4' || normIn === '4khz' || normIn === 'four')) return true;
+      if (normExp === '8' && (normIn === '8' || normIn === '8days' || normIn === 'eight')) return true;
 
       return false;
     };
@@ -195,17 +195,20 @@ const submitAnswer = async (req, res) => {
       const normExp = normalizeString(expected);
       if (normIn === normExp) return true;
 
-      // Smart synonyms for CS / DSA riddles
-      if (normExp === 'stack' && (normIn === 'lifo' || normIn === 'astack')) return true;
-      if (normExp === 'bfs' && (normIn === 'breadthfirstsearch' || normIn === 'breadthfirst')) return true;
-      if (normExp === 'dijkstra' && (normIn === 'dijkstras' || normIn === 'dijkstraalgorithm')) return true;
-      if (normExp === 'floyd' && (normIn === 'tortoiseandhare' || normIn === 'floydscycle' || normIn === 'floydscyclefindingalgorithm' || normIn === 'twopointers')) return true;
+      // Smart synonyms for CS / DSA riddles and simulations
+      if (normExp === 'hope' && normIn === 'hope') return true;
+      if (normExp === '3' && (normIn === '3' || normIn === '3steps' || normIn === 'three')) return true;
+      if (normExp === '4' && (normIn === '4' || normIn === '4khz' || normIn === 'four')) return true;
+      if (normExp === '8' && (normIn === '8' || normIn === '8days' || normIn === 'eight')) return true;
+      if (normExp === '6' && (normIn === '6' || normIn === '6moves' || normIn === 'six' || normIn === '6steps')) return true;
       if (normExp === 'abs' && normIn === 'antilockbrakingsystem') return true;
-      if (normExp === 'aandd' && (normIn === 'ad' || normIn === 'da')) return true;
+      if (normExp === 'aandd' && (normIn === 'ad' || normIn === 'da' || normIn === 'aandd')) return true;
       if (normExp === 'dabc' && normIn === 'dabc') return true;
       if (normExp === '4khz8cycles' && (normIn === '4khz8cycles' || normIn === '48' || normIn === '4khz8' || normIn === '48cycles')) return true;
       if (normExp === 'negativerail' && (normIn === 'negative' || normIn === 'ground' || normIn === 'gnd' || normIn === 'negativerail')) return true;
       if (normExp === 'logicalerror' && (normIn === 'infiniteloop' || normIn === 'infinitelooperror')) return true;
+      if (normExp === '346' && (normIn === '346' || normIn === '346m' || normIn === '3464' || normIn === '35')) return true;
+      if (normExp === '655' && (normIn === '655' || normIn === '654' || normIn === '65472')) return true;
 
       return false;
     };
