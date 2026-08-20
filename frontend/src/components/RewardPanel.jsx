@@ -79,39 +79,62 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '16px' }}>
-        {/* ORACLE HINT CARD */}
-        <div style={{
-          background: 'linear-gradient(145deg, rgba(10, 25, 45, 0.85) 0%, rgba(5, 15, 26, 0.95) 100%)',
-          border: '1.5px solid rgba(198, 165, 106, 0.35)',
-          borderRadius: '14px',
-          padding: '22px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          gap: '14px'
-        }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-              <span style={{ fontSize: '1.6rem' }}>🔮</span>
-              <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: 0, fontSize: '1.1rem' }}>
-                Seek Oracle's Hint
-              </h4>
-            </div>
-            <p style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.88rem', lineHeight: '1.45', margin: 0 }}>
-              Consult Athena and the fates for an illuminating clue on your active trial ({activeMainQuestion ? `Trial ${activeMainQuestion.sequence_number}` : 'Current Trial'}).
+        {/* ORACLE HINT CARD (Only available once Pre-Round is conquered) */}
+        {!activeMainQuestion ? (
+          <div style={{
+            background: 'rgba(10, 25, 45, 0.4)',
+            border: '1px dashed rgba(198, 165, 106, 0.25)',
+            borderRadius: '14px',
+            padding: '22px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            gap: '8px'
+          }}>
+            <span style={{ fontSize: '1.8rem', opacity: 0.5 }}>🔒</span>
+            <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: 0, fontSize: '1rem' }}>
+              Oracle's Clue Sealed
+            </h4>
+            <p style={{ color: 'rgba(231, 229, 221, 0.6)', fontSize: '0.84rem', margin: 0 }}>
+              Hints cannot be used during the Oracle's Pre-Round Ritual. Complete the ritual to unlock clues for main island trials.
             </p>
           </div>
+        ) : (
+          <div style={{
+            background: 'linear-gradient(145deg, rgba(10, 25, 45, 0.85) 0%, rgba(5, 15, 26, 0.95) 100%)',
+            border: '1.5px solid rgba(198, 165, 106, 0.35)',
+            borderRadius: '14px',
+            padding: '22px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            gap: '14px'
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <span style={{ fontSize: '1.6rem' }}>🔮</span>
+                <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: 0, fontSize: '1.1rem' }}>
+                  Seek Oracle's Hint
+                </h4>
+              </div>
+              <p style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.88rem', lineHeight: '1.45', margin: 0 }}>
+                Consult Athena and the fates for an illuminating clue on your active trial (Trial {activeMainQuestion.sequence_number || 1}).
+              </p>
+            </div>
 
-          <button 
-            type="button" 
-            className="spoken-submit-btn"
-            onClick={handleHintClick} 
-            disabled={loading || (!activeMainQuestion && availableMainQuestions.length === 0)}
-            style={{ padding: '10px', fontSize: '0.9rem' }}
-          >
-            {loading ? 'Consulting...' : `Invoke Oracle Clue ${activeMainQuestion ? `(Trial ${activeMainQuestion.sequence_number || 1})` : ''}`}
-          </button>
-        </div>
+            <button 
+              type="button" 
+              className="spoken-submit-btn"
+              onClick={handleHintClick} 
+              disabled={loading}
+              style={{ padding: '10px', fontSize: '0.9rem' }}
+            >
+              {loading ? 'Consulting...' : `Invoke Oracle Clue (Trial ${activeMainQuestion.sequence_number || 1})`}
+            </button>
+          </div>
+        )}
 
         {/* ACTIVE ARTIFACTS OR EMPTY STATE */}
         {activeInventory.length === 0 ? (
