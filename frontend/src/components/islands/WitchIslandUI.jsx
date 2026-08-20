@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import RunicSudoku from '../games/RunicSudoku.jsx';
 
 function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestion, hasBlessing, onBlessingClick }) {
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
+  const [sudokuSolved, setSudokuSolved] = useState(false);
 
   return (
     <div className="trials-chamber" style={{ width: '100%' }}>
@@ -13,6 +15,8 @@ function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
           {baseQuestions.filter(q => q.progress_status === 'CORRECT').length} of {baseQuestions.length} Incantations Solved
         </span>
       </div>
+
+      <RunicSudoku onSolve={() => setSudokuSolved(true)} isSolved={sudokuSolved} />
 
       {hasBlessing && (
         <div className="cyclops-artifact-banner" style={{

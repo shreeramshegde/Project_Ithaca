@@ -93,8 +93,25 @@ const submitPreRound = async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Pre-round already completed' });
     }
 
-    const isCorrect = (selected_option === question.correct_answer);
-    const isHiddenWrong = (question.hidden_wrong_answer && selected_option === question.hidden_wrong_answer);
+    const normalizeString = (str) => {
+      return str ? str.replace(/[^a-zA-Z0-9]/g, '').trim().toLowerCase() : '';
+    };
+
+    const isMatch = (input, expected) => {
+      const normIn = normalizeString(input);
+      const normExp = normalizeString(expected);
+      if (normIn === normExp) return true;
+
+      if (normExp === 'stack' && (normIn === 'lifo' || normIn === 'astack')) return true;
+      if (normExp === 'bfs' && (normIn === 'breadthfirstsearch' || normIn === 'breadthfirst')) return true;
+      if (normExp === 'dijkstra' && (normIn === 'dijkstras' || normIn === 'dijkstraalgorithm')) return true;
+      if (normExp === '4' && (normIn === '4khz' || normIn === '4000hz')) return true;
+
+      return false;
+    };
+
+    const isCorrect = isMatch(selected_option, question.correct_answer);
+    const isHiddenWrong = (question.hidden_wrong_answer && isMatch(selected_option, question.hidden_wrong_answer));
 
     if (isCorrect) {
       const rewardType = getRewardForIsland(question.island_id);
@@ -168,19 +185,34 @@ const submitAnswer = async (req, res) => {
       }
     }
 
-    // 3. Verify answer
+    // 3. Verify answer with smart synonym matching for DSA riddles
     const normalizeString = (str) => {
-      return str ? str.replace(/\s+/g, ' ').trim().toLowerCase() : '';
+      return str ? str.replace(/[^a-zA-Z0-9]/g, '').trim().toLowerCase() : '';
     };
 
-    const isCorrect = (question.format === 'NON_MCQ') 
-      ? (normalizeString(answer_string) === normalizeString(question.correct_answer))
-      : (answer_string === question.correct_answer);
+    const isMatch = (input, expected) => {
+      const normIn = normalizeString(input);
+      const normExp = normalizeString(expected);
+      if (normIn === normExp) return true;
 
-    const isHiddenWrong = question.hidden_wrong_answer && 
-      (question.format === 'NON_MCQ' 
-        ? (normalizeString(answer_string) === normalizeString(question.hidden_wrong_answer)) 
-        : (answer_string === question.hidden_wrong_answer));
+      // Smart synonyms for CS / DSA riddles
+      if (normExp === 'stack' && (normIn === 'lifo' || normIn === 'astack')) return true;
+      if (normExp === 'bfs' && (normIn === 'breadthfirstsearch' || normIn === 'breadthfirst')) return true;
+      if (normExp === 'dijkstra' && (normIn === 'dijkstras' || normIn === 'dijkstraalgorithm')) return true;
+      if (normExp === 'floyd' && (normIn === 'tortoiseandhare' || normIn === 'floydscycle' || normIn === 'floydscyclefindingalgorithm' || normIn === 'twopointers')) return true;
+      if (normExp === 'abs' && normIn === 'antilockbrakingsystem') return true;
+      if (normExp === 'aandd' && (normIn === 'ad' || normIn === 'da')) return true;
+      if (normExp === 'dabc' && normIn === 'dabc') return true;
+      if (normExp === '4khz8cycles' && (normIn === '4khz8cycles' || normIn === '48' || normIn === '4khz8' || normIn === '48cycles')) return true;
+      if (normExp === 'negativerail' && (normIn === 'negative' || normIn === 'ground' || normIn === 'gnd' || normIn === 'negativerail')) return true;
+      if (normExp === 'logicalerror' && (normIn === 'infiniteloop' || normIn === 'infinitelooperror')) return true;
+
+      return false;
+    };
+
+    const isCorrect = isMatch(answer_string, question.correct_answer);
+
+    const isHiddenWrong = question.hidden_wrong_answer && isMatch(answer_string, question.hidden_wrong_answer);
 
     let yearsChange = 0;
     let status = '';

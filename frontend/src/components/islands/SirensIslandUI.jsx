@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import FacePuzzle from '../games/FacePuzzle.jsx';
 
 function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestion, hasSandals, onSandalsClick }) {
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
+  const [faceSolved, setFaceSolved] = useState(false);
 
   return (
     <div className="trials-chamber" style={{ width: '100%' }}>
@@ -13,6 +15,8 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
           {baseQuestions.filter(q => q.progress_status === 'CORRECT').length} of {baseQuestions.length} Melodies Decoded
         </span>
       </div>
+
+      <FacePuzzle onSolve={() => setFaceSolved(true)} isSolved={faceSolved} />
 
       {hasSandals && (
         <div className="cyclops-artifact-banner" style={{
