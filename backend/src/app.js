@@ -9,7 +9,16 @@ const adminRoutes = require('./routes/admin.routes');
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://project-ithaca.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Swagger Configuration
