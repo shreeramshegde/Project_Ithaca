@@ -17,13 +17,13 @@ const ARTIFACT_INFO = {
   HERMES_SANDALS: {
     icon: '🪽',
     title: "Hermes' Sandals",
-    description: 'Fleet-footed talismans that bypass Sirens delays, deducting 2 years from your voyage.',
+    description: 'Fleet-footed talismans that bypass Sirens delays, deducting 1.0 year from your voyage.',
     targetRequired: false,
   },
   THE_BLESSING: {
     icon: '✨',
     title: 'The Blessing of Troy',
-    description: 'Divine grace that shields your crew from Circe and deducts 3 years.',
+    description: 'Divine grace that shields your crew from Circe and deducts 1.5 years.',
     targetRequired: false,
   },
 };

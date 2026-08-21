@@ -1,8 +1,15 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Drop existing tables to ensure clean rebuild with latest schema & defaults
+DROP TABLE IF EXISTS team_progress CASCADE;
+DROP TABLE IF EXISTS team_inventory CASCADE;
+DROP TABLE IF EXISTS questions CASCADE;
+DROP TABLE IF EXISTS teams CASCADE;
+DROP TABLE IF EXISTS game_settings CASCADE;
+
 -- Table for storing the teams
-CREATE TABLE IF NOT EXISTS teams (
+CREATE TABLE teams (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     team_name VARCHAR(100) UNIQUE NOT NULL,
     auth_code VARCHAR(100) UNIQUE NOT NULL,
