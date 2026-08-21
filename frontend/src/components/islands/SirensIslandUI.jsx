@@ -24,7 +24,7 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
             <div>
               <strong style={{ color: 'var(--gold)', display: 'block', fontSize: '0.95rem' }}>Hermes' Winged Sandals Available</strong>
               <span style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.82rem' }}>
-                Invoke to bypass the Sirens' time warp and instantly deduct 2 years from your voyage.
+                Invoke to bypass the Sirens' time warp and instantly deduct 1.0 year from your voyage.
               </span>
             </div>
           </div>
@@ -34,7 +34,7 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
             onClick={onSandalsClick}
             style={{ borderColor: 'var(--gold)', color: 'var(--gold)', background: 'rgba(198, 165, 106, 0.15)' }}
           >
-            ⚡ Don Sandals (-2 Yrs)
+            ⚡ Don Sandals (-1.0 Yr)
           </button>
         </div>
       )}
@@ -59,7 +59,7 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
 
           return (
             <div 
-              key={q.id}
+              key={q.id} 
               className={`sirens-portal-arch ${stateClass}`}
               onClick={() => {
                 if (isUnlocked && onSelectQuestion) {
@@ -84,7 +84,7 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
                 Song {index + 1}
               </h4>
               <span style={{ fontSize: '0.72rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
-                {!isUnlocked ? 'Locked' : '-1.5y'}
+                {!isUnlocked ? 'Locked' : '-0.75y'}
               </span>
             </div>
           );

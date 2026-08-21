@@ -21,3 +21,30 @@ export function adjustYears(auth, payload) {
     body: JSON.stringify(payload),
   });
 }
+
+export function freezeGame(auth) {
+  return request('/api/admin/freeze', {
+    method: 'GET',
+    headers: {
+      Authorization: encodeBasicAuth(auth.username, auth.password),
+    },
+  });
+}
+
+export function unfreezeGame(auth) {
+  return request('/api/admin/unfreeze', {
+    method: 'GET',
+    headers: {
+      Authorization: encodeBasicAuth(auth.username, auth.password),
+    },
+  });
+}
+
+export function getFreezeStatus(auth) {
+  return request('/api/admin/freeze-status', {
+    method: 'GET',
+    headers: {
+      Authorization: encodeBasicAuth(auth.username, auth.password),
+    },
+  });
+}

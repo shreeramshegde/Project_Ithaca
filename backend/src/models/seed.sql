@@ -71,7 +71,7 @@ Tasks:
 
 
 -- ============================================================================
--- ISLAND 1: LOTUS ISLAND (Reward: -0.5, Penalty: +2.0)
+-- ISLAND 1: LOTUS ISLAND (Reward: -0.25, Penalty: +1.0)
 -- 4 Default Main Trials + 10 Penalty Trials (Logic-First Algorithmic Riddles)
 -- ============================================================================
 
@@ -93,7 +93,7 @@ Move 4: Scout A at 5, Scout B at 3
 Move 5: Scout A at 6, Scout B at 5
 Move 6: Scout A at 1, Scout B at 1.
 So they meet after how many moves?', 
-'6', 0.5, 2.0, 1, 1);
+'6', 0.25, 1.0, 1, 1);
 
 -- Base Question 2: The Logic Switch Matrix
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -110,7 +110,7 @@ If switch S is pressed, which lamps will be ON? (e.g. Lamp1 and Lamp2):',
 1. S is pressed -> check state of A and B.
 2. Check if C turns ON based on A and B.
 3. Determine if D turns ON based on A and C.', 
-'A and D', 0.5, 2.0, 1, 2);
+'A and D', 0.25, 1.0, 1, 2);
 
 -- Base Question 3: Anti-lock Braking System
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -120,7 +120,7 @@ A safety system automatically modulates brake pressure to prevent the wheels fro
 
 Identify this 3-letter safety system:', 
 'It is a 3-letter acronym for an automated vehicle braking safety system.', 
-'ABS', 0.5, 2.0, 1, 3);
+'ABS', 0.25, 1.0, 1, 3);
 
 -- Base Question 4: Factorial Number Sequence
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -131,7 +131,7 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 
 What is the next number in this sequence?', 
 'Look at the multiplication pattern between consecutive terms (factorial series).', 
-'720', 0.5, 2.0, 1, 4);
+'720', 0.25, 1.0, 1, 4);
 
 -- ----------------------------------------------------------------------------
 -- ISLAND 1: EXTRA PENALTY QUESTIONS (Spawned on wrong answers)
@@ -145,12 +145,12 @@ int petals = 5;
 printf("%d ", petals++);
 printf("%d", ++petals);', 
 'Distinguish between post-increment (use current value, then increment) and pre-increment (increment first, then use value). Separate the two numbers by a space.', 
-'5 7', 0.0, 2.0, 1, 5),
+'5 7', 0.0, 1.0, 1, 5),
 
 (1, 'MAIN', 'NON_MCQ', 
 'Convert the 4-bit binary signal 1010 into decimal:', 
 'Calculate the sum of powers of 2 for each binary digit from left to right.', 
-'10', 0.0, 2.0, 1, 6),
+'10', 0.0, 1.0, 1, 6),
 
 (1, 'MAIN', 'NON_MCQ', 
 'Find the missing number in this pattern:
@@ -159,19 +159,19 @@ printf("%d", ++petals);',
 4    9    40
 5   11    60', 
 'Analyze how the numbers in each row relate mathematically across columns.', 
-'24', 0.0, 2.0, 1, 7),
+'24', 0.0, 1.0, 1, 7),
 
 (1, 'MAIN', 'NON_MCQ', 
 'What integer will be displayed?
 int a = 5;
 printf("%d", a > 2 && a < 10);', 
 'Evaluate the logical AND expression. In C, a true condition outputs an integer representation.', 
-'1', 0.0, 2.0, 1, 8),
+'1', 0.0, 1.0, 1, 8),
 
 (1, 'MAIN', 'NON_MCQ', 
 'If A = 1 and B = 1, what is the binary output of an XOR logic gate (A XOR B)?', 
 'An XOR (Exclusive OR) gate outputs 1 only when inputs differ.', 
-'0', 0.0, 2.0, 1, 9),
+'0', 0.0, 1.0, 1, 9),
 
 (1, 'MAIN', 'NON_MCQ', 
 'Solve the pattern to determine the missing number:
@@ -180,7 +180,7 @@ printf("%d", a > 2 && a < 10);',
 6    7    43
 8    9    ?', 
 'Analyze the mathematical operation applied to the first two columns to produce the third column.', 
-'73', 0.0, 2.0, 1, 10),
+'73', 0.0, 1.0, 1, 10),
 
 (1, 'MAIN', 'NON_MCQ', 
 'What type of error is caused by this loop?
@@ -189,20 +189,20 @@ while(petal <= 5) {
     printf("%d ", petal);
 }', 
 'Notice if the loop condition variable ever changes or increments.', 
-'logical error', 0.0, 2.0, 1, 11),
+'logical error', 0.0, 1.0, 1, 11),
 
 (1, 'MAIN', 'NON_MCQ', 
 '"I store electrical energy in an electrostatic field between two plates. My capacity is measured in Farads."
 Who am I?', 
 'It is a passive electronic component starting with C whose capacitance is measured in Farads.', 
-'Capacitor', 0.0, 2.0, 1, 12),
+'Capacitor', 0.0, 1.0, 1, 12),
 
 (1, 'MAIN', 'NON_MCQ', 
 'What will the console display for this ASCII code?
 char petal = ''B'';
 printf("%c %d", petal + 2, petal + 2);', 
 'Find the character corresponding to (ASCII of ''B'' + 2) and its numerical decimal value.', 
-'D 68', 0.0, 2.0, 1, 13),
+'D 68', 0.0, 1.0, 1, 13),
 
 (1, 'MAIN', 'NON_MCQ', 
 'Find the missing coordinate in this matrix:
@@ -211,11 +211,11 @@ printf("%c %d", petal + 2, petal + 2);',
 6    9    60
 8   11    ?', 
 'Look at how the second number relates to the first number in each row.', 
-'99', 0.0, 2.0, 1, 14);
+'99', 0.0, 1.0, 1, 14);
 
 
 -- ============================================================================
--- ISLAND 2: CYCLOPS ISLAND (Reward: -1.0, Penalty: +1.5)
+-- ISLAND 2: CYCLOPS ISLAND (Reward: -0.5, Penalty: +0.75)
 -- From Questions_Island2.md (Polyphemus Counting, Echoing XOR, Sheep Logic Circuit)
 -- ============================================================================
 
@@ -235,7 +235,7 @@ print(total)
 The warning, scrambled, reads: QEOMBQ
 Each letter of the warning was shifted forward in the alphabet by the ritual''s number. Shift each letter back by that same amount to reveal the true word. What does Polyphemus really say?', 
 'Walk i = 1 to 9. Divisible by 3: add to total; otherwise subtract 1. Total shift = 12. Shift QEOMBQ backward by 12 letters in the alphabet.', 
-'ESCAPE', 1.0, 1.5, 2, 1);
+'ESCAPE', 0.5, 0.75, 2, 1);
 
 -- Main Question 2: The Echoing Cave (Binary XOR Secret)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -249,7 +249,7 @@ He tests it twice:
 
 What is the cave''s secret number? And what will the echo reply if Odysseus shouts 15?', 
 'Write 5 and 9 in 4-bit binary, find the XOR pattern to deduce the cave''s secret number, then calculate the response for shout 15.', 
-'12, 3', 1.0, 1.5, 2, 2);
+'12, 3', 0.5, 0.75, 2, 2);
 
 -- Main Question 3: Hiding, Escape & Logic Circuit Decode
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -278,11 +278,11 @@ Q  R  E  R  G  B
 
 What is the decoded hidden message?', 
 'Trace Sheep 1 (Y=0), Sheep 2 (Y=0), Sheep 3 (Y=1, passes). Then shift Q R E R G B backward by 3: Q->N, R->O, E->B, R->O, G->D, B->Y.', 
-'NOBODY', 1.0, 1.5, 2, 3);
+'NOBODY', 0.5, 0.75, 2, 3);
 
 
 -- ============================================================================
--- ISLAND 3: SIRENS'' ISLAND (Reward: -1.5, Penalty: +1.0)
+-- ISLAND 3: SIRENS'' ISLAND (Reward: -0.75, Penalty: +0.5)
 -- 3 Hardest Questions (Voltage Divider, Conical Geometry, Honeycomb Symmetry)
 -- ============================================================================
 
@@ -295,7 +295,7 @@ The bell''s trigger wire is tapped across R2.
 
 In one word (a single number with unit, e.g. 4V), what voltage appears across R2 to sound the alarm?', 
 'Formula: Vout = Vsupply * (R2 / (R1 + R2)) = 12 * (2k / (4k + 2k)).', 
-'4V', 1.5, 1.0, 3, 1);
+'4V', 0.75, 0.5, 3, 1);
 
 -- Main Question 2: Conical Voice Conch Geometry (Mensuration)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -304,7 +304,7 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, option
 Its curved (lateral) surface area is 550 cm² and its slant height (l) is 25 cm.
 Using π = 22/7, what is the radius (r) of the horn''s conical mouth?', 
 'Curved surface area of cone = π * r * l. Rearrange to find r = CSA / (π * l).', 
-'["6 cm", "7 cm", "8 cm", "9 cm"]', '7 cm', 1.5, 1.0, 3, 2);
+'["6 cm", "7 cm", "8 cm", "9 cm"]', '7 cm', 0.75, 0.5, 3, 2);
 
 -- Main Question 3: Six-Chambered Honeycomb Ring (Figure & Opposite-Square Pattern)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -315,11 +315,11 @@ Opposite pairs follow the rule: opposite = (number)^2 + 2 (since 6^2 + 2 = 38, a
 
 What number belongs in place of ''?'' opposite 8?', 
 'Square the opposite number (8) and add 2: 8^2 + 2 = 64 + 2 = 66.', 
-'["68", "56", "66", "75"]', '66', 1.5, 1.0, 3, 3);
+'["68", "56", "66", "75"]', '66', 0.75, 0.5, 3, 3);
 
 
 -- ============================================================================
--- ISLAND 4: WITCH''S ISLAND (Reward: -2.0, Penalty: +0.5)
+-- ISLAND 4: WITCH''S ISLAND (Reward: -1.0, Penalty: +0.25)
 -- ============================================================================
 
 -- Main Question 1: The Forbidden Decision Tree (8 Ships Classification)
@@ -331,7 +331,7 @@ Reconstruct the correct decision tree using the Witch''s rules. Pass each of the
 
 Final Clue: "Only those who find the safe waters may carry the key."', 
 'Trace each ship from A to H through the branch rules. Collect the hidden numerical digits only from the ships that reach SAFE.', 
-'729586', 2.0, 0.5, 4, 1);
+'729586', 1.0, 0.25, 4, 1);
 
 -- Main Question 2: Circe''s Enchanted Domain (Interactive Linux Shell Terminal)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -341,4 +341,4 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 The god Hermes has granted you a vision of the island''s structure and the divine commands (unzip, tar, unrar) needed to break her magic. Navigate the island in the interactive terminal, unseal the three spell fragments from hidden archives, and speak the final incantation using Hermes''s formula:
 [Fragment 1]_[Fragment 2]_[Fragment 3]', 
 'Folders look empty? Use ls -a to reveal hidden files that start with a dot (.spell_alpha.zip in Potions_Lab, .spell_beta.tar.gz in Mud_Pits, .spell_gamma.rar in Stag_Clearing). Extract them and concatenate the words with underscores.', 
-'MOLY_SWINE_OATH', 2.0, 0.5, 4, 2);
+'MOLY_SWINE_OATH', 1.0, 0.25, 4, 2);

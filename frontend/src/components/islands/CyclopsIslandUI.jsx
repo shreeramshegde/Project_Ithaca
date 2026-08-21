@@ -80,7 +80,7 @@ function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye
                 Step {index + 1}
               </span>
               <span style={{ fontSize: '0.7rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
-                {!isUnlocked ? 'Locked' : '-1.0y'}
+                {!isUnlocked ? 'Locked' : '-0.5y'}
               </span>
             </div>
           );

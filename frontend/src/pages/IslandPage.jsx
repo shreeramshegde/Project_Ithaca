@@ -424,8 +424,8 @@ function IslandPage() {
               <p style={{ color: 'rgba(231, 229, 221, 0.85)', fontSize: '0.92rem', lineHeight: '1.5', margin: '0 0 24px 0' }}>
                 {confirmReward === 'ATHENAS_SCROLL' && "Reveal an illuminating Oracle clue on the active trial without deducting standard hints."}
                 {confirmReward === 'CYCLOPS_EYE' && "Eliminate one treacherous wrong option on this multiple-choice trial."}
-                {confirmReward === 'HERMES_SANDALS' && "Instantly bypass Sirens delays and deduct 2 years from your journey."}
-                {confirmReward === 'THE_BLESSING' && "Divine grace that shields your crew from Circe and deducts 3 years."}
+                {confirmReward === 'HERMES_SANDALS' && "Instantly bypass Sirens delays and deduct 1.0 year from your journey."}
+                {confirmReward === 'THE_BLESSING' && "Divine grace that shields your crew from Circe and deducts 1.5 years."}
                 <br />
                 <strong style={{ color: '#f87171', display: 'block', marginTop: '8px' }}>
                   This artifact can only be used once on this island!

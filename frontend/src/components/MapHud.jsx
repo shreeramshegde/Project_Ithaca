@@ -8,19 +8,31 @@ function MapHud({ teamName, state, previousYears, onLogout }) {
     : state?.team?.current_island 
     ? `Island ${state.team.current_island}` 
     : 'Awaiting route';
+  const isFrozen = state?.is_frozen;
 
   return (
     <div className="map-hud-overlay">
       <div className="map-hud-top-left">
-        <p className="eyebrow">Project Ithaca</p>
-        <h2 className="map-hud-title">{currentIslandName}</h2>
+        <div className="map-hud-left-info">
+          <p className="eyebrow" style={{ margin: 0 }}>Project Ithaca</p>
+          <h2 className="map-hud-title" style={{ margin: '2px 0 0 0', fontSize: '1.25rem' }}>{currentIslandName}</h2>
+        </div>
+        <div className="map-hud-left-divider" />
+        <div className="map-hud-left-years">
+          <JourneyYears
+            years={state?.team?.remaining_years}
+            previousYears={previousYears}
+          />
+        </div>
       </div>
 
       <div className="map-hud-top-center">
-        <JourneyYears
-          years={state?.team?.remaining_years}
-          previousYears={previousYears}
-        />
+        {isFrozen && (
+          <div className="map-hud-frozen-pill">
+            <span className="frozen-dot">●</span>
+            <span>ODYSSEY CONCLUDED · SUBMISSIONS FROZEN</span>
+          </div>
+        )}
       </div>
 
       <div className="map-hud-top-right">

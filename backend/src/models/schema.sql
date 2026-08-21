@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS teams (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     team_name VARCHAR(100) UNIQUE NOT NULL,
     auth_code VARCHAR(100) UNIQUE NOT NULL,
-    remaining_years DECIMAL(10, 2) DEFAULT 20.0,
+    remaining_years DECIMAL(10, 2) DEFAULT 10.0,
     standard_hints_left INT DEFAULT 3,
     current_island INT DEFAULT 1,
     start_time TIMESTAMP,
@@ -50,3 +50,12 @@ CREATE TABLE IF NOT EXISTS team_inventory (
     is_used BOOLEAN DEFAULT false,
     acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Table for global game settings (e.g. freeze submissions)
+CREATE TABLE IF NOT EXISTS game_settings (
+    key VARCHAR(50) PRIMARY KEY,
+    value VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO game_settings (key, value) VALUES ('is_frozen', 'false') ON CONFLICT (key) DO NOTHING;

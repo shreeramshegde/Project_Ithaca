@@ -85,9 +85,61 @@ const addQuestion = async (req, res) => {
   }
 };
 
+const freezeGame = async (req, res) => {
+  try {
+    const { setGameFrozen } = require('../services/gameSettings');
+    await setGameFrozen(true);
+    
+    // Freeze all active teams' end_time so their final durations are locked at this exact instant
+    await pool.query('UPDATE teams SET end_time = CURRENT_TIMESTAMP WHERE end_time IS NULL');
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'All incoming submissions are now closed and frozen. The competition has ended.',
+      is_frozen: true
+    });
+  } catch (err) {
+    console.error('Error freezing game:', err);
+    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+};
+
+const unfreezeGame = async (req, res) => {
+  try {
+    const { setGameFrozen } = require('../services/gameSettings');
+    await setGameFrozen(false);
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Game submissions reopened successfully.',
+      is_frozen: false
+    });
+  } catch (err) {
+    console.error('Error unfreezing game:', err);
+    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+};
+
+const getFreezeStatus = async (req, res) => {
+  try {
+    const { isGameFrozen } = require('../services/gameSettings');
+    const frozen = await isGameFrozen();
+    return res.status(200).json({
+      status: 'success',
+      is_frozen: frozen
+    });
+  } catch (err) {
+    console.error('Error fetching freeze status:', err);
+    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+};
+
 module.exports = {
   getLeaderboard,
   adjustYears,
   getQuestions,
-  addQuestion
+  addQuestion,
+  freezeGame,
+  unfreezeGame,
+  getFreezeStatus
 };

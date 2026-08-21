@@ -1,16 +1,19 @@
 const pool = require('../config/database');
+const { isGameFrozen } = require('../services/gameSettings');
 
 const getState = async (req, res) => {
   const teamId = req.team.id;
   try {
     const teamRes = await pool.query('SELECT remaining_years, current_island, standard_hints_left, is_completed FROM teams WHERE id = $1', [teamId]);
     const inventoryRes = await pool.query('SELECT * FROM team_inventory WHERE team_id = $1 AND is_used = false', [teamId]);
+    const frozen = await isGameFrozen();
     
     return res.status(200).json({
       status: 'success',
       data: {
         team: teamRes.rows[0],
-        inventory: inventoryRes.rows
+        inventory: inventoryRes.rows,
+        is_frozen: frozen
       }
     });
   } catch (err) {
@@ -71,6 +74,14 @@ const submitPreRound = async (req, res) => {
   const teamId = req.team.id;
   const { question_id, selected_option } = req.body;
 
+  if (await isGameFrozen()) {
+    return res.status(403).json({
+      status: 'error',
+      message: 'The Odyssey has concluded! All submissions are now frozen by the Oracle.',
+      is_frozen: true
+    });
+  }
+
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -123,8 +134,8 @@ const submitPreRound = async (req, res) => {
     } else {
       let penaltyMessage = 'Incorrect answer.';
       if (isHiddenWrong) {
-        await client.query('UPDATE teams SET remaining_years = remaining_years + 2 WHERE id = $1', [teamId]);
-        penaltyMessage = 'Hidden trap triggered! +2 years penalty applied.';
+        await client.query('UPDATE teams SET remaining_years = remaining_years + 1.0 WHERE id = $1', [teamId]);
+        penaltyMessage = 'Hidden trap triggered! +1.0 year penalty applied.';
       }
       await client.query('INSERT INTO team_progress (team_id, question_id, status) VALUES ($1, $2, $3)', [teamId, question_id, 'INCORRECT']);
       await client.query('COMMIT');
@@ -142,6 +153,14 @@ const submitPreRound = async (req, res) => {
 const submitAnswer = async (req, res) => {
   const teamId = req.team.id;
   const { question_id, answer_string } = req.body;
+
+  if (await isGameFrozen()) {
+    return res.status(403).json({
+      status: 'error',
+      message: 'The Odyssey has concluded! All submissions are now frozen by the Oracle.',
+      is_frozen: true
+    });
+  }
 
   const client = await pool.connect();
   try {
@@ -240,7 +259,7 @@ const submitAnswer = async (req, res) => {
       yearsChange = question.penalty_years;
       status = 'INCORRECT';
       if (isHiddenWrong) {
-        yearsChange += 2; // Extra penalty for hidden wrong answer
+        yearsChange += 1.0; // Extra penalty for hidden wrong answer (halved from +2 to +1.0)
         message = 'Hidden trap triggered! Extra penalty applied.';
       } else {
         message = 'Incorrect answer. Penalty applied.';
@@ -279,6 +298,14 @@ const submitAnswer = async (req, res) => {
 const useHint = async (req, res) => {
   const teamId = req.team.id;
   const { question_id } = req.body; // Need to know which question they want a hint for
+
+  if (await isGameFrozen()) {
+    return res.status(403).json({
+      status: 'error',
+      message: 'The Odyssey has concluded! All submissions are now frozen by the Oracle.',
+      is_frozen: true
+    });
+  }
 
   const client = await pool.connect();
   try {
@@ -326,6 +353,14 @@ const useHint = async (req, res) => {
 const useReward = async (req, res) => {
   const teamId = req.team.id;
   const { reward_type, target_question_id } = req.body;
+
+  if (await isGameFrozen()) {
+    return res.status(403).json({
+      status: 'error',
+      message: 'The Odyssey has concluded! All submissions are now frozen by the Oracle.',
+      is_frozen: true
+    });
+  }
 
   const client = await pool.connect();
   try {
@@ -380,7 +415,7 @@ const useReward = async (req, res) => {
       resultData.message = 'Cyclops Eye eliminates one wrong option!';
     }
     else if (reward_type === 'HERMES_SANDALS' || reward_type === 'THE_BLESSING') {
-      const yearsToDeduct = reward_type === 'THE_BLESSING' ? 3 : 2;
+      const yearsToDeduct = reward_type === 'THE_BLESSING' ? 1.5 : 1.0;
       const teamUpd = await client.query(
         'UPDATE teams SET remaining_years = remaining_years - $1 WHERE id = $2 RETURNING remaining_years', 
         [yearsToDeduct, teamId]
@@ -405,6 +440,15 @@ const useReward = async (req, res) => {
 
 const nextIsland = async (req, res) => {
   const teamId = req.team.id;
+
+  if (await isGameFrozen()) {
+    return res.status(403).json({
+      status: 'error',
+      message: 'The Odyssey has concluded! All submissions are now frozen by the Oracle.',
+      is_frozen: true
+    });
+  }
+
   const client = await pool.connect();
   
   try {

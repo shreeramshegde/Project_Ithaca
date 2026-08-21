@@ -6,6 +6,7 @@ import { getGameState } from '../api/game.js';
 import FeedbackBanner from '../components/FeedbackBanner.jsx';
 import MapHud from '../components/MapHud.jsx';
 import OceanMap from '../components/OceanMap.jsx';
+import VictoryCelebrationModal from '../components/VictoryCelebrationModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import '../journey-map.css'; // Import map styles
 
@@ -14,6 +15,8 @@ function JourneyPage() {
   const location = useLocation();
   const { token, team, clearSession } = useAuth();
   const [previousYears, setPreviousYears] = useState(team?.remaining_years ?? null);
+  const [showVictoryModal, setShowVictoryModal] = useState(false);
+  const [hasDismissedVictory, setHasDismissedVictory] = useState(false);
   const traveledFrom = location.state?.traveledFrom;
 
   const stateQuery = useQuery({
@@ -21,6 +24,14 @@ function JourneyPage() {
     queryFn: () => getGameState(token),
     refetchInterval: 10000,
   });
+
+  const isCompleted = Boolean(stateQuery.data?.data?.team?.is_completed);
+
+  useEffect(() => {
+    if (isCompleted && !hasDismissedVictory) {
+      setShowVictoryModal(true);
+    }
+  }, [isCompleted, hasDismissedVictory]);
 
   useEffect(() => {
     if (stateQuery.error?.message === 'Invalid or expired token') {
@@ -62,6 +73,37 @@ function JourneyPage() {
             }}
           />
         </div>
+      )}
+
+      {/* Floating Victory Re-Open Pill when game is completed */}
+      {isCompleted && !showVictoryModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 60,
+            cursor: 'pointer'
+          }}
+          onClick={() => setShowVictoryModal(true)}
+        >
+          <div className="victory-floating-pill">
+            <span>👑</span>
+            <span>Odyssey Completed · View Victory Summary</span>
+          </div>
+        </div>
+      )}
+
+      {showVictoryModal && (
+        <VictoryCelebrationModal
+          state={stateQuery.data?.data}
+          onClose={() => {
+            setShowVictoryModal(false);
+            setHasDismissedVictory(true);
+          }}
+          onNavigateIthaca={() => handleIslandClick('ithaca')}
+        />
       )}
 
       <OceanMap 
