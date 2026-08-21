@@ -247,7 +247,7 @@ He tests it twice:
 • He shouts 5, the echo replies 9.
 • He shouts 9, the echo replies 5.
 
-What is the cave''s secret number, and what will the echo reply if Odysseus shouts 15? (Format answer as: secret_num, reply_num):', 
+What is the cave''s secret number? And what will the echo reply if Odysseus shouts 15?', 
 'Write 5 and 9 in 4-bit binary, find the XOR pattern to deduce the cave''s secret number, then calculate the response for shout 15.', 
 '12, 3', 1.0, 1.5, 2, 2);
 

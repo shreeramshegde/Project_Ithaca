@@ -67,7 +67,8 @@ function QuestionTextRenderer({ text }) {
   const lines = text.split('\n');
   const renderedElements = [];
   let codeBuffer = [];
-  let inCodeBlock = false;
+  let inFencedBlock = false;
+  let inAutoCodeBlock = false;
 
   const flushCodeBuffer = (keyPrefix) => {
     if (codeBuffer.length > 0) {
@@ -79,32 +80,93 @@ function QuestionTextRenderer({ text }) {
     }
   };
 
-  lines.forEach((line, index) => {
-    const trimmed = line.trim();
-
-    // Check for C/code syntax patterns
-    const isCodeLine = (
+  const isCodeStart = (trimmed) => {
+    return (
       trimmed.startsWith('int ') ||
       trimmed.startsWith('char ') ||
-      trimmed.startsWith('printf(') ||
-      trimmed.startsWith('if (') ||
+      trimmed.startsWith('total =') ||
+      trimmed.startsWith('total=') ||
+      trimmed.startsWith('for i in range') ||
       trimmed.startsWith('while(') ||
       trimmed.startsWith('while (') ||
-      trimmed.startsWith('else') ||
-      trimmed === '{' ||
-      trimmed === '}' ||
+      trimmed.startsWith('if (') ||
       trimmed.startsWith('01000001') ||
       trimmed.startsWith('P1 ->')
     );
+  };
 
-    if (isCodeLine) {
-      inCodeBlock = true;
-      codeBuffer.push(line);
-    } else {
-      if (inCodeBlock && codeBuffer.length > 0) {
-        flushCodeBuffer(index);
-        inCodeBlock = false;
+  const isCodeContinuation = (line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return true; // keep blank lines inside code blocks
+    return (
+      line.startsWith('    ') ||
+      line.startsWith('\t') ||
+      trimmed.startsWith('if ') ||
+      trimmed.startsWith('else:') ||
+      trimmed.startsWith('else') ||
+      trimmed.startsWith('total +=') ||
+      trimmed.startsWith('total -=') ||
+      trimmed.startsWith('print(') ||
+      trimmed.startsWith('printf(') ||
+      trimmed.startsWith('return ') ||
+      trimmed === '{' ||
+      trimmed === '}' ||
+      trimmed.endsWith(';') ||
+      trimmed.endsWith(':')
+    );
+  };
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+
+    // Check for markdown code fences ```
+    if (trimmed.startsWith('```')) {
+      if (inFencedBlock) {
+        flushCodeBuffer(`fence-${index}`);
+        inFencedBlock = false;
+      } else {
+        if (inAutoCodeBlock) {
+          flushCodeBuffer(`auto-${index}`);
+          inAutoCodeBlock = false;
+        }
+        inFencedBlock = true;
       }
+      return;
+    }
+
+    if (inFencedBlock) {
+      codeBuffer.push(line);
+      return;
+    }
+
+    if (!inAutoCodeBlock && isCodeStart(trimmed)) {
+      inAutoCodeBlock = true;
+      codeBuffer.push(line);
+    } else if (inAutoCodeBlock) {
+      if (isCodeContinuation(line)) {
+        codeBuffer.push(line);
+      } else {
+        flushCodeBuffer(`auto-${index}`);
+        inAutoCodeBlock = false;
+        
+        // Render current non-code line
+        if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
+          renderedElements.push(
+            <div key={index} style={{ paddingLeft: '12px', margin: '4px 0', color: 'rgba(245, 242, 232, 0.95)' }}>
+              {line}
+            </div>
+          );
+        } else if (trimmed === '') {
+          renderedElements.push(<div key={index} style={{ height: '8px' }} />);
+        } else {
+          renderedElements.push(
+            <div key={index} style={{ margin: '2px 0' }}>
+              {line}
+            </div>
+          );
+        }
+      }
+    } else {
       if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
         renderedElements.push(
           <div key={index} style={{ paddingLeft: '12px', margin: '4px 0', color: 'rgba(245, 242, 232, 0.95)' }}>
