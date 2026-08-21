@@ -33,9 +33,7 @@ function IslandPage() {
   const [witchSudokuSolved, setWitchSudokuSolved] = useState(false);
   const [terminalPasswordFound, setTerminalPasswordFound] = useState('');
 
-  const isPuzzlePending =
-    (island?.slug === 'sirens' && !sirensPuzzleSolved) ||
-    (island?.slug === 'witch' && !witchSudokuSolved);
+  const isPuzzlePending = false;
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],

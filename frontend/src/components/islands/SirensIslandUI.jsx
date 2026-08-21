@@ -1,7 +1,6 @@
 import React from 'react';
-import FacePuzzle from '../games/FacePuzzle.jsx';
 
-function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestion, hasSandals, onSandalsClick, isPuzzleSolved = false, onSolvePuzzle }) {
+function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestion, hasSandals, onSandalsClick }) {
   const baseQuestions = mainQuestions.filter(q => q.sequence_number < 10);
 
   return (
@@ -14,8 +13,6 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
           {baseQuestions.filter(q => q.progress_status === 'CORRECT').length} of {baseQuestions.length} Melodies Decoded
         </span>
       </div>
-
-      <FacePuzzle onSolve={onSolvePuzzle} isSolved={isPuzzleSolved} />
 
       {hasSandals && (
         <div className="cyclops-artifact-banner" style={{
@@ -42,72 +39,57 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
         </div>
       )}
 
-      {/* Hide the portals until the Mosaic of Odysseus is solved */}
-      {isPuzzleSolved ? (
-        <div className="sirens-portals-row">
-          {baseQuestions.map((q, index) => {
-            const isSelected = q.id === activeMainQuestion?.id;
-            const isCompleted = q.progress_status === 'CORRECT';
-            const isFailed = q.progress_status === 'INCORRECT';
-            const isUnlocked = index === 0 || baseQuestions.slice(0, index).every(prev => prev.progress_status !== null);
+      <div className="sirens-portals-row">
+        {baseQuestions.map((q, index) => {
+          const isSelected = q.id === activeMainQuestion?.id;
+          const isCompleted = q.progress_status === 'CORRECT';
+          const isFailed = q.progress_status === 'INCORRECT';
+          const isUnlocked = index === 0 || baseQuestions.slice(0, index).every(prev => prev.progress_status !== null);
 
-            let stateClass = '';
-            if (!isUnlocked) {
-              stateClass = 'locked';
-            } else if (isCompleted) {
-              stateClass = 'completed';
-            } else if (isFailed) {
-              stateClass = 'failed';
-            } else if (isSelected) {
-              stateClass = 'active';
-            }
+          let stateClass = '';
+          if (!isUnlocked) {
+            stateClass = 'locked';
+          } else if (isCompleted) {
+            stateClass = 'completed';
+          } else if (isFailed) {
+            stateClass = 'failed';
+          } else if (isSelected) {
+            stateClass = 'active';
+          }
 
-            return (
-              <div 
-                key={q.id}
-                className={`sirens-portal-arch ${stateClass}`}
-                onClick={() => {
-                  if (isUnlocked && onSelectQuestion) {
-                    onSelectQuestion(q.id);
-                  }
-                }}
-                style={{
-                  opacity: !isUnlocked ? 0.4 : 1,
-                  cursor: !isUnlocked ? 'not-allowed' : 'pointer',
-                  borderColor: !isUnlocked ? 'rgba(255, 255, 255, 0.1)' : undefined
-                }}
-                title={!isUnlocked ? 'Decode previous songs sequentially to unlock' : `Song ${index + 1}`}
-              >
-                <div style={{
-                  fontSize: '1.8rem',
-                  color: !isUnlocked ? '#666' : isCompleted ? 'var(--success)' : isFailed ? '#f87171' : isSelected ? '#60a5fa' : 'rgba(198,165,106,0.6)',
-                  marginBottom: '8px'
-                }}>
-                  {!isUnlocked ? '🔒' : isCompleted ? '✓' : isFailed ? '✕' : 'Ω'}
-                </div>
-                <h4 style={{ fontFamily: 'var(--display)', color: !isUnlocked ? 'rgba(231,229,221,0.5)' : 'var(--cloud-white)', margin: '0 0 4px 0', fontSize: '0.92rem' }}>
-                  Song {index + 1}
-                </h4>
-                <span style={{ fontSize: '0.72rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
-                  {!isUnlocked ? 'Locked' : '-1.5y'}
-                </span>
+          return (
+            <div 
+              key={q.id}
+              className={`sirens-portal-arch ${stateClass}`}
+              onClick={() => {
+                if (isUnlocked && onSelectQuestion) {
+                  onSelectQuestion(q.id);
+                }
+              }}
+              style={{
+                opacity: !isUnlocked ? 0.4 : 1,
+                cursor: !isUnlocked ? 'not-allowed' : 'pointer',
+                borderColor: !isUnlocked ? 'rgba(255, 255, 255, 0.1)' : undefined
+              }}
+              title={!isUnlocked ? 'Decode previous songs sequentially to unlock' : `Song ${index + 1}`}
+            >
+              <div style={{
+                fontSize: '1.8rem',
+                color: !isUnlocked ? '#666' : isCompleted ? 'var(--success)' : isFailed ? '#f87171' : isSelected ? '#60a5fa' : 'rgba(198,165,106,0.6)',
+                marginBottom: '8px'
+              }}>
+                {!isUnlocked ? '🔒' : isCompleted ? '✓' : isFailed ? '✕' : 'Ω'}
               </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div style={{
-          textAlign: 'center',
-          padding: '16px',
-          background: 'rgba(3, 8, 16, 0.6)',
-          borderRadius: '12px',
-          border: '1px dashed rgba(198, 165, 106, 0.3)',
-          color: 'rgba(231, 229, 221, 0.6)',
-          fontSize: '0.9rem'
-        }}>
-          🔒 Complete the Mosaic of the Wanderer above to reveal the Siren's Harmonic Portals.
-        </div>
-      )}
+              <h4 style={{ fontFamily: 'var(--display)', color: !isUnlocked ? 'rgba(231,229,221,0.5)' : 'var(--cloud-white)', margin: '0 0 4px 0', fontSize: '0.92rem' }}>
+                Song {index + 1}
+              </h4>
+              <span style={{ fontSize: '0.72rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
+                {!isUnlocked ? 'Locked' : '-1.5y'}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
