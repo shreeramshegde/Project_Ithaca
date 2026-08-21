@@ -196,6 +196,10 @@ const submitAnswer = async (req, res) => {
       if (normIn === normExp) return true;
 
       // Smart synonyms for CS / DSA riddles and simulations
+      if (normExp === 'molyswineoath' && (normIn === 'molyswineoath' || normIn === 'moly_swine_oath' || normIn === 'moly swine oath')) return true;
+      if (normExp === '729586' && normIn === '729586') return true;
+      if (normExp === '31' && (normIn === '31' || normIn === '31moves' || normIn === '31steps')) return true;
+      if (normExp === 'circeolympus42' && (normIn === 'circeolympus42' || normIn === 'circe42' || normIn === 'olympus42')) return true;
       if (normExp === 'nobodycyclops42' && (normIn === 'nobodycyclops42' || normIn === 'nobody42')) return true;
       if (normExp === 'hope' && normIn === 'hope') return true;
       if (normExp === '3' && (normIn === '3' || normIn === '3steps' || normIn === 'three')) return true;

@@ -4,6 +4,7 @@ import AdminPage from './pages/AdminPage.jsx';
 import IslandPage from './pages/IslandPage.jsx';
 import JourneyPage from './pages/JourneyPage.jsx';
 import LandingPage from './pages/LandingPage.jsx';
+import StoryPage from './pages/StoryPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
@@ -11,6 +12,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/story" element={<StoryPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route
         path="/journey"

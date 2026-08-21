@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import WitchPreRoundGrid from './islands/witch/WitchPreRoundGrid.jsx';
+import WitchDecisionTree from './islands/witch/WitchDecisionTree.jsx';
+import CirceTerminal from './islands/witch/CirceTerminal.jsx';
 
 function CodeBlockWithCopy({ code }) {
   const [copied, setCopied] = useState(false);
@@ -187,69 +190,79 @@ function QuestionConsole({
       {/* 1. PRE-ROUND RITUAL CONSOLE */}
       {preRoundQuestion && (
         <section className="console-card-cinematic">
-          <div className="console-header-badge">
-            <span className="console-kind-pill">Oracle's Pre-Round Ritual</span>
-            <div className="console-rewards-pills">
-              <span className="console-reward-val deduct">Divine Artifact Reward</span>
-            </div>
-          </div>
-
-          <h3 className="console-title-text">
-            {island?.title || island?.name} Gateway Challenge
-          </h3>
-
-          <QuestionTextRenderer text={preRoundQuestion.question_text} />
-
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (preRoundAnswer) {
-                onSubmitPreRound({ question_id: preRoundQuestion.id, selected_option: preRoundAnswer });
-              }
-            }}
-          >
-            {preRoundQuestion.options && Array.isArray(preRoundQuestion.options) ? (
-              <div className="mcq-options-grid">
-                {preRoundQuestion.options.map((opt, i) => {
-                  const letter = OPTION_LETTERS[i] || `${i + 1}`;
-                  const isSelected = preRoundAnswer === opt;
-
-                  return (
-                    <div
-                      key={i}
-                      className={`mcq-option-card ${isSelected ? 'selected' : ''}`}
-                      onClick={() => setPreRoundAnswer(opt)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setPreRoundAnswer(opt); }}
-                    >
-                      <div className="mcq-option-letter">{letter}</div>
-                      <div className="mcq-option-text">{opt}</div>
-                    </div>
-                  );
-                })}
+          {island?.slug === 'witch' || island?.id === 4 ? (
+            <WitchPreRoundGrid
+              question={preRoundQuestion}
+              onSubmit={onSubmitPreRound}
+              loading={loading}
+            />
+          ) : (
+            <>
+              <div className="console-header-badge">
+                <span className="console-kind-pill">Oracle's Pre-Round Ritual</span>
+                <div className="console-rewards-pills">
+                  <span className="console-reward-val deduct">Divine Artifact Reward</span>
+                </div>
               </div>
-            ) : (
-              <div className="spoken-input-wrapper">
-                <label>Offer Your Response</label>
-                <textarea
-                  className="spoken-textarea-cinematic"
-                  value={preRoundAnswer}
-                  onChange={(e) => setPreRoundAnswer(e.target.value)}
-                  placeholder="Enter the Oracle's answer..."
-                  required
-                />
-              </div>
-            )}
 
-            <button 
-              className="spoken-submit-btn" 
-              type="submit" 
-              disabled={loading || !preRoundAnswer}
-            >
-              {loading ? 'Consulting the Gods...' : '⚡ Seal Choice & Open Gateway'}
-            </button>
-          </form>
+              <h3 className="console-title-text">
+                {island?.title || island?.name} Gateway Challenge
+              </h3>
+
+              <QuestionTextRenderer text={preRoundQuestion.question_text} />
+
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (preRoundAnswer) {
+                    onSubmitPreRound({ question_id: preRoundQuestion.id, selected_option: preRoundAnswer });
+                  }
+                }}
+              >
+                {preRoundQuestion.options && Array.isArray(preRoundQuestion.options) ? (
+                  <div className="mcq-options-grid">
+                    {preRoundQuestion.options.map((opt, i) => {
+                      const letter = OPTION_LETTERS[i] || `${i + 1}`;
+                      const isSelected = preRoundAnswer === opt;
+
+                      return (
+                        <div
+                          key={i}
+                          className={`mcq-option-card ${isSelected ? 'selected' : ''}`}
+                          onClick={() => setPreRoundAnswer(opt)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setPreRoundAnswer(opt); }}
+                        >
+                          <div className="mcq-option-letter">{letter}</div>
+                          <div className="mcq-option-text">{opt}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="spoken-input-wrapper">
+                    <label>Offer Your Response</label>
+                    <textarea
+                      className="spoken-textarea-cinematic"
+                      value={preRoundAnswer}
+                      onChange={(e) => setPreRoundAnswer(e.target.value)}
+                      placeholder="Enter the Oracle's answer..."
+                      required
+                    />
+                  </div>
+                )}
+
+                <button 
+                  className="spoken-submit-btn" 
+                  type="submit" 
+                  disabled={loading || !preRoundAnswer}
+                >
+                  {loading ? 'Consulting the Gods...' : '⚡ Seal Choice & Open Gateway'}
+                </button>
+              </form>
+            </>
+          )}
         </section>
       )}
 
@@ -351,7 +364,21 @@ function QuestionConsole({
                 </div>
               )}
 
-              <QuestionTextRenderer text={mainQuestion?.question_text} />
+              {island?.slug === 'witch' && mainQuestion?.sequence_number === 1 && !isMainCorrect && !isMainIncorrect ? (
+                <WitchDecisionTree
+                  question={mainQuestion}
+                  onSubmit={onSubmitAnswer}
+                  loading={loading}
+                />
+              ) : island?.slug === 'witch' && mainQuestion?.sequence_number === 2 && !isMainCorrect && !isMainIncorrect ? (
+                <CirceTerminal
+                  question={mainQuestion}
+                  onSubmit={onSubmitAnswer}
+                  loading={loading}
+                />
+              ) : (
+                <>
+                  <QuestionTextRenderer text={mainQuestion?.question_text} />
 
               {revealedHint && (
                 <div style={{
@@ -476,6 +503,8 @@ function QuestionConsole({
                     {loading ? 'Submitting Trial...' : '⚡ Offer Answer to the Fates'}
                   </button>
                 </form>
+              )}
+                </>
               )}
             </>
           )}

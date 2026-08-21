@@ -35,10 +35,10 @@ function LandingPage() {
     setIsDeparting(true);
     const timeline = runDepartureAnimation(refs, reducedMotion);
     timeline.eventCallback('onComplete', () => {
-      setTimeout(() => navigate('/login'), 500);
+      setTimeout(() => navigate('/story'), 400);
     });
     if (reducedMotion) {
-      setTimeout(() => navigate('/login'), 500);
+      navigate('/story');
     }
   };
 
