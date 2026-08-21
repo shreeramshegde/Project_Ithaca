@@ -1,4 +1,60 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+
+function CodeBlockWithCopy({ code }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="code-snippet-box" style={{ position: 'relative' }}>
+      <button
+        type="button"
+        onClick={handleCopy}
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          background: copied ? 'rgba(137, 171, 118, 0.25)' : 'rgba(255, 255, 255, 0.1)',
+          border: `1px solid ${copied ? 'var(--success)' : 'rgba(198, 165, 106, 0.3)'}`,
+          color: copied ? 'var(--success)' : 'var(--cloud-white)',
+          borderRadius: '4px',
+          padding: '2px 8px',
+          fontSize: '0.72rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px'
+        }}
+        title="Copy code snippet"
+      >
+        {copied ? (
+          <>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Copied
+          </>
+        ) : (
+          <>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy
+          </>
+        )}
+      </button>
+      <pre style={{ margin: 0, fontFamily: 'inherit', color: 'inherit', paddingRight: '60px' }}>
+        {code}
+      </pre>
+    </div>
+  );
+}
 
 function QuestionTextRenderer({ text }) {
   if (!text) return null;
@@ -11,12 +67,9 @@ function QuestionTextRenderer({ text }) {
 
   const flushCodeBuffer = (keyPrefix) => {
     if (codeBuffer.length > 0) {
+      const codeText = codeBuffer.join('\n');
       renderedElements.push(
-        <div key={`${keyPrefix}-code`} className="code-snippet-box">
-          <pre style={{ margin: 0, fontFamily: 'inherit', color: 'inherit' }}>
-            {codeBuffer.join('\n')}
-          </pre>
-        </div>
+        <CodeBlockWithCopy key={`${keyPrefix}-code`} code={codeText} />
       );
       codeBuffer = [];
     }
@@ -73,6 +126,8 @@ function QuestionTextRenderer({ text }) {
   return <div className="question-text-box">{renderedElements}</div>;
 }
 
+const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
 function QuestionConsole({ 
   island, 
   onSubmitPreRound, 
@@ -82,7 +137,7 @@ function QuestionConsole({
   onNextIsland, 
   preRoundQuestion, 
   mainQuestion, 
-  revealedHint,
+  revealedHint, 
   eliminatedOption, 
   sitOutRequired, 
   onSitOutAcknowledge,
@@ -100,11 +155,32 @@ function QuestionConsole({
     setPreRoundAnswer('');
   }, [preRoundQuestion?.id]);
 
-  const isMainAnswered = mainQuestion?.progress_status !== null && mainQuestion?.progress_status !== undefined;
   const isMainCorrect = mainQuestion?.progress_status === 'CORRECT';
   const isMainIncorrect = mainQuestion?.progress_status === 'INCORRECT';
 
-  const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+  // Keyboard shortcut listener for MCQ options (A, B, C, D)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Avoid overriding inside form inputs
+      if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+
+      const key = e.key.toUpperCase();
+      const letterIndex = OPTION_LETTERS.indexOf(key);
+
+      if (preRoundQuestion?.options && letterIndex !== -1 && letterIndex < preRoundQuestion.options.length) {
+        const option = preRoundQuestion.options[letterIndex];
+        setPreRoundAnswer(option);
+      } else if (mainQuestion?.options && letterIndex !== -1 && letterIndex < mainQuestion.options.length) {
+        const option = mainQuestion.options[letterIndex];
+        if (option !== eliminatedOption && !sitOutRequired && !loading && !isMainCorrect && !isMainIncorrect) {
+          setMainAnswer(option);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [preRoundQuestion, mainQuestion, eliminatedOption, sitOutRequired, loading, isMainCorrect, isMainIncorrect]);
 
   return (
     <div className="question-console-area">
@@ -143,6 +219,9 @@ function QuestionConsole({
                       key={i}
                       className={`mcq-option-card ${isSelected ? 'selected' : ''}`}
                       onClick={() => setPreRoundAnswer(opt)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setPreRoundAnswer(opt); }}
                     >
                       <div className="mcq-option-letter">{letter}</div>
                       <div className="mcq-option-text">{opt}</div>
@@ -278,7 +357,7 @@ function QuestionConsole({
                 <div style={{
                   margin: '16px 0',
                   padding: '16px 20px',
-                  background: 'linear-gradient(135deg, rgba(198, 165, 106, 0.15) 0%, rgba(7, 21, 38, 0.95) 100%)',
+                  background: 'linear-gradient(135deg, rgba(198, 165, 106, 0.18) 0%, rgba(7, 21, 38, 0.95) 100%)',
                   border: '1.5px solid var(--gold)',
                   borderRadius: '12px',
                   boxShadow: '0 0 25px rgba(198, 165, 106, 0.25)',
@@ -356,6 +435,13 @@ function QuestionConsole({
                             className={`mcq-option-card ${isSelected ? 'selected' : ''} ${isEliminated ? 'eliminated' : ''}`}
                             onClick={() => {
                               if (!isEliminated && !sitOutRequired && !loading) {
+                                setMainAnswer(opt);
+                              }
+                            }}
+                            role="button"
+                            tabIndex={isEliminated ? -1 : 0}
+                            onKeyDown={(e) => { 
+                              if (!isEliminated && (e.key === 'Enter' || e.key === ' ')) {
                                 setMainAnswer(opt);
                               }
                             }}

@@ -12,6 +12,26 @@ const registerTeam = async (req, res) => {
     );
 
     if (existingTeam.rows.length > 0) {
+      // If BOTH team_name and auth_code match, log them in directly
+      const match = existingTeam.rows.find(
+        (t) => t.team_name === team_name && t.auth_code === auth_code
+      );
+
+      if (match) {
+        const token = jwt.sign(
+          { id: match.id, team_name: match.team_name },
+          process.env.JWT_SECRET || 'supersecretjwtkey_change_in_production',
+          { expiresIn: '6h' }
+        );
+
+        return res.status(200).json({
+          status: 'success',
+          message: 'Welcome back, crew authenticated successfully',
+          token,
+          data: match
+        });
+      }
+
       return res.status(409).json({
         status: 'error',
         message: 'Team name or Auth code already exists'
