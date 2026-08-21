@@ -33,14 +33,17 @@ Which stone did he remove last? (Type the exact name):',
 -- Island 2: Cyclops Island Pre-Round MCQ (Reward: Cyclops Eye)
 INSERT INTO questions (island_id, type, format, question_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (2, 'PRE_ROUND', 'MCQ', 
-'Odysseus''s men escape unnoticed underneath the sheep because Polyphemus only feels their backs. In civil engineering, a lintel beam above a doorway lets people walk safely underneath it because:
+'Story line: "Nobody" trick
+Odysseus names himself "Nobody," so when Polyphemus screams for help, his cry carries no valid identity and other Cyclopes ignore it.
 
-a) There is no load above the lintel.
-b) The lintel transfers the wall''s load sideways into the columns/side walls, keeping the doorway space clear.
-c) The lintel absorbs the load internally until it eventually collapses.
-d) The lintel is structurally disconnected from the wall.', 
-'["There is no load above the lintel", "The lintel transfers the wall''s load sideways into the columns/side walls, keeping the doorway space clear", "The lintel absorbs the load internally until it eventually collapses", "The lintel is structurally disconnected from the wall"]', 
-'The lintel transfers the wall''s load sideways into the columns/side walls, keeping the doorway space clear', 0, 0, 1, 0);
+In a communication / electrical system, a request arriving with a missing or invalid Source ID / authorization signal is typically:
+
+a) Always executed with the highest priority.
+b) Rejected or ignored by the receiving system since the source cannot be verified.
+c) Automatically duplicated and sent to all nodes.
+d) Converted into a checksum-only response.', 
+'["Always executed with the highest priority", "Rejected or ignored by the receiving system since the source cannot be verified", "Automatically duplicated and sent to all nodes", "Converted into a checksum-only response"]', 
+'Rejected or ignored by the receiving system since the source cannot be verified', 0, 0, 1, 0);
 
 -- Island 3: Sirens Island Pre-Round MCQ (Reward: Hermes'' Sandals / Trap: +3 years)
 INSERT INTO questions (island_id, type, format, question_text, options, correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -231,34 +234,13 @@ For row 4: 11 * (8 + 1) = 11 * 9 = ?',
 
 -- ============================================================================
 -- ISLAND 2: CYCLOPS ISLAND (Reward: -1.0, Penalty: +1.5)
+-- From Questions_Island2.md (Polyphemus Counting, Echoing XOR, Sheep Logic Circuit)
 -- ============================================================================
 
--- Main Question 1: OSPF Link-State Routing & Dual Failure Calculation
-INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(2, 'MAIN', 'MCQ', 
-'A company''s network has 4 routers (R1, R2, R3, R4) connected as follows:
-• R1 ↔ R2: 10 Mbps (Cost = 100/10 = 10)
-• R1 ↔ R3: 100 Mbps (Cost = 100/100 = 1)
-• R2 ↔ R3: 20 Mbps (Cost = 100/20 = 5)
-• R2 ↔ R4: 50 Mbps (Cost = 100/50 = 2)
-• R3 ↔ R4: 10 Mbps (Cost = 100/10 = 10)
-
-The network uses OSPF where Cost = 100 / Bandwidth (Mbps). A packet travels from R1 to R4.
-During transmission:
-1. The R1–R3 link fails.
-2. OSPF recalculates the shortest path.
-3. Before the packet reaches R4, the R2–R4 link also fails.
-4. OSPF recalculates again. (Routers cannot be visited more than once).
-
-What route will the packet ultimately take from R1 to R4, and what is the total OSPF cost after the second failure?', 
-'Convert each bandwidth into OSPF cost (10, 1, 5, 2, 10). After R1-R3 and R2-R4 fail, trace R1 -> R2 -> R3 -> R4 and sum the remaining link costs.', 
-'["R1 -> R2 -> R3 -> R4, cost = 25", "R1 -> R2 -> R3 -> R4, cost = 15", "R1 -> R3 -> R2 -> R4, cost = 16", "No valid route exists"]', 
-'R1 -> R2 -> R3 -> R4, cost = 25', 'R1 -> R2 -> R3 -> R4, cost = 15', 1.0, 1.5, 2, 1);
-
--- Main Question 2: Polyphemus Counting Ritual & Reverse Caesar Shift
+-- Main Question 1: Polyphemus Counting Ritual & Reverse Caesar Shift
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (2, 'MAIN', 'NON_MCQ', 
-'Trapped in the cave, Odysseus overhears Polyphemus muttering a counting ritual:
+'Trapped in the cave, Odysseus overhears Polyphemus muttering a counting ritual before he speaks his final warning. Trace the ritual below to find its number — then use that number to unshift the warning and read what the Cyclops truly said.
 
 total = 0
 for i in range(1, 10):
@@ -268,23 +250,53 @@ for i in range(1, 10):
         total -= 1
 print(total)
 
-The Cyclops''s scrambled warning reads: QEOMBQ
-Each letter was shifted forward in the alphabet by the ritual''s number. Shift each letter back by that same number to reveal what Polyphemus truly warned:', 
-'Calculate loop total: for i=1..9, multiples of 3 are 3, 6, 9 (sum = 18). Non-multiples are 6 numbers (-6). Total shift = 18 - 6 = 12. Shift QEOMBQ backward by 12 letters.', 
-'ESCAPE', 1.0, 1.5, 2, 2);
+The warning, scrambled, reads: QEOMBQ
+Each letter of the warning was shifted forward in the alphabet by the ritual''s number. Shift each letter back by that same amount to reveal the true word. What does Polyphemus really say?', 
+'Walk i = 1 to 9. Divisible by 3: add to total; otherwise subtract 1. Total shift = 12. Shift QEOMBQ backward by 12 letters in the alphabet.', 
+'ESCAPE', 1.0, 1.5, 2, 1);
 
--- Main Question 3: The Echoing Cave (Binary XOR Secret)
+-- Main Question 2: The Echoing Cave (Binary XOR Secret)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (2, 'MAIN', 'NON_MCQ', 
 'The Echoing Cave:
-Deep in the cave, every shout comes back changed. Odysseus discovers the echo compares his number to a secret cave-number, digit by digit, using binary XOR.
-Tests:
-• When he shouts 5 (0101), the echo replies 9 (1001).
-• When he shouts 9 (1001), the echo replies 5 (0101).
+Deep in the cave, every shout comes back changed. Odysseus discovers the echo works by a strange rule: it compares his number to a secret cave-number, digit by digit, in binary — where matching digits become 0 and differing digits become 1 (XOR).
 
-What is the cave''s secret number, and what will the echo reply if Odysseus shouts 15 (1111)? (Format answer as: secret = 12, reply = 3 or simply: 12, 3):', 
-'Find secret: 5 XOR 9 = 0101 XOR 1001 = 1100 in binary = 12. Then compute 15 XOR 12 = 1111 XOR 1100 = 0011 = 3.', 
-'12, 3', 1.0, 1.5, 2, 3);
+He tests it twice:
+• He shouts 5, the echo replies 9.
+• He shouts 9, the echo replies 5.
+
+What is the cave''s secret number? And what will the echo reply if Odysseus shouts 15? (Format answer as: secret = 12, reply = 3 or simply: 12, 3):', 
+'Write 5 (0101) and 9 (1001) in binary. 0101 XOR 1001 = 1100 = 12. Then calculate 15 (1111) XOR 12 (1100) = 0011 = 3.', 
+'12, 3', 1.0, 1.5, 2, 2);
+
+-- Main Question 3: Hiding, Escape & Logic Circuit Decode
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(2, 'MAIN', 'NON_MCQ', 
+'Odysseus and his men are trying to escape Polyphemus''s cave by hiding under the sheep.
+For each sheep, Polyphemus performs a logical check using three inputs:
+• A = Touch feels like a normal sheep''s back
+• B = Bleat matches a real sheep
+• C = Weight/gait matches a real sheep
+
+His circuit works as follows:
+P = A XOR B
+Q = NAND(P, C)
+Y = Q XOR B (Y = 1 means passes undetected; Y = 0 raises suspicion)
+
+The result carries forward to the next sheep:
+A(next) = Y
+B(next) = A
+C(next) = B
+
+For the first sheep: A = 1, B = 0, C = 1.
+Three sheep pass through the cave in sequence.
+
+After determining the output for all three sheep, decode the following message by shifting each letter 3 positions backward in the alphabet:
+Q  R  E  R  G  B
+
+What is the decoded hidden message?', 
+'Trace Sheep 1 (Y=0), Sheep 2 (Y=0), Sheep 3 (Y=1, passes). Then shift Q R E R G B backward by 3: Q->N, R->O, E->B, R->O, G->D, B->Y.', 
+'NOBODY', 1.0, 1.5, 2, 3);
 
 
 -- ============================================================================
