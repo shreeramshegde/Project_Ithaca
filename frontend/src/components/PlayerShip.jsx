@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { animateShipTravel } from '../animations/mapAnimations.js';
 
 function PlayerShip({ nodes, currentIsland, traveledFrom }) {

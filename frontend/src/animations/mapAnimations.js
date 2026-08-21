@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 
-export function animateMapCamera(islandSlug) {
+export function animateMapCamera(_islandSlug) {
   // A real implementation would find the island's coordinates and pan/zoom to it.
   // We'll just do a subtle zoom on the container for the cinematic effect.
   return gsap.to('.ocean-map-world', {

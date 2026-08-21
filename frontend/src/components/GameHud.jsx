@@ -242,7 +242,7 @@ function GameHud({ teamName, state, previousYears, flashValue, onLogout }) {
                 className="btn-confirm-danger" 
                 onClick={() => {
                   setShowLogoutConfirm(false);
-                  onLogout();
+                  onLogout?.();
                 }}
               >
                 Confirm Departure

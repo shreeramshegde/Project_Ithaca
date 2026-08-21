@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import FacePuzzle from '../games/FacePuzzle.jsx';
 
 function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestion, hasSandals, onSandalsClick, isPuzzleSolved = false, onSolvePuzzle }) {

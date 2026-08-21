@@ -38,10 +38,13 @@ function LoginPage() {
         token: payload.token,
         team: payload.data,
       });
+      const isReturning = payload?.message?.toLowerCase().includes('welcome back');
       setFeedback({
         kind: 'success',
-        title: '20 years remain',
-        message: 'Your crew is registered. The passage opens in a moment.',
+        title: isReturning ? 'Crew recognized' : '20 years remain',
+        message: isReturning
+          ? 'Welcome back. The passage opens in a moment.'
+          : 'Your crew is registered. The passage opens in a moment.',
       });
       const target = location.state?.from || '/journey';
       window.setTimeout(() => navigate(target), 900);
@@ -52,7 +55,7 @@ function LoginPage() {
         title: 'Unable to begin journey',
         message:
           error.message === 'Team name or Auth code already exists'
-            ? 'Existing teams must continue from the saved browser session token.'
+            ? 'That team name or code is already in use. Returning crews must enter the same name and code together.'
             : error.message,
       });
       // Shake the panel on error

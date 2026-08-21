@@ -154,8 +154,9 @@ function LinuxTerminal({ onKeyFound }) {
           const newExtracted = { ...extractedFiles };
           const logLines = [`Archive:  ${arg}`];
 
+          const zipDir = targetPath.slice(0, targetPath.lastIndexOf('/')) || currentPath;
           Object.entries(filesExtracted).forEach(([fname, content]) => {
-            const fullExtractedPath = `${currentPath}/${fname}`.replace(/\/+/g, '/');
+            const fullExtractedPath = `${zipDir}/${fname}`.replace(/\/+/g, '/');
             newExtracted[fullExtractedPath] = content;
             logLines.push(`  inflating: ${fname}`);
           });

@@ -28,7 +28,14 @@ const registerTeam = async (req, res) => {
           status: 'success',
           message: 'Welcome back, crew authenticated successfully',
           token,
-          data: match
+          data: {
+            id: match.id,
+            team_name: match.team_name,
+            remaining_years: match.remaining_years,
+            standard_hints_left: match.standard_hints_left,
+            current_island: match.current_island,
+            is_completed: match.is_completed,
+          }
         });
       }
 

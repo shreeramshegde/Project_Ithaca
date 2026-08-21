@@ -26,7 +26,7 @@ function AdminPage() {
     return teams.filter(
       (t) =>
         t.team_name?.toLowerCase().includes(q) ||
-        t.id?.toLowerCase().includes(q) ||
+        String(t.id ?? '').toLowerCase().includes(q) ||
         `island ${t.current_island}`.includes(q)
     );
   }, [teams, searchFilter]);

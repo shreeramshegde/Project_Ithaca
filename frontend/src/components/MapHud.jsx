@@ -84,7 +84,7 @@ function MapHud({ teamName, state, previousYears, onLogout }) {
                 className="btn-confirm-danger" 
                 onClick={() => {
                   setShowLogoutConfirm(false);
-                  onLogout();
+                  onLogout?.();
                 }}
               >
                 Confirm Departure

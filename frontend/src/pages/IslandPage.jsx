@@ -22,7 +22,7 @@ function IslandPage() {
   const island = findIslandBySlug(islandSlug);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { token, team } = useAuth();
+  const { token, team, clearSession } = useAuth();
   const [feedback, setFeedback] = useState(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
   const [showRules, setShowRules] = useState(true);
@@ -33,7 +33,9 @@ function IslandPage() {
   const [witchSudokuSolved, setWitchSudokuSolved] = useState(false);
   const [terminalPasswordFound, setTerminalPasswordFound] = useState('');
 
-  const isPuzzlePending = (island.slug === 'sirens' && !sirensPuzzleSolved) || (island.slug === 'witch' && !witchSudokuSolved);
+  const isPuzzlePending =
+    (island?.slug === 'sirens' && !sirensPuzzleSolved) ||
+    (island?.slug === 'witch' && !witchSudokuSolved);
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],
@@ -165,7 +167,21 @@ function IslandPage() {
     }
   }, [clearSession, stateQuery.error?.message]);
 
-  if (!island || isLocked) {
+  if (!island) {
+    return <Navigate to="/journey" replace />;
+  }
+
+  if (stateQuery.isLoading) {
+    return (
+      <main className={`page-shell island-page ${island.themeClass}`}>
+        <div className="page-content journey-layout">
+          <p className="muted-copy">Charting the island...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (isLocked) {
     return <Navigate to="/journey" replace />;
   }
 
@@ -250,7 +266,7 @@ function IslandPage() {
                 </div>
                 <h1 className="island-hero-title">{island.title}</h1>
                 <p className="island-hero-lore">
-                  {island.summary || island.subtitle || 'Solve the sacred inscriptions and trials to shorten your voyage.'}
+                  {island.blurb || island.summary || island.subtitle || 'Solve the sacred inscriptions and trials to shorten your voyage.'}
                 </p>
               </div>
 

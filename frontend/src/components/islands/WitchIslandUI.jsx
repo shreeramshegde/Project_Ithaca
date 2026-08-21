@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import RunicSudoku from '../games/RunicSudoku.jsx';
 
 function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestion, hasBlessing, onBlessingClick, isPuzzleSolved = false, onSolvePuzzle }) {
