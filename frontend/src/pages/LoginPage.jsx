@@ -129,13 +129,12 @@ function LoginPage() {
               <label htmlFor="auth-code">Team Code</label>
               <input
                 id="auth-code"
-                type="password"
+                type="text"
                 value={form.auth_code}
                 onChange={(event) => setForm((current) => ({ ...current, auth_code: event.target.value }))}
                 placeholder="Your secret code"
                 required
                 minLength={4}
-                autoComplete="new-password"
               />
             </div>
 
