@@ -301,6 +301,12 @@ function QuestionConsole({
                         >
                           <div className="mcq-option-letter">{letter}</div>
                           <div className="mcq-option-text">{opt}</div>
+                          <div className="mcq-option-indicator">
+                            <span className="mcq-kbd-hint">[{letter}]</span>
+                            <span className={`mcq-check-circle ${isSelected ? 'active' : ''}`}>
+                              {isSelected ? '✓' : ''}
+                            </span>
+                          </div>
                         </div>
                       );
                     })}
@@ -318,13 +324,15 @@ function QuestionConsole({
                   </div>
                 )}
 
-                <button 
-                  className="spoken-submit-btn" 
-                  type="submit" 
-                  disabled={loading || !preRoundAnswer}
-                >
-                  {loading ? 'Consulting the Gods...' : '⚡ Seal Choice & Open Gateway'}
-                </button>
+                <div className="console-submit-row">
+                  <button 
+                    className="spoken-submit-btn" 
+                    type="submit" 
+                    disabled={loading || !preRoundAnswer}
+                  >
+                    {loading ? 'Consulting the Gods...' : '⚡ Seal Choice & Open Gateway'}
+                  </button>
+                </div>
               </form>
             </>
           )}
@@ -561,6 +569,12 @@ function QuestionConsole({
                             <div className="mcq-option-text">
                               {opt} {isEliminated && <span style={{ color: '#f87171', fontSize: '0.8rem', marginLeft: '6px' }}>(Eliminated by Cyclops' Eye)</span>}
                             </div>
+                            <div className="mcq-option-indicator">
+                              <span className="mcq-kbd-hint">[{letter}]</span>
+                              <span className={`mcq-check-circle ${isSelected ? 'active' : ''}`}>
+                                {isSelected ? '✓' : ''}
+                              </span>
+                            </div>
                           </div>
                         );
                       })}
@@ -579,13 +593,15 @@ function QuestionConsole({
                     </div>
                   )}
 
-                  <button 
-                    className="spoken-submit-btn" 
-                    type="submit" 
-                    disabled={loading || sitOutRequired || !mainAnswer}
-                  >
-                    {loading ? 'Submitting Trial...' : '⚡ Offer Answer to the Fates'}
-                  </button>
+                  <div className="console-submit-row">
+                    <button 
+                      className="spoken-submit-btn" 
+                      type="submit" 
+                      disabled={loading || sitOutRequired || !mainAnswer}
+                    >
+                      {loading ? 'Submitting Trial...' : '⚡ Offer Answer to the Fates'}
+                    </button>
+                  </div>
                 </form>
               )}
                 </>

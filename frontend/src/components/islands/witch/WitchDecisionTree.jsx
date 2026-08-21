@@ -85,6 +85,9 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
       <div className="witch-challenge-header">
         <p className="eyebrow" style={{ color: 'var(--gold)' }}>WITCH MAIN TRIAL 1</p>
         <h3 className="witch-challenge-title">The Forbidden Decision Tree & The Eight Ships</h3>
+        <p className="witch-challenge-subtitle">
+          Classify approaching ships A through H as SAFE or DANGER. Discard numbers from DANGER vessels to synthesize the 6-digit escape code.
+        </p>
       </div>
 
       {/* Image Reference Section */}
@@ -131,7 +134,7 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
                 className="witch-doc-image"
               />
               <div className="witch-image-zoom-badge">
-                <span>🔍 Click to Enlarge Tree</span>
+                <span>🔍 Enlarge Decision Tree</span>
               </div>
             </div>
           )}
@@ -153,7 +156,7 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
                 className="witch-doc-image"
               />
               <div className="witch-image-zoom-badge">
-                <span>🔍 Click to Enlarge Ships Table</span>
+                <span>🔍 Enlarge Ships Table</span>
               </div>
             </div>
           )}
@@ -164,7 +167,7 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
       <div className="witch-scratchpad-card">
         <div className="witch-scratchpad-header">
           <h4>Ship Classification Scratchpad</h4>
-          <p>Classify each ship using the Decision Tree to collect the surviving escape digits:</p>
+          <p>Classify each ship using the Decision Tree rules to collect the surviving escape digits:</p>
         </div>
 
         <div className="witch-table-responsive">
@@ -183,7 +186,7 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
               {SHIPS_DATA.map((row) => {
                 const status = shipStatuses[row.ship];
                 return (
-                  <tr key={row.ship} className={`ship-row ${status || ''}`}>
+                  <tr key={row.ship} className={`ship-row ${status ? status.toLowerCase() : ''}`}>
                     <td><strong className="ship-letter">{row.ship}</strong></td>
                     <td>{row.speed}</td>
                     <td>{row.distance}</td>
@@ -196,14 +199,14 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
                           className={`class-btn safe ${status === 'SAFE' ? 'selected' : ''}`}
                           onClick={() => toggleShipStatus(row.ship, 'SAFE')}
                         >
-                          SAFE
+                          ✓ SAFE
                         </button>
                         <button
                           type="button"
                           className={`class-btn danger ${status === 'DANGER' ? 'selected' : ''}`}
                           onClick={() => toggleShipStatus(row.ship, 'DANGER')}
                         >
-                          DANGER
+                          ✕ DANGER
                         </button>
                       </div>
                     </td>
@@ -216,34 +219,38 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
 
         {/* Scratchpad Summary */}
         <div className="witch-scratchpad-summary">
-          <span>Surviving Digits from SAFE Ships (A → H):</span>
-          <strong className="kept-digits-preview">
-            {keptNumbers ? (
-              <>
-                {keptNumbers}{' '}
-                <button
-                  type="button"
-                  className="apply-kept-btn"
-                  onClick={handleApplyKeptNumbers}
-                  title="Copy to Escape Code input"
-                >
-                  Apply to Escape Code ➔
-                </button>
-              </>
-            ) : (
-              'None classified as SAFE yet'
-            )}
-          </strong>
+          <div className="summary-info">
+            <span>Surviving Digits from SAFE Ships (A → H):</span>
+            <strong className="kept-digits-preview">
+              {keptNumbers ? (
+                <>
+                  <span className="digits-pill">{keptNumbers}</span>
+                  <button
+                    type="button"
+                    className="apply-kept-btn"
+                    onClick={handleApplyKeptNumbers}
+                    title="Transfer digits to Escape Code input"
+                  >
+                    Apply to Escape Code ➔
+                  </button>
+                </>
+              ) : (
+                <span style={{ color: 'rgba(231,229,221,0.4)', fontStyle: 'italic' }}>
+                  No ships classified as SAFE yet
+                </span>
+              )}
+            </strong>
+          </div>
         </div>
       </div>
 
       {/* Final Escape Code Submission Form */}
       <form className="witch-answer-form" onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="witch-escape-code">
+        <div className="field" style={{ width: '100%', maxWidth: '580px', margin: '0 auto 16px auto' }}>
+          <label htmlFor="witch-escape-code" style={{ display: 'block', textAlign: 'center', marginBottom: '8px' }}>
             Final Escape Code <span style={{ color: 'var(--gold)' }}>*</span>
           </label>
-          <div className="witch-code-input-wrapper">
+          <div className="witch-code-input-wrapper" style={{ justifyContent: 'center' }}>
             <input
               id="witch-escape-code"
               type="text"
@@ -254,10 +261,11 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
               onChange={(e) => setEscapeCode(e.target.value.replace(/[^0-9]/g, ''))}
               required
               disabled={loading}
+              style={{ textAlign: 'center', fontSize: '1.5rem', letterSpacing: '0.3em', fontWeight: 'bold' }}
             />
           </div>
-          <span className="field-hint">
-            Enter the final escape digits assembled from the surviving safe ships in order A → H.
+          <span className="field-hint" style={{ textAlign: 'center', display: 'block', marginTop: '6px' }}>
+            Enter the 6 final escape digits from the surviving safe ships in order A → H.
           </span>
         </div>
 
@@ -265,8 +273,9 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
           type="submit"
           className="action-button cinematic-button witch-submit-btn"
           disabled={loading || !escapeCode.trim()}
+          style={{ maxWidth: '440px', margin: '0 auto' }}
         >
-          {loading ? 'TRANSMITTING ESCAPE CODE...' : 'Transmit Final Escape Code'}
+          {loading ? 'TRANSMITTING ESCAPE CODE...' : '⚡ Transmit Final Escape Code'}
         </button>
       </form>
     </div>
@@ -274,3 +283,4 @@ function WitchDecisionTree({ question, onSubmit, loading }) {
 }
 
 export default WitchDecisionTree;
+
