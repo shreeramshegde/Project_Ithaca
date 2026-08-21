@@ -289,9 +289,10 @@ What is the cave''s secret number, and what will the echo reply if Odysseus shou
 
 -- ============================================================================
 -- ISLAND 3: SIRENS'' ISLAND (Reward: -1.5, Penalty: +1.0)
+-- 3 Hardest Questions (Voltage Divider, Conical Geometry, Honeycomb Symmetry)
 -- ============================================================================
 
--- Main Question 1: Warning Bell Voltage Divider
+-- Main Question 1: Warning Bell Voltage Divider (Subjective / Calculation)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (3, 'MAIN', 'NON_MCQ', 
 'As the ship drifts closer to the island, the Sirens'' song begins to blur the crew''s minds. Odysseus rigs a warning bell using a voltage divider off the ship''s 12 V battery:
@@ -302,46 +303,16 @@ In one word (a single number with unit, e.g. 4V), what voltage appears across R2
 'Formula: Vout = Vsupply * (R2 / (R1 + R2)) = 12 * (2k / (4k + 2k)).', 
 '4V', 1.5, 1.0, 3, 1);
 
--- Main Question 2: Recently Played Music Buffer Data Structure
-INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(3, 'MAIN', 'MCQ', 
-'You are building a music player''s "Recently Played" playlist buffer (maximum 50 songs).
-When a new song is played, it should appear at the top, and the oldest song should be removed from the bottom if the buffer is full.
-
-Which data structure is most optimal for O(1) insertion and deletion at both ends?', 
-'A Double-Ended Queue allows fast insertion at the front and eviction from the rear.', 
-'["Stack", "Queue", "Deque", "Hash Table + Doubly Linked List"]', 'Deque', 1.5, 1.0, 3, 2);
-
--- Main Question 3: Sirens Acoustic Beat Frequency
-INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(3, 'MAIN', 'MCQ', 
-'As the ship draws nearer, two of the Sirens'' loudest voices ring out at 440 Hz and 446 Hz.
-Odysseus realises that counting the throbs per second in the combined sound reveals their proximity.
-
-What beat frequency (rate of loudness modulation) will the crew hear from these two overlapping voices?', 
-'Beat frequency is simply the absolute difference between the two frequencies: |f1 - f2|.', 
-'["3 Hz", "6 Hz", "440 Hz", "446 Hz"]', '6 Hz', 1.5, 1.0, 3, 3);
-
--- Main Question 4: Castaway Rail Sequence
-INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(3, 'MAIN', 'MCQ', 
-'One sailor notices a sequence scratched into the ship''s rail by a castaway long before them:
-3, 6, 11, 18, 27, ?
-
-Certain that the next number marks how many heartbeats remain before they clear the rocks, what is the missing number in the sequence?', 
-'Examine consecutive differences: 6-3=3, 11-6=5, 18-11=7, 27-18=9. Add the next odd integer (11) to 27.', 
-'["34", "36", "38", "40"]', '38', 1.5, 1.0, 3, 4);
-
--- Main Question 5: Conical Voice Conch Geometry
+-- Main Question 2: Conical Voice Conch Geometry (Mensuration)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (3, 'MAIN', 'MCQ', 
 'Washed up on the black rocks lies a conch horn the Sirens used to throw their voices.
 Its curved (lateral) surface area is 550 cm² and its slant height (l) is 25 cm.
 Using π = 22/7, what is the radius (r) of the horn''s conical mouth?', 
 'Curved surface area of cone = π * r * l. Rearrange to find r = CSA / (π * l).', 
-'["6 cm", "7 cm", "8 cm", "9 cm"]', '7 cm', 1.5, 1.0, 3, 5);
+'["6 cm", "7 cm", "8 cm", "9 cm"]', '7 cm', 1.5, 1.0, 3, 2);
 
--- Main Question 6: Six-Chambered Honeycomb Ring
+-- Main Question 3: Six-Chambered Honeycomb Ring (Figure & Opposite-Square Pattern)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (3, 'MAIN', 'MCQ', 
 'Carved into the rock is a six-chambered honeycomb bearing numbers in ring order:
@@ -350,7 +321,7 @@ Opposite pairs follow the rule: opposite = (number)^2 + 2 (since 6^2 + 2 = 38, a
 
 What number belongs in place of ''?'' opposite 8?', 
 'Square the opposite number (8) and add 2: 8^2 + 2 = 64 + 2 = 66.', 
-'["68", "56", "66", "75"]', '66', 1.5, 1.0, 3, 6);
+'["68", "56", "66", "75"]', '66', 1.5, 1.0, 3, 3);
 
 
 -- ============================================================================
