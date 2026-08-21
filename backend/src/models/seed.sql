@@ -105,13 +105,11 @@ An inscription describes how the lamps respond to a switch S:
 • C is ON only when both A and B are ON.
 • D is ON when exactly one of A or C is ON.
 
-If switch S is pressed, which lamps will be ON? (Type the lamp letters, e.g. A and D):', 
+If switch S is pressed, which lamps will be ON? (e.g. Lamp1 and Lamp2):', 
 'Evaluate lamp by lamp when switch S is pressed:
-1. S is pressed -> A is ON.
-2. S is pressed -> B is OFF (since B is only ON when S is NOT pressed).
-3. C requires both A and B to be ON -> C is OFF.
-4. D is ON if exactly ONE of A or C is ON -> Since A is ON and C is OFF, D is ON.
-Which two lamps are ON?', 
+1. S is pressed -> check state of A and B.
+2. Check if C turns ON based on A and B.
+3. Determine if D turns ON based on A and C.', 
 'A and D', 0.5, 2.0, 1, 2);
 
 -- Base Question 3: Anti-lock Braking System
@@ -121,7 +119,7 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 A safety system automatically modulates brake pressure to prevent the wheels from locking up, allowing the driver to maintain steering control.
 
 Identify this 3-letter safety system:', 
-'It stands for Anti-lock Braking System (3 uppercase letters).', 
+'It is a 3-letter acronym for an automated vehicle braking safety system.', 
 'ABS', 0.5, 2.0, 1, 3);
 
 -- Base Question 4: Factorial Number Sequence
@@ -132,12 +130,7 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 1,  2,  6,  24,  120,  ?
 
 What is the next number in this sequence?', 
-'Look at the multiplication pattern between consecutive terms:
-1 * 2 = 2
-2 * 3 = 6
-6 * 4 = 24
-24 * 5 = 120
-Now calculate: 120 * 6 = ?', 
+'Look at the multiplication pattern between consecutive terms (factorial series).', 
 '720', 0.5, 2.0, 1, 4);
 
 -- ----------------------------------------------------------------------------
@@ -151,49 +144,42 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 int petals = 5;
 printf("%d ", petals++);
 printf("%d", ++petals);', 
-'1. "petals++" is post-increment: it prints the current value (5), then increases petals to 6.
-2. "++petals" is pre-increment: it increases petals from 6 to 7 first, then prints (7).
-Format answer with space: 5 7', 
+'Distinguish between post-increment (use current value, then increment) and pre-increment (increment first, then use value). Separate the two numbers by a space.', 
 '5 7', 0.0, 2.0, 1, 5),
 
 (1, 'MAIN', 'NON_MCQ', 
 'Convert the 4-bit binary signal 1010 into decimal:', 
-'Position values from left to right: (1 * 8) + (0 * 4) + (1 * 2) + (0 * 1) = 8 + 2 = ?', 
+'Calculate the sum of powers of 2 for each binary digit from left to right.', 
 '10', 0.0, 2.0, 1, 6),
 
 (1, 'MAIN', 'NON_MCQ', 
 'Find the missing number in this pattern:
-2    5    12   (2 * 5 + 2 = 12)
-3    7    ?    (3 * 7 + 3 = ?)
-4    9    40   (4 * 9 + 4 = 40)
-5   11    60   (5 * 11 + 5 = 60)', 
-'Row rule is: (First Column * Second Column) + First Column.
-For row 2: (3 * 7) + 3 = 21 + 3 = ?', 
+2    5    12
+3    7    ?
+4    9    40
+5   11    60', 
+'Analyze how the numbers in each row relate mathematically across columns.', 
 '24', 0.0, 2.0, 1, 7),
 
 (1, 'MAIN', 'NON_MCQ', 
 'What integer will be displayed?
 int a = 5;
 printf("%d", a > 2 && a < 10);', 
-'Both (5 > 2) is True and (5 < 10) is True.
-True AND True = True.
-In C programming, a True boolean condition prints the integer 1.', 
+'Evaluate the logical AND expression. In C, a true condition outputs an integer representation.', 
 '1', 0.0, 2.0, 1, 8),
 
 (1, 'MAIN', 'NON_MCQ', 
 'If A = 1 and B = 1, what is the binary output of an XOR logic gate (A XOR B)?', 
-'An XOR (Exclusive OR) gate outputs 1 ONLY when inputs are different. When both inputs are identical (1 and 1), the output is 0.', 
+'An XOR (Exclusive OR) gate outputs 1 only when inputs differ.', 
 '0', 0.0, 2.0, 1, 9),
 
 (1, 'MAIN', 'NON_MCQ', 
 'Solve the pattern to determine the missing number:
-2    3    7    (3^2 - 2 = 7)
-4    5    21   (5^2 - 4 = 21)
-6    7    43   (7^2 - 6 = 43)
-8    9    ?    (9^2 - 8 = ?)', 
-'Square the second number and subtract the first number:
-9 * 9 = 81.
-81 - 8 = ?', 
+2    3    7
+4    5    21
+6    7    43
+8    9    ?', 
+'Analyze the mathematical operation applied to the first two columns to produce the third column.', 
 '73', 0.0, 2.0, 1, 10),
 
 (1, 'MAIN', 'NON_MCQ', 
@@ -202,33 +188,29 @@ int petal = 1;
 while(petal <= 5) {
     printf("%d ", petal);
 }', 
-'Because petal is never incremented inside the loop, (petal <= 5) stays true forever, causing an infinite loop. In programming classification, this is called a logical error.', 
+'Notice if the loop condition variable ever changes or increments.', 
 'logical error', 0.0, 2.0, 1, 11),
 
 (1, 'MAIN', 'NON_MCQ', 
 '"I store electrical energy in an electrostatic field between two plates. My capacity is measured in Farads."
 Who am I?', 
-'It is a passive electronic component starting with C (Capacitor).', 
+'It is a passive electronic component starting with C whose capacitance is measured in Farads.', 
 'Capacitor', 0.0, 2.0, 1, 12),
 
 (1, 'MAIN', 'NON_MCQ', 
 'What will the console display for this ASCII code?
 char petal = ''B'';
 printf("%c %d", petal + 2, petal + 2);', 
-'The ASCII value of ''B'' is 66.
-1. 66 + 2 = 68.
-2. The letter for ASCII 68 is ''D''.
-3. So %c prints D, and %d prints 68 (Format: D 68).', 
+'Find the character corresponding to (ASCII of ''B'' + 2) and its numerical decimal value.', 
 'D 68', 0.0, 2.0, 1, 13),
 
 (1, 'MAIN', 'NON_MCQ', 
-'Find the missing coordinate:
-3    5    18   (5 * (3 + 1) = 18 ? wait 5 * 4 - 2 = 18)
-4    7    32   (7 * (4 + 1) - 3 = 32)
-6    9    60   (9 * 7 - 3 = 60)
-8   11    ?    (11 * (8 + 1) = 99)', 
-'Formula is: b * (a + 1).
-For row 4: 11 * (8 + 1) = 11 * 9 = ?', 
+'Find the missing coordinate in this matrix:
+3    5    18
+4    7    32
+6    9    60
+8   11    ?', 
+'Look at how the second number relates to the first number in each row.', 
 '99', 0.0, 2.0, 1, 14);
 
 
@@ -265,8 +247,8 @@ He tests it twice:
 • He shouts 5, the echo replies 9.
 • He shouts 9, the echo replies 5.
 
-What is the cave''s secret number? And what will the echo reply if Odysseus shouts 15? (Format answer as: secret = 12, reply = 3 or simply: 12, 3):', 
-'Write 5 (0101) and 9 (1001) in binary. 0101 XOR 1001 = 1100 = 12. Then calculate 15 (1111) XOR 12 (1100) = 0011 = 3.', 
+What is the cave''s secret number, and what will the echo reply if Odysseus shouts 15? (Format answer as: secret_num, reply_num):', 
+'Write 5 and 9 in 4-bit binary, find the XOR pattern to deduce the cave''s secret number, then calculate the response for shout 15.', 
 '12, 3', 1.0, 1.5, 2, 2);
 
 -- Main Question 3: Hiding, Escape & Logic Circuit Decode
@@ -348,7 +330,7 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 Reconstruct the correct decision tree using the Witch''s rules. Pass each of the eight ships (A through H) through the tree to determine whether each ship reaches SAFE or DANGER. Discard the hidden numbers belonging to DANGER ships. Read the remaining hidden numbers in ship order (A → H) to form the final escape code.
 
 Final Clue: "Only those who find the safe waters may carry the key."', 
-'The tree has only one path that survives every decision: Ships B(7), C(2), D(9), E(5), G(8), H(6) are SAFE. Combine their digits.', 
+'Trace each ship from A to H through the branch rules. Collect the hidden numerical digits only from the ships that reach SAFE.', 
 '729586', 2.0, 0.5, 4, 1);
 
 -- Main Question 2: Circe''s Enchanted Domain (Interactive Linux Shell Terminal)
