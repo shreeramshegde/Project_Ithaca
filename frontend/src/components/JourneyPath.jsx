@@ -1,4 +1,4 @@
-function JourneyPath({ nodes, currentIsland }) {
+function JourneyPath({ nodes }) {
   if (!nodes || nodes.length < 2) return null;
 
   // We construct an SVG path based on percentages.

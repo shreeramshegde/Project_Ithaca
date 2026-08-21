@@ -17,6 +17,7 @@ function LandingPage() {
   const subtitleRef = useRef(null);
   const quoteRef = useRef(null);
   const actionsRef = useRef(null);
+  const marqueeRef = useRef(null);
 
   const refs = {
     video: videoRef,
@@ -41,8 +42,14 @@ function LandingPage() {
     }
   };
 
+  const MARQUEE_ITEMS = [
+    'Four Islands', 'One Journey Home', 'Lotus', 'Cyclops', 'Sirens', 'Circe',
+    'Four Islands', 'One Journey Home', 'Lotus', 'Cyclops', 'Sirens', 'Circe',
+  ];
+
   return (
     <main className="page-shell landing-page">
+      {/* Cinematic video background */}
       <div className="landing-video-wrap" aria-hidden="true">
         <div className="video-cropper">
           <video
@@ -59,6 +66,7 @@ function LandingPage() {
         <div className="landing-vignette" ref={vignetteRef} />
       </div>
 
+      {/* Top navigation bar */}
       <header className="landing-topbar">
         <div className="landing-topbar-left">
           <img
@@ -78,7 +86,8 @@ function LandingPage() {
         </div>
       </header>
 
-      <div className="page-content landing-content">
+      {/* Hero — Cinematic Center */}
+      <div className="landing-content">
         <section className="landing-stage">
           <div className="landing-copy">
             <p ref={subtitleRef} className="landing-kicker">
@@ -87,7 +96,6 @@ function LandingPage() {
             <h1 ref={titleRef} className="display-title landing-heading">
               Project Ithaca
             </h1>
-            <p className="landing-subheading">The Tech Odyssey</p>
             <p ref={quoteRef} className="landing-quote">
               Four trials. One journey home.
             </p>
@@ -103,6 +111,18 @@ function LandingPage() {
             </div>
           </div>
         </section>
+      </div>
+
+      {/* Infinite marquee — docked to bottom */}
+      <div className="landing-marquee-wrap" aria-hidden="true" ref={marqueeRef}>
+        <div className="landing-marquee-track">
+          {MARQUEE_ITEMS.map((item, i) => (
+            <span key={i} className="landing-marquee-item">
+              {item}
+              <span className="landing-marquee-dot" />
+            </span>
+          ))}
+        </div>
       </div>
     </main>
   );

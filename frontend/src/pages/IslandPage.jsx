@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useParams, useNavigate } from 'react-router-dom';
-import { getGameState, submitAnswer, submitPreRound, useHint, useReward, nextIsland, getQuestions } from '../api/game.js';
+import { getGameState, submitAnswer, submitPreRound, fetchHint, applyReward, nextIsland, getQuestions } from '../api/game.js';
 import FeedbackBanner from '../components/FeedbackBanner.jsx';
 import GameHud from '../components/GameHud.jsx';
 import QuestionConsole from '../components/QuestionConsole.jsx';
@@ -10,12 +10,10 @@ import RulesModal from '../components/RulesModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { findIslandBySlug } from '../data/islands.js';
 import { animateIslandEntry } from '../animations/mapAnimations.js';
-import EnvironmentalMarker from '../components/EnvironmentalMarker.jsx';
 import LotusIslandUI from '../components/islands/LotusIslandUI.jsx';
 import CyclopsIslandUI from '../components/islands/CyclopsIslandUI.jsx';
 import SirensIslandUI from '../components/islands/SirensIslandUI.jsx';
 import WitchIslandUI from '../components/islands/WitchIslandUI.jsx';
-import IthacaIslandUI from '../components/islands/IthacaIslandUI.jsx';
 import '../journey-map.css';
 import '../island-ui.css';
 
@@ -35,7 +33,9 @@ function IslandPage() {
   const [witchSudokuSolved, setWitchSudokuSolved] = useState(false);
   const [terminalPasswordFound, setTerminalPasswordFound] = useState('');
 
-  const isPuzzlePending = (island.slug === 'sirens' && !sirensPuzzleSolved) || (island.slug === 'witch' && !witchSudokuSolved);
+  const isPuzzlePending =
+    (island?.slug === 'sirens' && !sirensPuzzleSolved) ||
+    (island?.slug === 'witch' && !witchSudokuSolved);
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],
@@ -63,18 +63,9 @@ function IslandPage() {
     queryClient.invalidateQueries({ queryKey: ['game-questions', token, currentIsland] });
   };
 
-  const onMutationSuccess = (title, payload) => {
-    setFeedback({
-      kind: 'success',
-      title,
-      message: payload?.message || 'The backend accepted the action and the latest state is syncing now.',
-    });
-    refreshState();
-  };
-
   const preRoundMutation = useMutation({
     mutationFn: (payload) => submitPreRound(token, payload),
-    onSuccess: (payload) => {
+    onSuccess: () => {
       refreshState();
     },
     onError: (error) => setFeedback({ kind: 'error', title: 'Pre-round failed', message: error.message }),
@@ -108,7 +99,7 @@ function IslandPage() {
   });
 
   const hintMutation = useMutation({
-    mutationFn: (payload) => useHint(token, payload),
+    mutationFn: (payload) => fetchHint(token, payload),
     onSuccess: (payload, variables) => {
       const hintText = payload?.hint || payload?.message;
       if (variables?.question_id && payload?.hint) {
@@ -125,7 +116,7 @@ function IslandPage() {
   });
 
   const rewardMutation = useMutation({
-    mutationFn: (payload) => useReward(token, payload),
+    mutationFn: (payload) => applyReward(token, payload),
     onSuccess: (payload, variables) => {
       if (variables?.target_question_id && payload?.hint) {
         setRevealedHints(prev => ({ ...prev, [variables.target_question_id]: payload.hint }));
@@ -141,7 +132,6 @@ function IslandPage() {
   });
 
   const loading = preRoundMutation.isPending || answerMutation.isPending || hintMutation.isPending || rewardMutation.isPending || nextIslandMutation.isPending;
-  const inventory = stateQuery.data?.data?.inventory || [];
   const eliminatedOption = rewardMutation.data?.eliminated_option;
 
   const [confirmReward, setConfirmReward] = useState(null);
@@ -177,7 +167,21 @@ function IslandPage() {
     }
   }, [clearSession, stateQuery.error?.message]);
 
-  if (!island || isLocked) {
+  if (!island) {
+    return <Navigate to="/journey" replace />;
+  }
+
+  if (stateQuery.isLoading) {
+    return (
+      <main className={`page-shell island-page ${island.themeClass}`}>
+        <div className="page-content journey-layout">
+          <p className="muted-copy">Charting the island...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (isLocked) {
     return <Navigate to="/journey" replace />;
   }
 
@@ -262,7 +266,7 @@ function IslandPage() {
                 </div>
                 <h1 className="island-hero-title">{island.title}</h1>
                 <p className="island-hero-lore">
-                  {island.summary || island.subtitle || 'Solve the sacred inscriptions and trials to shorten your voyage.'}
+                  {island.blurb || island.summary || island.subtitle || 'Solve the sacred inscriptions and trials to shorten your voyage.'}
                 </p>
               </div>
 

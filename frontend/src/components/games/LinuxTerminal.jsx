@@ -154,8 +154,9 @@ function LinuxTerminal({ onKeyFound }) {
           const newExtracted = { ...extractedFiles };
           const logLines = [`Archive:  ${arg}`];
 
+          const zipDir = targetPath.slice(0, targetPath.lastIndexOf('/')) || currentPath;
           Object.entries(filesExtracted).forEach(([fname, content]) => {
-            const fullExtractedPath = `${currentPath}/${fname}`.replace(/\/+/g, '/');
+            const fullExtractedPath = `${zipDir}/${fname}`.replace(/\/+/g, '/');
             newExtracted[fullExtractedPath] = content;
             logLines.push(`  inflating: ${fname}`);
           });
@@ -199,59 +200,26 @@ function LinuxTerminal({ onKeyFound }) {
   };
 
   return (
-    <div style={{
-      background: 'rgba(2, 6, 14, 0.98)',
-      border: '1.5px solid #00f0ff',
-      borderRadius: '12px',
-      overflow: 'hidden',
-      boxShadow: '0 0 30px rgba(0, 240, 255, 0.25)',
-      fontFamily: 'monospace',
-      margin: '16px 0'
-    }}>
+    <div className="linux-terminal">
       {/* Terminal Title Bar */}
-      <div style={{
-        background: 'linear-gradient(90deg, #0d2137 0%, #05101e 100%)',
-        padding: '8px 14px',
-        borderBottom: '1px solid rgba(0, 240, 255, 0.3)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
-          <span style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }} />
-          <span style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-          <span style={{ color: '#00f0ff', fontSize: '0.82rem', fontWeight: 'bold', marginLeft: '8px' }}>
-            🐚 bash — odysseus@cyclops-cave: {currentPath}
+      <div className="terminal-titlebar">
+        <div className="terminal-titlebar-left">
+          <span className="terminal-dot dot-close" />
+          <span className="terminal-dot dot-minimize" />
+          <span className="terminal-dot dot-maximize" />
+          <span className="terminal-session-label">
+            bash — odysseus@cyclops-cave: {currentPath}
           </span>
         </div>
-        <span style={{ color: 'rgba(231, 229, 221, 0.5)', fontSize: '0.72rem' }}>TTY-1</span>
+        <span className="terminal-tty-label">TTY-1</span>
       </div>
 
       {/* Terminal Screen Body */}
-      <div style={{
-        padding: '14px',
-        minHeight: '220px',
-        maxHeight: '320px',
-        overflowY: 'auto',
-        fontSize: '0.88rem',
-        lineHeight: '1.5',
-        color: '#e2e8f0'
-      }}>
+      <div className="terminal-body">
         {history.map((line, idx) => (
-          <div 
-            key={idx} 
-            style={{
-              marginBottom: '4px',
-              whiteSpace: 'pre-wrap',
-              color: line.type === 'input' 
-                ? '#38bdf8' 
-                : line.type === 'system'
-                  ? 'var(--gold)'
-                  : line.type === 'error'
-                    ? '#f87171'
-                    : '#a7f3d0'
-            }}
+          <div
+            key={idx}
+            className={`terminal-line terminal-line--${line.type}`}
           >
             {line.text}
           </div>
@@ -260,48 +228,18 @@ function LinuxTerminal({ onKeyFound }) {
       </div>
 
       {/* Prompt Line */}
-      <form 
-        onSubmit={handleCommand} 
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: '#040b15',
-          borderTop: '1px solid rgba(0, 240, 255, 0.2)',
-          padding: '6px 12px'
-        }}
-      >
-        <span style={{ color: '#00f0ff', marginRight: '8px', fontSize: '0.85rem' }}>
-          odysseus@cave:$
-        </span>
-        <input 
-          type="text" 
-          value={input} 
+      <form onSubmit={handleCommand} className="terminal-prompt-row">
+        <span className="terminal-prompt-prefix">odysseus@cave:$</span>
+        <input
+          type="text"
+          value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type command (e.g. ls, cd archives, unzip cyclops_escape.zip, cat clearance_password.txt)..."
+          placeholder="ls, cd archives, unzip cyclops_escape.zip, cat clearance_password.txt …"
           autoFocus
-          style={{
-            flex: 1,
-            background: 'transparent',
-            border: 'none',
-            outline: 'none',
-            color: '#f8fafc',
-            fontFamily: 'monospace',
-            fontSize: '0.9rem',
-            padding: '4px 0'
-          }}
+          className="terminal-prompt-input"
+          aria-label="Terminal command input"
         />
-        <button 
-          type="submit" 
-          style={{
-            background: 'rgba(0, 240, 255, 0.15)',
-            border: '1px solid #00f0ff',
-            color: '#00f0ff',
-            borderRadius: '4px',
-            padding: '4px 10px',
-            fontSize: '0.75rem',
-            cursor: 'pointer'
-          }}
-        >
+        <button type="submit" className="terminal-execute-btn">
           Execute
         </button>
       </form>

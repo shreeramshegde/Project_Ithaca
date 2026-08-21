@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { animateMapCamera } from '../animations/mapAnimations.js';
 import { ISLANDS } from '../data/islands.js';
 import IslandLandmark from './IslandLandmark.jsx';
 import IslandTooltip from './IslandTooltip.jsx';

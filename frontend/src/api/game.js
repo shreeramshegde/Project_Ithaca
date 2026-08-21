@@ -41,6 +41,7 @@ export function useHint(token, payload) {
     body: JSON.stringify(payload || {}),
   });
 }
+export const fetchHint = useHint;
 
 export function useReward(token, payload) {
   return request('/api/game/use-reward', {
@@ -49,6 +50,7 @@ export function useReward(token, payload) {
     body: JSON.stringify(payload),
   });
 }
+export const applyReward = useReward;
 
 export function nextIsland(token) {
   return request('/api/game/next-island', {
