@@ -2,7 +2,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { registerTeam } from '../api/auth.js';
 import FeedbackBanner from '../components/FeedbackBanner.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -76,10 +76,13 @@ function LoginPage() {
     if (shouldClear) {
       window.localStorage.removeItem('ithaca-team-session');
       window.location.href = '/login';
-    } else if (isAuthenticated) {
-      navigate('/journey', { replace: true });
     }
-  }, [isAuthenticated, navigate, shouldClear]);
+  }, [shouldClear]);
+
+  // If already authenticated and not clearing session, immediately route to /journey
+  if (isAuthenticated && !shouldClear) {
+    return <Navigate to="/journey" replace />;
+  }
 
   return (
     <main className="page-shell auth-page" ref={containerRef}>
