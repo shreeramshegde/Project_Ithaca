@@ -370,6 +370,8 @@ function IslandPage() {
                 sitOutRequired={sitOutRequired}
                 onSitOutAcknowledge={() => setSitOutRequired(false)}
                 autoFillAnswer={activeMainQuestion?.sequence_number === 2 && island.slug === 'cyclops' ? terminalPasswordFound : ''}
+                isPuzzleSolved={witchSudokuSolved}
+                onSolvePuzzle={() => setWitchSudokuSolved(true)}
               />
             </div>
           )}

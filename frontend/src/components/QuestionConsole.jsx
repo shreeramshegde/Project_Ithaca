@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import WitchPreRoundGrid from './islands/witch/WitchPreRoundGrid.jsx';
 import WitchDecisionTree from './islands/witch/WitchDecisionTree.jsx';
 import CirceTerminal from './islands/witch/CirceTerminal.jsx';
+import RunicSudoku from './games/RunicSudoku.jsx';
 
 function CodeBlockWithCopy({ code }) {
   const [copied, setCopied] = useState(false);
@@ -144,7 +145,9 @@ function QuestionConsole({
   eliminatedOption, 
   sitOutRequired, 
   onSitOutAcknowledge,
-  autoFillAnswer
+  autoFillAnswer,
+  isPuzzleSolved,
+  onSolvePuzzle
 }) {
   const [preRoundAnswer, setPreRoundAnswer] = useState('');
   const [mainAnswer, setMainAnswer] = useState('');
@@ -370,6 +373,25 @@ function QuestionConsole({
                   onSubmit={onSubmitAnswer}
                   loading={loading}
                 />
+              ) : island?.slug === 'witch' && !isPuzzleSolved ? (
+                <div style={{ margin: '16px 0' }}>
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(7, 21, 38, 0.95) 100%)',
+                    border: '1.5px solid #a855f7',
+                    borderRadius: '12px',
+                    padding: '16px 20px',
+                    marginBottom: '16px',
+                    textAlign: 'center'
+                  }}>
+                    <h4 style={{ color: '#c084fc', margin: '0 0 6px 0', fontFamily: 'var(--display)', fontSize: '1.15rem' }}>
+                      ✦ THE WITCH'S TRANSMUTATION WARD ✦
+                    </h4>
+                    <p style={{ color: 'rgba(245, 242, 232, 0.9)', fontSize: '0.92rem', margin: 0, lineHeight: '1.5' }}>
+                      Your fleet has navigated the safe waters, but Odysseus's crew remains bewitched as swine! Solve Circe's 6x6 Runic Matrix below to brew the counter-potion and restore your crew to human form before accessing the Archive Terminal.
+                    </p>
+                  </div>
+                  <RunicSudoku onSolve={onSolvePuzzle} isSolved={isPuzzleSolved} />
+                </div>
               ) : island?.slug === 'witch' && mainQuestion?.sequence_number === 2 && !isMainCorrect && !isMainIncorrect ? (
                 <CirceTerminal
                   question={mainQuestion}
