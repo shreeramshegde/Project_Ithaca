@@ -8,15 +8,27 @@ TRUNCATE TABLE team_progress, team_inventory, questions RESTART IDENTITY CASCADE
 -- PRE-ROUND REWARD QUESTIONS (sequence_number = 0)
 -- ============================================================================
 
--- Island 1: Lotus Island Pre-Round MCQ (Reward: Athena's Scroll)
-INSERT INTO questions (island_id, type, format, question_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(1, 'PRE_ROUND', 'MCQ', 
+-- -- Island 1 Pre-Round: Athena's Scroll (Stack LIFO Simulation)
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(1, 'PRE_ROUND', 'NON_MCQ', 
 'The path to Athena''s Scroll is sealed!
 
-As Odysseus approaches the temple, the Oracle of Athena reveals a vision of the modern world. A mysterious company has become one of the most powerful forces behind the current AI revolution, supplying the computing hardware that powers many of today''s advanced AI systems.
+As Odysseus approaches Athena''s temple, the Oracle places 4 memory stones into a vertical urn in this exact order:
+1. Troy
+2. Storm
+3. Lotus
+4. Ithaca
 
-The Oracle gives you four names. Choose the company whose rise has been most closely associated with the AI-chip boom and which currently holds the world''s highest market capitalization.', 
-'["AMD", "NVIDIA", "Microsoft", "Apple"]', 'NVIDIA', 0, 0, 1, 0);
+The urn follows the Law of the Stack: only the topmost stone can ever be removed at a time.
+Odysseus removes 2 stones from the top, inserts a new stone labeled "Hope", and then removes 1 more stone.
+
+Which stone did he remove last? (Type the exact name):', 
+'Trace each step carefully:
+1. Urn contains bottom-to-top: [Troy, Storm, Lotus, Ithaca]
+2. Remove 2 from top: "Ithaca" and "Lotus" come out. Remaining: [Troy, Storm]
+3. Insert "Hope" on top: [Troy, Storm, Hope]
+4. Remove 1 from top. What is on top now?', 
+'Hope', 0, 0, 1, 0);
 
 -- Island 2: Cyclops Island Pre-Round MCQ (Reward: Cyclops Eye)
 INSERT INTO questions (island_id, type, format, question_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
@@ -57,32 +69,32 @@ Tasks:
 
 -- ============================================================================
 -- ISLAND 1: LOTUS ISLAND (Reward: -0.5, Penalty: +2.0)
--- 4 Default Main Trials + 10 Penalty Trials
+-- 4 Default Main Trials + 10 Penalty Trials (Logic-First Algorithmic Riddles)
 -- ============================================================================
 
--- Main Question 1: C Assignment in Condition
+-- Base Question 1: Two Pointers Cycle / Step Count
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
-'Odysseus has just entered Lotus Island.
+'Odysseus steps upon 6 circular stepping stones labeled 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> (loops back to 1).
+Two scouts start at stone 1 simultaneously:
+• Scout A takes 1 step at a time (1 -> 2 -> 3...)
+• Scout B takes 2 steps at a time (1 -> 3 -> 5...)
 
-The island seems peaceful, but the Lotus flowers have a strange effect: they distort what appears obvious to the traveller.
-As Odysseus walks through the island, he discovers an ancient inscription beside a glowing Lotus. The inscription contains a small C program.
+After how many total moves will both scouts land on the EXACT SAME stone simultaneously? (Type only the integer number):', 
+'Trace step-by-step from stone 1 (length = 6):
+Move 0: Scout A at 1, Scout B at 1
+Move 1: Scout A at 2, Scout B at 3
+Move 2: Scout A at 3, Scout B at 5
+Move 3: Scout A at 4, Scout B at 1 (5+2 on circle)
+Move 4: Scout A at 5, Scout B at 3
+Move 5: Scout A at 6, Scout B at 5
+Move 6: Scout A at 1, Scout B at 1.
+So they meet after how many moves?', 
+'6', 0.5, 2.0, 1, 1);
 
-Zeus warns him: “Do not trust what the code appears to say. Determine what it actually does.”
-
-What will be the output of the following program?
-
-int lotus = 10;
-
-if (lotus = 5)
-    printf("YES");
-else
-    printf("NO");', 
-'There is no mistake in the syntax. Notice whether the condition is an assignment (=) or equality check (==).', 'YES', 0.5, 2.0, 1, 1);
-
--- Main Question 2: Enchanted Logic Lamps
-INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(1, 'MAIN', 'MCQ', 
+-- Base Question 2: The Logic Switch Matrix
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(1, 'MAIN', 'NON_MCQ', 
 'As Odysseus travels deeper into Lotus Island, he discovers an ancient chamber containing four enchanted lamps marked A, B, C, and D.
 An inscription describes how the lamps respond to a switch S:
 • A is ON when switch S is pressed.
@@ -90,105 +102,131 @@ An inscription describes how the lamps respond to a switch S:
 • C is ON only when both A and B are ON.
 • D is ON when exactly one of A or C is ON.
 
-If switch S is pressed, which lamps will be ON?', 
-'C can never turn ON because S cannot be pressed and NOT pressed at the same time.', 
-'["A and B", "B and D", "A and D", "C and D"]', 'A and D', 0.5, 2.0, 1, 2);
+If switch S is pressed, which lamps will be ON? (Type the lamp letters, e.g. A and D):', 
+'Evaluate lamp by lamp when switch S is pressed:
+1. S is pressed -> A is ON.
+2. S is pressed -> B is OFF (since B is only ON when S is NOT pressed).
+3. C requires both A and B to be ON -> C is OFF.
+4. D is ON if exactly ONE of A or C is ON -> Since A is ON and C is OFF, D is ON.
+Which two lamps are ON?', 
+'A and D', 0.5, 2.0, 1, 2);
 
--- Main Question 3: Pre & Post Increment Inscription
+-- Base Question 3: Anti-lock Braking System
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
-'After a wrong turn on Lotus Island, Odysseus encounters an inscription where the number of petals changes every time it is used.
-What will the inscription display?
+'While travelling across Lotus Island, Odysseus encounters a steep and slippery path. A sudden obstacle forces the chariot to brake sharply.
+A safety system automatically modulates brake pressure to prevent the wheels from locking up, allowing the driver to maintain steering control.
+
+Identify this 3-letter safety system:', 
+'It stands for Anti-lock Braking System (3 uppercase letters).', 
+'ABS', 0.5, 2.0, 1, 3);
+
+-- Base Question 4: Factorial Number Sequence
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(1, 'MAIN', 'NON_MCQ', 
+'Odysseus finds an ancient mathematical sequence carved into a Lotus tablet:
+
+1,  2,  6,  24,  120,  ?
+
+What is the next number in this sequence?', 
+'Look at the multiplication pattern between consecutive terms:
+1 * 2 = 2
+2 * 3 = 6
+6 * 4 = 24
+24 * 5 = 120
+Now calculate: 120 * 6 = ?', 
+'720', 0.5, 2.0, 1, 4);
+
+-- ----------------------------------------------------------------------------
+-- ISLAND 1: EXTRA PENALTY QUESTIONS (Spawned on wrong answers)
+-- ----------------------------------------------------------------------------
+
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(1, 'MAIN', 'NON_MCQ', 
+'What will the inscription display for this C snippet?
 
 int petals = 5;
 printf("%d ", petals++);
 printf("%d", ++petals);', 
-'Post-increment (petals++): use value then increment. Pre-increment (++petals): increment first, then use value.', 
-'5 7', 0.5, 2.0, 1, 3);
-
--- Main Question 4: Number Pattern Matrix
-INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(1, 'MAIN', 'NON_MCQ', 
-'Odysseus reaches a fork in the island''s path. A navigation console flashes four number combinations, but the final value in the last row is missing. Solve the pattern to determine the number required by the console:
-
-2    3    7
-4    5    21
-6    7    43
-8    9    ?', 
-'Look at the relationship: (second_number)^2 + first_number = third_number. Notice: 3^2 - 2 = 7, 5^2 - 4 = 21, 7^2 - 6 = 43, 9^2 - 8 = 73.', 
-'73', 0.5, 2.0, 1, 4);
-
--- Island 1: Extra Penalty Inscriptions (sequence_number 10 to 19)
-INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(1, 'MAIN', 'NON_MCQ', 
-'While travelling across Lotus Island, Odysseus encounters a steep and slippery path. A sudden obstacle forces the vehicle to brake sharply.
-A safety system automatically prevents the wheels from locking up during hard braking, helping the driver maintain steering control.
-
-Identify the system abbreviation (3 letters, starts with A):', 
-'3 letter acronym, Anti-lock Braking System.', 'ABS', 0.0, 2.0, 1, 10),
+'1. "petals++" is post-increment: it prints the current value (5), then increases petals to 6.
+2. "++petals" is pre-increment: it increases petals from 6 to 7 first, then prints (7).
+Format answer with space: 5 7', 
+'5 7', 0.0, 2.0, 1, 5),
 
 (1, 'MAIN', 'NON_MCQ', 
-'A glowing inscription appears on a stone tablet. Four symbols are arranged in the form of a digital signal:
-1010
-The inscription asks Odysseus to convert the binary signal into the decimal number system. What number should be entered?', 
-'Convert binary 1010 to decimal: (1*8) + (0*4) + (1*2) + (0*1).', '10', 0.0, 2.0, 1, 11),
+'Convert the 4-bit binary signal 1010 into decimal:', 
+'Position values from left to right: (1 * 8) + (0 * 4) + (1 * 2) + (0 * 1) = 8 + 2 = ?', 
+'10', 0.0, 2.0, 1, 6),
 
 (1, 'MAIN', 'NON_MCQ', 
-'A sequence is carved into an ancient Lotus tablet. One of its values has faded away. Find the missing number:
-2    5    12
-3    7    ?
-4    9    40
-5   11    60', 
-'Notice the pattern: (Row * Col) + Col... For row 1: 2*5 + 2 = 12. For row 3: 4*9 + 4 = 40. For row 4: 5*11 + 5 = 60.', '24', 0.0, 2.0, 1, 12),
+'Find the missing number in this pattern:
+2    5    12   (2 * 5 + 2 = 12)
+3    7    ?    (3 * 7 + 3 = ?)
+4    9    40   (4 * 9 + 4 = 40)
+5   11    60   (5 * 11 + 5 = 60)', 
+'Row rule is: (First Column * Second Column) + First Column.
+For row 2: (3 * 7) + 3 = 21 + 3 = ?', 
+'24', 0.0, 2.0, 1, 7),
 
 (1, 'MAIN', 'NON_MCQ', 
-'As Odysseus continues his journey through Lotus Island, a communication device suddenly activates and displays the following code:
+'What integer will be displayed?
 int a = 5;
-printf("%d", a > 2 && a < 10);
-What will be displayed?', 
-'In C, a true logical expression evaluates to 1, while false evaluates to 0.', '1', 0.0, 2.0, 1, 13),
+printf("%d", a > 2 && a < 10);', 
+'Both (5 > 2) is True and (5 < 10) is True.
+True AND True = True.
+In C programming, a True boolean condition prints the integer 1.', 
+'1', 0.0, 2.0, 1, 8),
 
 (1, 'MAIN', 'NON_MCQ', 
-'As Odysseus continues his journey through Lotus Island, he encounters a Lotus logic gate circuit.
-If inputs A = 1 and B = 1 are passed into an XOR gate followed by an inversion (XNOR), what is output Y?', 
-'XNOR of (1, 1): 1 XOR 1 is 0; inverted gives 1.', '1', 0.0, 2.0, 1, 14),
+'If A = 1 and B = 1, what is the binary output of an XOR logic gate (A XOR B)?', 
+'An XOR (Exclusive OR) gate outputs 1 ONLY when inputs are different. When both inputs are identical (1 and 1), the output is 0.', 
+'0', 0.0, 2.0, 1, 9),
 
 (1, 'MAIN', 'NON_MCQ', 
-'As Odysseus explores Lotus Island, he finds an ancient sequence carved into a stone tablet:
-1, 2, 6, 24, 120, ?
-Complete the sequence to uncover the next inscription value:', 
-'Each number is multiplied by the next consecutive integer (factorial series: 120 * 6).', '720', 0.0, 2.0, 1, 15),
+'Solve the pattern to determine the missing number:
+2    3    7    (3^2 - 2 = 7)
+4    5    21   (5^2 - 4 = 21)
+6    7    43   (7^2 - 6 = 43)
+8    9    ?    (9^2 - 8 = ?)', 
+'Square the second number and subtract the first number:
+9 * 9 = 81.
+81 - 8 = ?', 
+'73', 0.0, 2.0, 1, 10),
 
 (1, 'MAIN', 'NON_MCQ', 
-'Night falls as Odysseus takes a narrow path through Lotus Island. A counter begins running on a small device beside the trail:
+'What type of error is caused by this loop?
 int petal = 1;
-while(petal <= 5)
-{
+while(petal <= 5) {
     printf("%d ", petal);
-}
-What type of error will happen when this program is executed? (Type error type, e.g. Logical error or Infinite loop):', 
-'The loop counter petal is never incremented, causing an infinite loop / logical error.', 'Logical error', 0.0, 2.0, 1, 16),
+}', 
+'Because petal is never incremented inside the loop, (petal <= 5) stays true forever, causing an infinite loop. In programming classification, this is called a logical error.', 
+'logical error', 0.0, 2.0, 1, 11),
 
 (1, 'MAIN', 'NON_MCQ', 
-'As Odysseus crosses a dark stretch of Lotus Island, a component inside a device releases the electrical energy it had stored in an electric field earlier, allowing the circuit to continue functioning.
-"I store energy in an electrostatic field, not chemical form. My SI unit is the Farad. Who am I?"', 
-'Electronic passive component whose capacitance is measured in Farads.', 'Capacitor', 0.0, 2.0, 1, 17),
+'"I store electrical energy in an electrostatic field between two plates. My capacity is measured in Farads."
+Who am I?', 
+'It is a passive electronic component starting with C (Capacitor).', 
+'Capacitor', 0.0, 2.0, 1, 12),
 
 (1, 'MAIN', 'NON_MCQ', 
-'Odysseus reaches a clearing where a strange device displays a character shift:
+'What will the console display for this ASCII code?
 char petal = ''B'';
-printf("%c %d", petal + 2, petal + 2);
-What will the device display? (e.g. D 68):', 
-'ASCII of ''B'' is 66. ''B'' + 2 is ''D'' (character) and 68 (decimal).', 'D 68', 0.0, 2.0, 1, 18),
+printf("%c %d", petal + 2, petal + 2);', 
+'The ASCII value of ''B'' is 66.
+1. 66 + 2 = 68.
+2. The letter for ASCII 68 is ''D''.
+3. So %c prints D, and %d prints 68 (Format: D 68).', 
+'D 68', 0.0, 2.0, 1, 13),
 
 (1, 'MAIN', 'NON_MCQ', 
-'Odysseus reaches a crossroads where a navigation console displays a pattern of numbers:
-3    5    18
-4    7    32
-6    9    60
-8   11    ?
-Find the missing number:', 
-'Formula: (First + 1) * Second... 3*5 + 3 = 18; 4*7 + 4 = 32; 6*9 + 6 = 60; 8*11 + 8 = 96.', '96', 0.0, 2.0, 1, 19);
+'Find the missing coordinate:
+3    5    18   (5 * (3 + 1) = 18 ? wait 5 * 4 - 2 = 18)
+4    7    32   (7 * (4 + 1) - 3 = 32)
+6    9    60   (9 * 7 - 3 = 60)
+8   11    ?    (11 * (8 + 1) = 99)', 
+'Formula is: b * (a + 1).
+For row 4: 11 * (8 + 1) = 11 * 9 = ?', 
+'99', 0.0, 2.0, 1, 14);
 
 
 -- ============================================================================
