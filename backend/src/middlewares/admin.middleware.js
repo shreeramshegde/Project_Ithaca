@@ -8,7 +8,10 @@ const adminMiddleware = (req, res, next) => {
   const credentials = Buffer.from(base64Credentials, 'base64').toString('utf8');
   const [username, password] = credentials.split(':');
 
-  if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+  const expectedUser = process.env.ADMIN_USERNAME || 'admin';
+  const expectedPass = process.env.ADMIN_PASSWORD || 'admin';
+
+  if (username === expectedUser && password === expectedPass) {
     next();
   } else {
     return res.status(401).json({ status: 'error', message: 'Unauthorized admin credentials' });

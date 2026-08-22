@@ -13,6 +13,8 @@ function StoryVideo({
   onTimeUpdate,
   onEnded,
   isTransitioning,
+  isMuted = false,
+  onAutoplayBlocked,
 }) {
   const videoRefs = useRef([]);
 
@@ -28,15 +30,19 @@ function StoryVideo({
       if (!el) return;
 
       if (idx === currentVideoIndex) {
-        // Active video: unmute, reset if starting, and play
-        el.muted = false;
+        // Specifically mute the second video (index 1 / Journey Home), keep audio enabled for all other videos
+        const shouldMuteThisTrack = isMuted || idx === 1;
+        el.muted = shouldMuteThisTrack;
         el.currentTime = 0;
         const playPromise = el.play();
         if (playPromise !== undefined) {
           playPromise.catch((err) => {
             console.warn(`Autoplay with sound prevented for video ${idx}:`, err);
-            // Fallback to muted if user hasn't interacted yet
+            // If browser autoplay policy blocked sound, mute and notify parent
             el.muted = true;
+            if (onAutoplayBlocked) {
+              onAutoplayBlocked();
+            }
             el.play().catch(() => {});
           });
         }
@@ -51,7 +57,7 @@ function StoryVideo({
         }, 650);
       }
     });
-  }, [currentVideoIndex]);
+  }, [currentVideoIndex, isMuted, onAutoplayBlocked]);
 
   // Preload upcoming video for instant zero-lag transition
   useEffect(() => {

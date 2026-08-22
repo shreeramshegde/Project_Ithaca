@@ -107,4 +107,48 @@ router.post('/adjust-years', validate(adjustYearsSchema), adminController.adjust
 router.get('/questions', adminController.getQuestions);
 router.post('/questions', validate(addQuestionSchema), adminController.addQuestion);
 
+/**
+  * @swagger
+  * /api/admin/freeze:
+  *   get:
+  *     summary: Freeze all frontend submissions (Closes game for all teams)
+  *     tags: [Admin]
+  *     security:
+  *       - basicAuth: []
+  *     responses:
+  *       200:
+  *         description: Game frozen successfully
+  */
+router.get('/freeze', adminController.freezeGame);
+router.post('/freeze', adminController.freezeGame);
+
+/**
+  * @swagger
+  * /api/admin/unfreeze:
+  *   get:
+  *     summary: Reopen game submissions
+  *     tags: [Admin]
+  *     security:
+  *       - basicAuth: []
+  *     responses:
+  *       200:
+  *         description: Game unfrozen successfully
+  */
+router.get('/unfreeze', adminController.unfreezeGame);
+router.post('/unfreeze', adminController.unfreezeGame);
+
+/**
+  * @swagger
+  * /api/admin/freeze-status:
+  *   get:
+  *     summary: Check current freeze status
+  *     tags: [Admin]
+  *     security:
+  *       - basicAuth: []
+  *     responses:
+  *       200:
+  *         description: Current freeze status
+  */
+router.get('/freeze-status', adminController.getFreezeStatus);
+
 module.exports = router;

@@ -17,13 +17,13 @@ const ARTIFACT_INFO = {
   HERMES_SANDALS: {
     icon: '🪽',
     title: "Hermes' Sandals",
-    description: 'Fleet-footed talismans that bypass Sirens delays, deducting 2 years from your voyage.',
+    description: 'Fleet-footed talismans that bypass Sirens delays, deducting 1.0 year from your voyage.',
     targetRequired: false,
   },
   THE_BLESSING: {
     icon: '✨',
     title: 'The Blessing of Troy',
-    description: 'Divine grace that shields your crew from Circe and deducts 3 years.',
+    description: 'Divine grace that shields your crew from Circe and deducts 1.5 years.',
     targetRequired: false,
   },
 };
@@ -89,12 +89,12 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
         </span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '18px', marginTop: '16px' }}>
         {/* ORACLE HINT CARD (Only available once Pre-Round is conquered) */}
         {!activeMainQuestion ? (
           <div style={{
-            background: 'rgba(10, 25, 45, 0.4)',
-            border: '1px dashed rgba(198, 165, 106, 0.25)',
+            background: 'linear-gradient(135deg, rgba(8, 20, 36, 0.6) 0%, rgba(4, 12, 22, 0.75) 100%)',
+            border: '1.5px dashed rgba(198, 165, 106, 0.3)',
             borderRadius: '14px',
             padding: '22px',
             display: 'flex',
@@ -102,36 +102,57 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
-            gap: '8px'
+            gap: '10px',
+            minHeight: '180px'
           }}>
-            <span style={{ fontSize: '1.8rem', opacity: 0.5 }}>🔒</span>
-            <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: 0, fontSize: '1rem' }}>
-              Oracle's Clue Sealed
-            </h4>
-            <p style={{ color: 'rgba(231, 229, 221, 0.6)', fontSize: '0.84rem', margin: 0 }}>
-              Hints cannot be used during the Oracle's Pre-Round Ritual. Complete the ritual to unlock clues for main island trials.
-            </p>
+            <span style={{ fontSize: '2rem', opacity: 0.45 }}>🔒</span>
+            <div>
+              <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: '0 0 6px 0', fontSize: '1.05rem', letterSpacing: '0.04em' }}>
+                Oracle's Clue Sealed
+              </h4>
+              <p style={{ color: 'rgba(231, 229, 221, 0.65)', fontSize: '0.85rem', margin: 0, lineHeight: '1.45' }}>
+                Hints are locked during the Pre-Round Ritual. Complete the ritual to unlock auguries for main island trials.
+              </p>
+            </div>
           </div>
         ) : (
           <div style={{
-            background: 'linear-gradient(145deg, rgba(10, 25, 45, 0.85) 0%, rgba(5, 15, 26, 0.95) 100%)',
-            border: '1.5px solid rgba(198, 165, 106, 0.35)',
+            background: 'linear-gradient(135deg, rgba(198, 165, 106, 0.12) 0%, rgba(7, 21, 38, 0.95) 100%)',
+            border: '1.5px solid var(--gold)',
             borderRadius: '14px',
             padding: '22px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            gap: '14px'
+            gap: '16px',
+            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(198, 165, 106, 0.15)',
+            position: 'relative',
+            overflow: 'hidden'
           }}>
+            <div style={{
+              position: 'absolute',
+              top: '-20px',
+              right: '-20px',
+              width: '90px',
+              height: '90px',
+              background: 'radial-gradient(circle, rgba(198, 165, 106, 0.25) 0%, transparent 70%)',
+              borderRadius: '50%',
+              pointerEvents: 'none'
+            }} />
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                <span style={{ fontSize: '1.6rem' }}>🔮</span>
-                <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: 0, fontSize: '1.1rem' }}>
-                  Seek Oracle's Hint
-                </h4>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                <span style={{ fontSize: '1.8rem', filter: 'drop-shadow(0 0 8px rgba(198, 165, 106, 0.6))' }}>🔮</span>
+                <div>
+                  <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: 0, fontSize: '1.15rem', letterSpacing: '0.04em' }}>
+                    Seek Oracle's Hint
+                  </h4>
+                  <span style={{ fontSize: '0.75rem', color: 'rgba(231, 229, 221, 0.55)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Athena's Divine Augury
+                  </span>
+                </div>
               </div>
-              <p style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.88rem', lineHeight: '1.45', margin: 0 }}>
-                Consult Athena and the fates for an illuminating clue on your active trial (Trial {activeMainQuestion.sequence_number || 1}).
+              <p style={{ color: 'rgba(231, 229, 221, 0.85)', fontSize: '0.9rem', lineHeight: '1.5', margin: 0 }}>
+                Consult Athena and the fates for an illuminating clue on your active trial (Stage {activeMainQuestion.sequence_number || 1}).
               </p>
             </div>
 
@@ -140,9 +161,18 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
               className="spoken-submit-btn"
               onClick={handleHintClick} 
               disabled={loading}
-              style={{ padding: '10px', fontSize: '0.9rem' }}
+              style={{
+                width: '100%',
+                padding: '12px 18px',
+                fontSize: '0.92rem',
+                margin: 0,
+                background: 'linear-gradient(180deg, rgba(198, 165, 106, 0.35) 0%, rgba(198, 165, 106, 0.15) 100%)',
+                borderColor: 'var(--gold)',
+                color: 'var(--gold)',
+                boxShadow: '0 0 15px rgba(198, 165, 106, 0.2)'
+              }}
             >
-              {loading ? 'Consulting...' : `Invoke Oracle Clue (Trial ${activeMainQuestion.sequence_number || 1})`}
+              {loading ? 'Consulting Fate...' : `⚡ Invoke Clue · Stage ${activeMainQuestion.sequence_number || 1}`}
             </button>
           </div>
         )}
@@ -150,23 +180,30 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
         {/* ACTIVE ARTIFACTS OR EMPTY STATE */}
         {activeInventory.length === 0 ? (
           <div style={{
-            background: 'rgba(5, 11, 20, 0.5)',
-            border: '1px dashed rgba(198, 165, 106, 0.25)',
+            background: 'linear-gradient(135deg, rgba(8, 20, 36, 0.6) 0%, rgba(4, 12, 22, 0.75) 100%)',
+            border: '1.5px dashed rgba(198, 165, 106, 0.3)',
             borderRadius: '14px',
             padding: '22px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            textAlign: 'center'
+            textAlign: 'center',
+            gap: '10px',
+            minHeight: '180px'
           }}>
-            <span style={{ fontSize: '2rem', opacity: 0.4, marginBottom: '8px' }}>🏺</span>
-            <p style={{ color: 'rgba(231, 229, 221, 0.6)', fontSize: '0.9rem', margin: 0 }}>
-              The sacred reliquary is empty. Conquer the Pre-Round Rituals on each island to earn mythical divine artifacts.
-            </p>
+            <span style={{ fontSize: '2rem', opacity: 0.45 }}>🏺</span>
+            <div>
+              <h4 style={{ fontFamily: 'var(--display)', color: 'rgba(231, 229, 221, 0.8)', margin: '0 0 6px 0', fontSize: '1.05rem', letterSpacing: '0.04em' }}>
+                Sacred Reliquary Empty
+              </h4>
+              <p style={{ color: 'rgba(231, 229, 221, 0.65)', fontSize: '0.85rem', margin: 0, lineHeight: '1.45' }}>
+                Conquer the Pre-Round Rituals on each island to earn mythical divine artifacts and blessings.
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="artifacts-grid" style={{ gridTemplateColumns: '1fr', margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {activeInventory.map((item) => {
               const info = ARTIFACT_INFO[item.reward_type] || {
                 icon: '⚡',
@@ -176,22 +213,68 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
               };
 
               return (
-                <div key={item.id} className="artifact-card-item">
-                  <div className="artifact-card-header">
-                    <span className="artifact-icon">{info.icon}</span>
-                    <div>
-                      <h5 className="artifact-name">{info.title}</h5>
-                      <span style={{ color: 'rgba(231, 229, 221, 0.7)', fontSize: '0.8rem' }}>
-                        {info.description}
+                <div 
+                  key={item.id} 
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(14, 34, 58, 0.85) 0%, rgba(6, 17, 30, 0.95) 100%)',
+                    border: '1.5px solid rgba(198, 165, 106, 0.5)',
+                    borderRadius: '14px',
+                    padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '14px',
+                    boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(198, 165, 106, 0.15)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute',
+                    top: '-20px',
+                    right: '-20px',
+                    width: '90px',
+                    height: '90px',
+                    background: 'radial-gradient(circle, rgba(198, 165, 106, 0.2) 0%, transparent 70%)',
+                    borderRadius: '50%',
+                    pointerEvents: 'none'
+                  }} />
+
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '1.8rem', filter: 'drop-shadow(0 0 8px rgba(198, 165, 106, 0.6))' }}>
+                        {info.icon}
                       </span>
+                      <div>
+                        <h4 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: 0, fontSize: '1.15rem', letterSpacing: '0.04em' }}>
+                          {info.title}
+                        </h4>
+                        <span style={{ fontSize: '0.75rem', color: 'rgba(137, 171, 118, 0.9)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
+                          ✦ Ready to Channel
+                        </span>
+                      </div>
                     </div>
+
+                    <p style={{ color: 'rgba(231, 229, 221, 0.85)', fontSize: '0.9rem', lineHeight: '1.5', margin: 0 }}>
+                      {info.description}
+                    </p>
                   </div>
 
                   <button 
                     type="button"
-                    className="artifact-invoke-btn"
+                    className="spoken-submit-btn"
                     onClick={() => setConfirmArtifact(item.reward_type)}
                     disabled={loading}
+                    style={{
+                      width: '100%',
+                      padding: '12px 18px',
+                      fontSize: '0.92rem',
+                      margin: 0,
+                      background: 'linear-gradient(180deg, rgba(137, 171, 118, 0.3) 0%, rgba(137, 171, 118, 0.1) 100%)',
+                      borderColor: 'rgba(137, 171, 118, 0.7)',
+                      color: '#a3e635',
+                      boxShadow: '0 0 15px rgba(137, 171, 118, 0.25)'
+                    }}
                   >
                     {loading ? 'Channeling...' : `⚡ Invoke ${info.title}`}
                   </button>
@@ -228,10 +311,10 @@ function RewardPanel({ inventory = [], onUseHint, onUseReward, loading, activeMa
             textAlign: 'center',
             boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8)'
           }}>
-            <span style={{ fontSize: '3rem', display: 'block', marginBottom: '12px' }}>
+            <span style={{ fontSize: '3rem', display: 'block', marginBottom: '12px', filter: 'drop-shadow(0 0 12px rgba(198, 165, 106, 0.6))' }}>
               {ARTIFACT_INFO[confirmArtifact]?.icon || '⚡'}
             </span>
-            <h3 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: '0 0 10px 0', fontSize: '1.4rem' }}>
+            <h3 style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: '0 0 10px 0', fontSize: '1.4rem', letterSpacing: '0.04em' }}>
               Invoke {ARTIFACT_INFO[confirmArtifact]?.title || confirmArtifact}?
             </h3>
             <p style={{ color: 'rgba(231, 229, 221, 0.85)', fontSize: '0.92rem', lineHeight: '1.5', margin: '0 0 24px 0' }}>

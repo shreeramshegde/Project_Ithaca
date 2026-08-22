@@ -82,7 +82,7 @@ function LotusIslandUI({
                 {isPenalty ? `Penalty ${q.sequence_number - 4}` : `Trial ${q.sequence_number || index + 1}`}
               </span>
               <span className="node-reward-tag">
-                {isPenalty ? '+2.0y' : '-0.5y'}
+                {isPenalty ? '+1.0y' : '-0.25y'}
               </span>
             </div>
           );

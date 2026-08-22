@@ -38,11 +38,13 @@ function CirceTerminal({ question, onSubmit, loading }) {
   const [incantation, setIncantation] = useState('');
   const [showLightbox, setShowLightbox] = useState(false);
 
-  const bottomRef = useRef(null);
+  const terminalBodyRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (terminalBodyRef.current) {
+      terminalBodyRef.current.scrollTop = terminalBodyRef.current.scrollHeight;
+    }
   }, [history]);
 
   const getCurrentDirName = () => {
@@ -434,16 +436,19 @@ function CirceTerminal({ question, onSubmit, loading }) {
           </div>
         </div>
         <div className="circe-instructions">
-          <h4>Enchanted Infiltration Directives:</h4>
+          <h4>Enchanted Terminal Rules:</h4>
           <ul>
-            <li><strong>Reveal Archives</strong>: Type <code>ls -a</code> to reveal hidden dotfiles (e.g. <code>.spell_alpha.zip</code>).</li>
-            <li><strong>Chamber 1</strong>: <code>cd Circes_Palace/Potions_Lab</code> ➔ <code>unzip .spell_alpha.zip</code> ➔ <code>cat spell_alpha.txt</code></li>
-            <li><strong>Chamber 2</strong>: <code>cd Pig_Pens/Mud_Pits</code> ➔ <code>tar -xzf .spell_beta.tar.gz</code> ➔ <code>cat spell_beta.txt</code></li>
-            <li><strong>Chamber 3</strong>: <code>cd Dark_Woods/Stag_Clearing</code> ➔ <code>unrar e .spell_gamma.rar</code> ➔ <code>cat spell_gamma.txt</code></li>
+            <li><strong>Hidden Archives</strong>: Archives are hidden dotfiles (names starting with <code>.</code>). Use <code>ls -a</code> to inspect chambers.</li>
+            <li><strong>Archive Extraction Tools</strong>:
+              <ul style={{ marginTop: '4px', gap: '4px' }}>
+                <li><code>.zip</code> archives: extract with <code>unzip &lt;file.zip&gt;</code></li>
+                <li><code>.tar.gz</code> archives: extract with <code>tar -xzf &lt;file.tar.gz&gt;</code></li>
+                <li><code>.rar</code> archives: extract with <code>unrar e &lt;file.rar&gt;</code></li>
+              </ul>
+            </li>
+            <li><strong>Read Fragments</strong>: Use <code>cat &lt;filename.txt&gt;</code> to read the uncovered spell words.</li>
+            <li><strong>Final Incantation</strong>: Combine the 3 fragment words in sequential order (1, 2, 3) separated by underscores: <code>FRAGMENT1_FRAGMENT2_FRAGMENT3</code>.</li>
           </ul>
-          <span className="circe-directive-tip">
-            ✨ Once all 3 words are discovered, join with underscores (<code>MOLY_SWINE_OATH</code>) to break Circe's spell.
-          </span>
         </div>
       </div>
 
@@ -469,7 +474,7 @@ function CirceTerminal({ question, onSubmit, loading }) {
             </div>
           </div>
 
-          <div className="terminal-body">
+          <div ref={terminalBodyRef} className="terminal-body">
             {history.map((line, idx) => {
               if (line.type === 'prompt') return (
                 <div key={idx} className="terminal-row terminal-row--input">
@@ -514,18 +519,17 @@ function CirceTerminal({ question, onSubmit, loading }) {
               </span>
               <input ref={inputRef} type="text" className="terminal-native-input" value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} autoFocus spellCheck="false" autoComplete="off" aria-label="Circe Terminal Input" />
             </form>
-            <div ref={bottomRef} />
           </div>
         </div>
 
         <div className="terminal-tips-strip">
-          <span>💡 Quick Directives:</span>
+          <span>💡 Quick Commands:</span>
+          <button type="button" onClick={() => { setInputVal('ls'); inputRef.current?.focus(); }}>ls</button>
           <button type="button" onClick={() => { setInputVal('ls -a'); inputRef.current?.focus(); }}>ls -a</button>
-          <button type="button" onClick={() => { setInputVal('cd Circes_Palace'); inputRef.current?.focus(); }}>cd Circes_Palace</button>
-          <button type="button" onClick={() => { setInputVal('cd Potions_Lab'); inputRef.current?.focus(); }}>cd Potions_Lab</button>
-          <button type="button" onClick={() => { setInputVal('unzip .spell_alpha.zip'); inputRef.current?.focus(); }}>unzip .spell_alpha.zip</button>
-          <button type="button" onClick={() => { setInputVal('cat spell_alpha.txt'); inputRef.current?.focus(); }}>cat spell_alpha.txt</button>
+          <button type="button" onClick={() => { setInputVal('pwd'); inputRef.current?.focus(); }}>pwd</button>
           <button type="button" onClick={() => { setInputVal('cd ..'); inputRef.current?.focus(); }}>cd ..</button>
+          <button type="button" onClick={() => { setInputVal('help'); inputRef.current?.focus(); }}>help</button>
+          <button type="button" onClick={() => { setInputVal('clear'); inputRef.current?.focus(); }}>clear</button>
         </div>
       </div>
 
@@ -539,7 +543,7 @@ function CirceTerminal({ question, onSubmit, loading }) {
               id="circe-incantation"
               type="text"
               className="cinematic-input circe-incantation-input"
-              placeholder="e.g. MOLY_SWINE_OATH"
+              placeholder="e.g. WORD1_WORD2_WORD3"
               value={incantation}
               onChange={(e) => setIncantation(e.target.value.toUpperCase())}
               required
@@ -548,7 +552,7 @@ function CirceTerminal({ question, onSubmit, loading }) {
             />
           </div>
           <span className="field-hint" style={{ textAlign: 'center', display: 'block', marginTop: '6px' }}>
-            Format: <code>MOLY_SWINE_OATH</code> (auto-assembled from the 3 unsealed fragments).
+            Combine the 3 unsealed fragments in sequential order with underscores (e.g. <code>WORD1_WORD2_WORD3</code>).
           </span>
         </div>
 

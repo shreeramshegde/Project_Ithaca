@@ -113,7 +113,7 @@ function WitchPreRoundGrid({ question, onSubmit, loading }) {
                   min="1"
                   max="100"
                   className="cinematic-input witch-cost-field"
-                  placeholder="e.g. 31"
+                  placeholder="Enter calculated cost..."
                   value={cost}
                   onChange={(e) => setCost(e.target.value)}
                   required

@@ -167,6 +167,34 @@ function QuestionTextRenderer({ text }) {
         }
       }
     } else {
+      if (trimmed.startsWith('![') && trimmed.includes('](') && trimmed.endsWith(')')) {
+        const imgMatch = trimmed.match(/!\[(.*?)\]\((.*?)\)/);
+        if (imgMatch) {
+          const altText = imgMatch[1] || 'Question illustration';
+          const srcUrl = imgMatch[2];
+          renderedElements.push(
+            <div key={index} style={{ textAlign: 'center', margin: '18px 0' }}>
+              <img
+                src={srcUrl}
+                alt={altText}
+                style={{
+                  maxWidth: '100%',
+                  width: 'auto',
+                  maxHeight: '450px',
+                  borderRadius: '12px',
+                  border: '1.5px solid rgba(198, 165, 106, 0.5)',
+                  boxShadow: '0 8px 28px rgba(0, 0, 0, 0.7)',
+                  objectFit: 'contain',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  padding: '8px'
+                }}
+              />
+            </div>
+          );
+          return;
+        }
+      }
+
       if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
         renderedElements.push(
           <div key={index} style={{ paddingLeft: '12px', margin: '4px 0', color: 'rgba(245, 242, 232, 0.95)' }}>

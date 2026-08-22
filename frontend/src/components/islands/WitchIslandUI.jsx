@@ -26,7 +26,7 @@ function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
             <div>
               <strong style={{ color: 'var(--gold)', display: 'block', fontSize: '0.95rem' }}>The Blessing of Troy Available</strong>
               <span style={{ color: 'rgba(231, 229, 221, 0.8)', fontSize: '0.82rem' }}>
-                Invoke divine talisman to protect your crew and deduct 3 years from your voyage.
+                Invoke divine talisman to protect your crew and deduct 1.5 years from your voyage.
               </span>
             </div>
           </div>
@@ -36,7 +36,7 @@ function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
             onClick={onBlessingClick}
             style={{ borderColor: 'var(--gold)', color: 'var(--gold)', background: 'rgba(198, 165, 106, 0.2)' }}
           >
-            ⚡ Invoke Blessing (-3 Yrs)
+            ⚡ Invoke Blessing (-1.5 Yrs)
           </button>
         </div>
       )}
@@ -90,7 +90,7 @@ function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
                 {index === 0 ? '1. Decision Tree' : '2. Terminal'}
               </h4>
               <span className="altar-reward-tag">
-                {!isUnlocked ? 'Locked' : '-2.0y'}
+                {!isUnlocked ? 'Locked' : '-1.0y'}
               </span>
             </div>
           );

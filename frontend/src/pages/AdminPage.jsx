@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useMemo } from 'react';
-import { adjustYears, getLeaderboard } from '../api/admin.js';
+import { adjustYears, getLeaderboard, freezeGame, unfreezeGame, getFreezeStatus } from '../api/admin.js';
 import FeedbackBanner from '../components/FeedbackBanner.jsx';
 
 function AdminPage() {
@@ -14,7 +14,56 @@ function AdminPage() {
     queryKey: ['admin-leaderboard', submittedCredentials],
     queryFn: () => getLeaderboard(submittedCredentials),
     enabled: Boolean(submittedCredentials),
-    refetchInterval: submittedCredentials ? 8000 : false,
+    refetchInterval: submittedCredentials ? 6000 : false,
+  });
+
+  const freezeStatusQuery = useQuery({
+    queryKey: ['admin-freeze-status', submittedCredentials],
+    queryFn: () => getFreezeStatus(submittedCredentials),
+    enabled: Boolean(submittedCredentials),
+    refetchInterval: submittedCredentials ? 6000 : false,
+  });
+
+  const isFrozen = Boolean(freezeStatusQuery.data?.is_frozen);
+
+  const freezeMutation = useMutation({
+    mutationFn: () => freezeGame(submittedCredentials),
+    onSuccess: (payload) => {
+      setFeedback({
+        kind: 'success',
+        title: 'Odyssey Frozen & Submissions Closed',
+        message: payload.message || 'All incoming student responses are now permanently locked.',
+      });
+      freezeStatusQuery.refetch();
+      leaderboardQuery.refetch();
+    },
+    onError: (error) => {
+      setFeedback({
+        kind: 'error',
+        title: 'Freeze Command Failed',
+        message: error.message,
+      });
+    },
+  });
+
+  const unfreezeMutation = useMutation({
+    mutationFn: () => unfreezeGame(submittedCredentials),
+    onSuccess: (payload) => {
+      setFeedback({
+        kind: 'success',
+        title: 'Submissions Reopened',
+        message: payload.message || 'Game submissions have been reopened.',
+      });
+      freezeStatusQuery.refetch();
+      leaderboardQuery.refetch();
+    },
+    onError: (error) => {
+      setFeedback({
+        kind: 'error',
+        title: 'Unfreeze Command Failed',
+        message: error.message,
+      });
+    },
   });
 
   const rawTeams = leaderboardQuery.data?.data;
@@ -108,6 +157,69 @@ function AdminPage() {
               }}
             />
           ) : null}
+
+          {/* Master Competition Freeze & Final Submission Lock */}
+          {submittedCredentials && (
+            <div style={{ 
+              marginTop: '24px', 
+              padding: '16px', 
+              background: isFrozen ? 'rgba(239, 68, 68, 0.12)' : 'rgba(34, 197, 94, 0.08)',
+              border: `1.5px solid ${isFrozen ? 'rgba(239, 68, 68, 0.5)' : 'rgba(34, 197, 94, 0.3)'}`,
+              borderRadius: '12px' 
+            }}>
+              <p className="eyebrow" style={{ color: isFrozen ? '#f87171' : '#4ade80', margin: 0 }}>
+                {isFrozen ? '🔒 COMPETITION STATUS: FROZEN' : '🟢 COMPETITION STATUS: ACTIVE'}
+              </p>
+              <h4 style={{ fontFamily: 'var(--display)', color: 'var(--cloud-white)', margin: '6px 0 8px 0', fontSize: '1.05rem' }}>
+                {isFrozen ? 'All Frontend Submissions Locked' : 'Live Submissions Accepted'}
+              </h4>
+              <p style={{ color: 'rgba(231, 229, 221, 0.8)', fontSize: '0.8rem', lineHeight: '1.4', margin: '0 0 12px 0' }}>
+                {isFrozen 
+                  ? 'All student inputs, island advances, and trial answers are blocked. Database scores & durations are fixed in place.' 
+                  : 'Clicking "Freeze & Submit All" immediately locks all student inputs and closes further trial attempts.'}
+              </p>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                {!isFrozen ? (
+                  <button
+                    type="button"
+                    onClick={() => freezeMutation.mutate()}
+                    disabled={freezeMutation.isPending}
+                    className="action-button"
+                    style={{
+                      background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+                      borderColor: '#ef4444',
+                      color: '#ffffff',
+                      fontWeight: 'bold',
+                      fontSize: '0.82rem',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      boxShadow: '0 0 16px rgba(220, 38, 38, 0.4)'
+                    }}
+                  >
+                    {freezeMutation.isPending ? 'Freezing Submissions...' : '🛑 Freeze All Submissions (Submit All)'}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => unfreezeMutation.mutate()}
+                    disabled={unfreezeMutation.isPending}
+                    className="action-button"
+                    style={{
+                      background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                      borderColor: '#22c55e',
+                      color: '#ffffff',
+                      fontWeight: 'bold',
+                      fontSize: '0.82rem',
+                      padding: '8px 16px',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    {unfreezeMutation.isPending ? 'Reopening...' : '🔓 Reopen Submissions'}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Quick manual adjustment panel */}
           <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid rgba(198, 165, 106, 0.2)' }}>

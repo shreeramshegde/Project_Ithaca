@@ -41,7 +41,7 @@ function LoginPage() {
       const isReturning = payload?.message?.toLowerCase().includes('welcome back');
       setFeedback({
         kind: 'success',
-        title: isReturning ? 'Crew recognized' : '20 years remain',
+        title: isReturning ? 'Crew recognized' : '10 years remain',
         message: isReturning
           ? 'Welcome back. The passage opens in a moment.'
           : 'Your crew is registered. The passage opens in a moment.',

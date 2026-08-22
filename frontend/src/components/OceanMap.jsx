@@ -7,11 +7,11 @@ import PlayerShip from './PlayerShip.jsx';
 
 // Extended island metadata for cinematic scrollable map
 export const MAP_POSITIONS = {
-  1: { x: 25, y: 88 }, // Lotus (Start / South)
-  2: { x: 72, y: 68 }, // Cyclops
-  3: { x: 28, y: 48 }, // Sirens
-  4: { x: 74, y: 28 }, // Witch
-  5: { x: 50, y: 9 },  // Ithaca (Destination / North)
+  1: { x: 25, y: 89 }, // Lotus (Start / South)
+  2: { x: 72, y: 71 }, // Cyclops
+  3: { x: 28, y: 52 }, // Sirens
+  4: { x: 74, y: 34 }, // Witch
+  5: { x: 50, y: 16 }, // Ithaca (Destination / North - with abundant top sky space)
 };
 
 export function getStateForIsland(islandId, currentIsland) {
@@ -62,6 +62,9 @@ function OceanMap({ currentIsland, traveledFrom, onIslandClick }) {
 
   return (
     <div className="ocean-map-container" ref={containerRef}>
+      {/* Celestial Northern Sea Sky Banner above Ithaca */}
+      <div className="ocean-celestial-banner" />
+
       {/* Ambient Nautical Background Details */}
       <div className="ocean-grid-overlay" />
       
