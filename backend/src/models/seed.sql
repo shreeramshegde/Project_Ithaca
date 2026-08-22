@@ -103,7 +103,7 @@ An inscription describes how the lamps respond to a switch S:
 • C is ON only when both A and B are ON.
 • D is ON when exactly one of A or C is ON.
 
-If switch S is pressed, which lamps will be ON? (e.g. Lamp1 and Lamp2):', 
+If switch S is pressed, which lamps will be ON?', 
 'Evaluate lamp by lamp when switch S is pressed:
 1. S is pressed -> check state of A and B.
 2. Check if C turns ON based on A and B.
