@@ -28,13 +28,24 @@ const getQuestions = async (req, res) => {
     const teamRes = await pool.query('SELECT current_island FROM teams WHERE id = $1', [teamId]);
     const currentIsland = teamRes.rows[0].current_island;
 
+    const eyeCheck = await pool.query(
+      "SELECT 1 FROM team_inventory WHERE team_id = $1 AND reward_type = 'CYCLOPS_EYE' AND is_used = false",
+      [teamId]
+    );
+    const hasActiveEye = eyeCheck.rows.length > 0;
+
     const qRes = await pool.query(
-      `SELECT q.id, q.type, q.format, q.question_text, q.options, q.reward_years, q.penalty_years, q.difficulty_level, q.sequence_number, 
+      `SELECT q.id, q.type, q.format, q.question_text, q.options, q.reward_years, 
+       CASE 
+         WHEN q.island_id = 2 AND $3 = true THEN (q.penalty_years / 2.0)
+         ELSE q.penalty_years 
+       END AS penalty_years,
+       q.difficulty_level, q.sequence_number, 
        (SELECT status FROM team_progress tp WHERE tp.question_id = q.id AND tp.team_id = $1 ORDER BY attempted_at DESC LIMIT 1) as progress_status 
        FROM questions q
        WHERE q.island_id = $2 
        ORDER BY q.type DESC, q.sequence_number ASC`,
-      [teamId, currentIsland]
+      [teamId, currentIsland, hasActiveEye]
     );
 
     return res.status(200).json({
@@ -258,17 +269,32 @@ const submitAnswer = async (req, res) => {
     let message = '';
 
     if (isCorrect) {
-      yearsChange = -question.reward_years;
+      yearsChange = -Number(question.reward_years);
       status = 'CORRECT';
       message = 'Correct answer!';
     } else {
-      yearsChange = question.penalty_years;
+      let effectivePenalty = Number(question.penalty_years);
+
+      // If on Island 2 and team holds an active Cyclops Eye, reduce the penalty by half
+      if (question.island_id === 2) {
+        const eyeHold = await client.query(
+          "SELECT 1 FROM team_inventory WHERE team_id = $1 AND reward_type = 'CYCLOPS_EYE' AND is_used = false",
+          [teamId]
+        );
+        if (eyeHold.rows.length > 0) {
+          effectivePenalty = effectivePenalty / 2.0; // 0.75 / 2 = 0.375
+        }
+      }
+
+      yearsChange = effectivePenalty;
       status = 'INCORRECT';
       if (isHiddenWrong) {
         yearsChange += 1.0; // Extra penalty for hidden wrong answer (halved from +2 to +1.0)
         message = 'Hidden trap triggered! Extra penalty applied.';
       } else {
-        message = 'Incorrect answer. Penalty applied.';
+        message = question.island_id === 2 && yearsChange === 0.375
+          ? 'Incorrect answer. Cyclops Eye protected your crew: penalty halved to +0.375 years.'
+          : 'Incorrect answer. Penalty applied.';
       }
     }
 
@@ -415,14 +441,7 @@ const useReward = async (req, res) => {
       resultData.message = `Athena's Scroll reveals: "${question.hint_text}"`;
     } 
     else if (reward_type === 'CYCLOPS_EYE') {
-      // Halve the penalty burden on Island 2: instantly deducts 0.375 years (half of 0.75 penalty)
-      const penaltyRelief = 0.375;
-      const teamUpd = await client.query(
-        'UPDATE teams SET remaining_years = remaining_years - $1 WHERE id = $2 RETURNING remaining_years', 
-        [penaltyRelief, teamId]
-      );
-      resultData.remaining_years = teamUpd.rows[0].remaining_years;
-      resultData.message = "Cyclops' Eye invoked! Pierced through Polyphemus' wrath and reduced Island 2 penalty burden by half (-0.375 years).";
+      resultData.message = "Cyclops' Eye awakened! Polyphemus' wrath is mitigated: all penalties on Island 2 are now reduced by 50% (+0.375 yrs instead of +0.75 yrs).";
     }
     else if (reward_type === 'HERMES_SANDALS' || reward_type === 'THE_BLESSING') {
       const yearsToDeduct = reward_type === 'THE_BLESSING' ? 1.5 : 1.0;
