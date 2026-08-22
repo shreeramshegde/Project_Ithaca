@@ -15,20 +15,12 @@ function IthacaIslandUI() {
         Your team's voyage has been permanently recorded in the annals of history. Please await the final reckoning on the master leaderboard.
       </p>
       
-      <div style={{ padding: '2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '2rem' }}>
+      <div style={{ padding: '2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', margin: '0 auto', maxWidth: '400px' }}>
         <h3 style={{ color: 'var(--success)', marginBottom: '0.5rem', fontSize: '1.5rem' }}>Journey Completed</h3>
-        <p style={{ color: 'var(--cloud)', fontSize: '1.1rem' }}>
-          Final Remaining Years: <strong>{team?.remaining_years}</strong>
+        <p style={{ color: 'var(--cloud)', fontSize: '1.1rem', margin: 0 }}>
+          Final Remaining Years: <strong style={{ color: 'var(--gold)' }}>{team?.remaining_years}</strong>
         </p>
       </div>
-
-      <button 
-        className="action-button cinematic-button" 
-        onClick={clearSession}
-        style={{ padding: '1rem 3rem', fontSize: '1.2rem' }}
-      >
-        Abandon Ship / New Game
-      </button>
     </div>
   );
 }

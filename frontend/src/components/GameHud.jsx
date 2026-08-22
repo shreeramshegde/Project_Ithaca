@@ -113,32 +113,10 @@ function GameHud({ teamName, state, previousYears, flashValue, onLogout }) {
       }}>
         <div className="hud-meta">
           <div>
-            <p className="eyebrow" style={{ color: 'var(--gold)' }}>Crew Vessel</p>
-            <h3 style={{ margin: '4px 0 10px 0', fontSize: '1.05rem', color: 'var(--cloud-white)' }}>
-              {teamName || 'Unnamed Crew'}
-            </h3>
-            <button 
-              onClick={() => setShowLogoutConfirm(true)}
-              className="action-button cinematic-button" 
-              style={{ 
-                padding: '4px 10px', 
-                fontSize: '0.78rem', 
-                border: '1px solid rgba(239, 68, 68, 0.5)', 
-                color: '#f87171', 
-                background: 'rgba(239, 68, 68, 0.1)',
-                borderRadius: '6px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <polyline points="16 17 21 12 16 7"/>
-                <line x1="21" y1="12" x2="9" y2="12"/>
-              </svg>
-              Abandon Ship
-            </button>
+            <p className="eyebrow" style={{ color: 'var(--gold)' }}>Crew Name</p>
+            <strong style={{ fontSize: '1.2rem', color: 'var(--cloud-white)' }}>
+              {teamName || 'Unnamed'}
+            </strong>
           </div>
           <div>
             <p className="eyebrow" style={{ color: 'var(--gold)' }}>Oracle Hints</p>
@@ -218,39 +196,6 @@ function GameHud({ teamName, state, previousYears, flashValue, onLogout }) {
           )}
         </div>
       </section>
-
-      {/* Abandon Ship Confirmation Modal */}
-      {showLogoutConfirm && (
-        <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-          <div className="modal-dialog">
-            <h3 id="modal-title" style={{ fontFamily: 'var(--display)', color: 'var(--gold)', margin: '0 0 10px 0' }}>
-              Abandon Voyage?
-            </h3>
-            <p style={{ color: 'rgba(231, 229, 221, 0.8)', fontSize: '0.9rem', lineHeight: '1.5', margin: 0 }}>
-              Are you sure you want to disembark? Your team's journey progress and scores remain securely saved on the database.
-            </p>
-            <div className="modal-actions">
-              <button 
-                type="button" 
-                className="btn-cancel" 
-                onClick={() => setShowLogoutConfirm(false)}
-              >
-                Stay Aboard
-              </button>
-              <button 
-                type="button" 
-                className="btn-confirm-danger" 
-                onClick={() => {
-                  setShowLogoutConfirm(false);
-                  onLogout?.();
-                }}
-              >
-                Confirm Departure
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </aside>
   );
 }
