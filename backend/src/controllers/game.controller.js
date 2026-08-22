@@ -29,7 +29,7 @@ const getQuestions = async (req, res) => {
     const currentIsland = teamRes.rows[0].current_island;
 
     const eyeCheck = await pool.query(
-      "SELECT 1 FROM team_inventory WHERE team_id = $1 AND reward_type = 'CYCLOPS_EYE' AND is_used = false",
+      "SELECT 1 FROM team_inventory WHERE team_id = $1 AND reward_type = 'CYCLOPS_EYE'",
       [teamId]
     );
     const hasActiveEye = eyeCheck.rows.length > 0;
@@ -275,10 +275,10 @@ const submitAnswer = async (req, res) => {
     } else {
       let effectivePenalty = Number(question.penalty_years);
 
-      // If on Island 2 and team holds an active Cyclops Eye, reduce the penalty by half
+      // If on Island 2 and team has earned Cyclops Eye, reduce the penalty by half
       if (question.island_id === 2) {
         const eyeHold = await client.query(
-          "SELECT 1 FROM team_inventory WHERE team_id = $1 AND reward_type = 'CYCLOPS_EYE' AND is_used = false",
+          "SELECT 1 FROM team_inventory WHERE team_id = $1 AND reward_type = 'CYCLOPS_EYE'",
           [teamId]
         );
         if (eyeHold.rows.length > 0) {
