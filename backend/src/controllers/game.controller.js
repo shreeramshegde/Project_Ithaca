@@ -415,10 +415,14 @@ const useReward = async (req, res) => {
       resultData.message = `Athena's Scroll reveals: "${question.hint_text}"`;
     } 
     else if (reward_type === 'CYCLOPS_EYE') {
-      if (!question || question.format !== 'MCQ') throw new Error('Target MCQ question required for Cyclops Eye');
-      const wrongOptions = question.options.filter(opt => opt !== question.correct_answer);
-      resultData.eliminated_option = wrongOptions.length > 0 ? wrongOptions[0] : null;
-      resultData.message = 'Cyclops Eye eliminates one wrong option!';
+      // Halve the penalty burden on Island 2: instantly deducts 0.375 years (half of 0.75 penalty)
+      const penaltyRelief = 0.375;
+      const teamUpd = await client.query(
+        'UPDATE teams SET remaining_years = remaining_years - $1 WHERE id = $2 RETURNING remaining_years', 
+        [penaltyRelief, teamId]
+      );
+      resultData.remaining_years = teamUpd.rows[0].remaining_years;
+      resultData.message = "Cyclops' Eye invoked! Pierced through Polyphemus' wrath and reduced Island 2 penalty burden by half (-0.375 years).";
     }
     else if (reward_type === 'HERMES_SANDALS' || reward_type === 'THE_BLESSING') {
       const yearsToDeduct = reward_type === 'THE_BLESSING' ? 1.5 : 1.0;

@@ -21,7 +21,7 @@ function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye
             <div>
               <strong style={{ color: '#00f0ff', display: 'block', fontSize: '0.95rem' }}>Cyclops' Eye Active in Inventory</strong>
               <span style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.82rem' }}>
-                Invoke to eliminate one treacherous wrong path on the current challenge.
+                Invoke to pierce through the darkness and reduce the Island 2 penalty burden by half (-0.375 yrs).
               </span>
             </div>
           </div>

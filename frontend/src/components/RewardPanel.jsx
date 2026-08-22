@@ -11,8 +11,8 @@ const ARTIFACT_INFO = {
   CYCLOPS_EYE: {
     icon: '👁',
     title: "Cyclops' Eye",
-    description: 'Pierces through illusions to eliminate one wrong path on a multiple-choice trial.',
-    targetRequired: true,
+    description: "Pierces Polyphemus' gaze to halve the penalty burden on this island (-0.375 years).",
+    targetRequired: false,
   },
   HERMES_SANDALS: {
     icon: '🪽',
