@@ -30,29 +30,25 @@ Which stone did he remove last? (Type the exact name):',
 4. Remove 1 from top. What is on top now?', 
 'Hope', 0, 0, 1, 0);
 
--- Island 2: Cyclops Island Pre-Round MCQ (Reward: Cyclops Eye)
-INSERT INTO questions (island_id, type, format, question_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(2, 'PRE_ROUND', 'MCQ', 
+-- Island 2: Cyclops Island Pre-Round (Reward: Cyclops Eye)
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(2, 'PRE_ROUND', 'NON_MCQ', 
 'Story line: "Nobody" trick
 Odysseus names himself "Nobody," so when Polyphemus screams for help, his cry carries no valid identity and other Cyclopes ignore it.
 
-In a communication / electrical system, a request arriving with a missing or invalid Source ID / authorization signal is typically:
+In a communication / electrical system, what happens to an incoming request packet that arrives with a missing or unverified Source ID / authorization signal? (Type what the receiving system does):', 
+'Consider standard security verification in communication networks when the sender cannot be identified.', 
+'Rejected', 0, 0, 1, 0);
 
-a) Always executed with the highest priority.
-b) Rejected or ignored by the receiving system since the source cannot be verified.
-c) Automatically duplicated and sent to all nodes.
-d) Converted into a checksum-only response.', 
-'["Always executed with the highest priority", "Rejected or ignored by the receiving system since the source cannot be verified", "Automatically duplicated and sent to all nodes", "Converted into a checksum-only response"]', 
-'Rejected or ignored by the receiving system since the source cannot be verified', 0, 0, 1, 0);
-
--- Island 3: Sirens Island Pre-Round MCQ (Reward: Hermes'' Sandals / Trap: +3 years)
-INSERT INTO questions (island_id, type, format, question_text, options, correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(3, 'PRE_ROUND', 'MCQ', 
+-- Island 3: Sirens Island Pre-Round (Reward: Hermes'' Sandals / Trap: +1.0 year)
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(3, 'PRE_ROUND', 'NON_MCQ', 
 'I''m a two-digit number. My tens digit is three times my units digit, and if you subtract 18 from me, my digits reverse. What number am I?', 
-'["62", "31", "93", "41"]', '31', '93', 0, 0, 2, 0);
+'Subtracting 18 and getting the digits to reverse relates to how far apart the two digits are — swapping digits changes the value by 9 times the difference between the digits.', 
+'31', '93', 0, 0, 2, 0);
 
 -- Island 4: Witch''s Island Pre-Round (Reward: The Blessing / 10x10 Snake & Cyclops Grid)
-INSERT INTO questions (island_id, type, format, question_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (4, 'PRE_ROUND', 'NON_MCQ', 
 'Odysseus is trapped inside Cyclops''s island. He must travel from S (Start), in the top-left corner, to the Temple (T), in the bottom-right corner, using the 10×10 grid below. Two long walls of snakes cut across the island — each has only one narrow gap, and the gaps are not aligned with each other.
 
@@ -67,7 +63,9 @@ Movement Rules:
 Tasks:
 1. Find the minimum-cost route from S to T.
 2. Write the route using directions (U / D / L / R).
-3. Calculate its total cost.', '31', 0, 0, 3, 0);
+3. Calculate its total cost.', 
+'Trace the optimal path avoiding the snake walls while factoring in the double-move penalty of SEA terrain.', 
+'31', 0, 0, 3, 0);
 
 
 -- ============================================================================
@@ -283,39 +281,66 @@ What is the decoded hidden message?',
 
 -- ============================================================================
 -- ISLAND 3: SIRENS'' ISLAND (Reward: -0.75, Penalty: +0.5)
--- 3 Hardest Questions (Voltage Divider, Conical Geometry, Honeycomb Symmetry)
+-- Full 6 Non-MCQ Questions (From Questions_Island3.md)
 -- ============================================================================
 
--- Main Question 1: Warning Bell Voltage Divider (Subjective / Calculation)
+-- Question 1: Warning Bell Voltage Divider (Electrical Circuits)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (3, 'MAIN', 'NON_MCQ', 
-'As the ship drifts closer to the island, the Sirens'' song begins to blur the crew''s minds. Odysseus rigs a warning bell using a voltage divider off the ship''s 12 V battery:
-A 4 kΩ resistor (R1) is in series with a 2 kΩ resistor (R2).
-The bell''s trigger wire is tapped across R2.
+'As the ship drifts closer to the island, the crew''s minds begin to blur under the first faint notes of the Sirens'' song, so Odysseus rigs a small warning bell to trip before anyone can be fully entranced. He builds a simple voltage divider off the ship''s 12 V battery, running a 4 kΩ resistor (R1) in series with a 2 kΩ resistor (R2), and taps the bell''s trigger wire across R2.
 
-In one word (a single number with unit, e.g. 4V), what voltage appears across R2 to sound the alarm?', 
-'Formula: Vout = Vsupply * (R2 / (R1 + R2)) = 12 * (2k / (4k + 2k)).', 
+In one word (a single number, in volts), what voltage appears across R2 — the exact point that will sound the alarm while there''s still time to plug the crew''s ears?', 
+'This is a series voltage divider — the voltage across any resistor is the supply voltage multiplied by that resistor''s share of the total resistance: Vout = Vsupply * (R2 / (R1 + R2)).', 
 '4V', 0.75, 0.5, 3, 1);
 
--- Main Question 2: Conical Voice Conch Geometry (Mensuration)
-INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(3, 'MAIN', 'MCQ', 
-'Washed up on the black rocks lies a conch horn the Sirens used to throw their voices.
-Its curved (lateral) surface area is 550 cm² and its slant height (l) is 25 cm.
-Using π = 22/7, what is the radius (r) of the horn''s conical mouth?', 
-'Curved surface area of cone = π * r * l. Rearrange to find r = CSA / (π * l).', 
-'["6 cm", "7 cm", "8 cm", "9 cm"]', '7 cm', 0.75, 0.5, 3, 2);
+-- Question 2: Music Player Recently Played (Data Structures)
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(3, 'MAIN', 'NON_MCQ', 
+'You are building a music player''s "Recently Played" list (maximum 50 songs). When a new song is played, it should appear at the top, and the oldest song should be removed if the list is full.
 
--- Main Question 3: Six-Chambered Honeycomb Ring (Figure & Opposite-Square Pattern)
-INSERT INTO questions (island_id, type, format, question_text, hint_text, options, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(3, 'MAIN', 'MCQ', 
-'Carved into the rock is a six-chambered honeycomb bearing numbers in ring order:
-6, 8, 10, 38, ?, 102
-Opposite pairs follow the rule: opposite = (number)^2 + 2 (since 6^2 + 2 = 38, and 10^2 + 2 = 102).
+Which linear data structure is best suited to efficiently insert at the front and remove from the rear?', 
+'Think about which end of the list each operation touches: new songs enter at one end, old songs exit from the opposite end. You need a double-ended structure.', 
+'Deque', 0.75, 0.5, 3, 2);
 
-What number belongs in place of ''?'' opposite 8?', 
-'Square the opposite number (8) and add 2: 8^2 + 2 = 64 + 2 = 66.', 
-'["68", "56", "66", "75"]', '66', 0.75, 0.5, 3, 3);
+-- Question 3: Harmonics & Beat Frequency (Physics / Acoustics)
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(3, 'MAIN', 'NON_MCQ', 
+'As the ship draws nearer, the Sirens'' voices blend together in the air, each singing at a pitch just slightly off from the others, creating an eerie pulsing throb meant to lull the crew into a trance. Odysseus notices two of the loudest voices ring out at 440 Hz and 446 Hz, and realises that counting the throbs per second in the combined sound could tell his men how close they''re getting without looking toward the island.
+
+What beat frequency (in Hz) — the rate at which the loudness rises and falls — will the crew hear from these two overlapping voices?', 
+'Beat frequency depends on how far apart the two frequencies are: |f1 - f2|.', 
+'6 Hz', 0.75, 0.5, 3, 3);
+
+-- Question 4: Castaway Rail Sequence (Number Patterns)
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(3, 'MAIN', 'NON_MCQ', 
+'Half-mad with the Sirens'' droning refrain, one sailor notices the throbs Odysseus counted earlier aren''t random — they follow a count scratched into the ship''s rail by a castaway long before them:
+
+3,  6,  11,  18,  27,  ?
+
+Certain that the next number marks exactly how many heartbeats remain before they clear the rocks, the crew must find it fast. What is the missing number in the sequence?', 
+'Look at the gaps between consecutive numbers: 6-3=3, 11-6=5, 18-11=7, 27-18=9. What is the next gap?', 
+'38', 0.75, 0.5, 3, 4);
+
+-- Question 5: Conical Voice Conch Geometry (Mensuration)
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(3, 'MAIN', 'NON_MCQ', 
+'Washed up on the black rocks lies a conch-like horn the Sirens once used to throw their voices far out over the water. Odysseus measures it: its curved (lateral) surface area is 550 cm² and its slant height is 25 cm. To judge whether the horn is small enough to smash silently underfoot, he needs its radius.
+
+Using π = 22/7, what is the radius (r) of the horn''s conical mouth (in cm)?', 
+'Curved surface area of a cone is CSA = π * r * l. Rearrange to find r = CSA / (π * l).', 
+'7 cm', 0.75, 0.5, 3, 5);
+
+-- Question 6: Six-Chambered Honeycomb Ring (Figure & Opposite-Square Pattern)
+INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
+(3, 'MAIN', 'NON_MCQ', 
+'Carved into the rock above the Sirens'' nest is a strange six-chambered honeycomb, each chamber bearing a number. Legend says a sailor who finds the missing number and speaks it aloud will see through every illusion the Sirens cast for the rest of the voyage. Odysseus sketches the carving exactly as he sees it:
+
+![Six-chambered Honeycomb Rock Carving](/assets/sirens/honeycomb_puzzle.png)
+
+What number belongs in place of the ''?'' opposite 8?', 
+'Don''t read the six chambers straight around the ring — check pairs of numbers directly OPPOSITE each other across the centre. Try squaring one number in a pair and compare with the number sitting across from it.', 
+'66', 0.75, 0.5, 3, 6);
 
 
 -- ============================================================================

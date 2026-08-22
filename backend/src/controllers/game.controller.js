@@ -222,6 +222,12 @@ const submitAnswer = async (req, res) => {
       if (normExp === 'escape' && (normIn === 'escape' || normIn === 'escaped')) return true;
       if (normExp === '123' && (normIn === '123' || normIn === 'secret12reply3' || normIn === '12and3' || normIn === '12reply3')) return true;
       if (normExp === '4v' && (normIn === '4v' || normIn === '4volts' || normIn === '4')) return true;
+      if (normExp === 'deque' && (normIn === 'deque' || normIn === 'doubleendedqueue' || normIn === 'doubleended' || normIn === 'deq')) return true;
+      if (normExp === '6hz' && (normIn === '6hz' || normIn === '6' || normIn === '6hertz')) return true;
+      if (normExp === '38' && normIn === '38') return true;
+      if (normExp === '7cm' && (normIn === '7cm' || normIn === '7' || normIn === '7centimeters')) return true;
+      if (normExp === '66' && normIn === '66') return true;
+      if (normExp === 'rejected' && (normIn === 'rejected' || normIn === 'ignored' || normIn === 'dropped' || normIn === 'reject' || normIn === 'ignore' || normIn === 'rejectedorignored')) return true;
       if (normExp === '57' && (normIn === '57' || normIn === '5and7' || normIn === '57petals')) return true;
       if (normExp === 'yes' && normIn === 'yes') return true;
       if (normExp === 'aandd' && (normIn === 'ad' || normIn === 'da' || normIn === 'aandd' || normIn === 'aandc')) return true;
