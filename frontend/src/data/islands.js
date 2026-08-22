@@ -29,9 +29,9 @@ export const ISLANDS = [
   {
     id: 4,
     slug: 'witch',
-    name: "Witch's Island",
-    title: 'The Final Curse Before Home',
-    blurb: 'Fog, ruin, and the last reckoning before Ithaca can finally be seen.',
+    name: "The Scylla Island",
+    title: 'The Final Peril Before Home',
+    blurb: 'Six-headed terror, crashing reefs, and the last reckoning before Ithaca can finally be seen.',
     themeClass: 'witch',
     pathLabel: 'Final gauntlet',
   },

@@ -47,7 +47,7 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 'Subtracting 18 and getting the digits to reverse relates to how far apart the two digits are — swapping digits changes the value by 9 times the difference between the digits.', 
 '31', '93', 0, 0, 2, 0);
 
--- Island 4: Witch''s Island Pre-Round (Reward: The Blessing / 10x10 Snake & Cyclops Grid)
+-- Island 4: The Scylla Island Pre-Round (Reward: The Blessing / 10x10 Snake & Cyclops Grid)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (4, 'PRE_ROUND', 'NON_MCQ', 
 'Odysseus is trapped inside Cyclops''s island. He must travel from S (Start), in the top-left corner, to the Temple (T), in the bottom-right corner, using the 10×10 grid below. Two long walls of snakes cut across the island — each has only one narrow gap, and the gaps are not aligned with each other.
@@ -344,7 +344,7 @@ What number belongs in place of the ''?'' opposite 8?',
 
 
 -- ============================================================================
--- ISLAND 4: WITCH''S ISLAND (Reward: -1.0, Penalty: +0.25)
+-- ISLAND 4: THE SCYLLA ISLAND (Reward: -1.0, Penalty: +0.25)
 -- ============================================================================
 
 -- Main Question 1: The Forbidden Decision Tree (8 Ships Classification)

@@ -126,8 +126,8 @@ export const STORY_TIMELINE = [
     videoIndex: 3,
     start: 7.5,
     end: 10.0,
-    title: 'THE WITCH',
-    caption: 'Ancient spells demand a reckoning before the curse is broken.',
+    title: 'THE SCYLLA',
+    caption: 'Ancient perils demand a reckoning before the strait can be conquered.',
   },
 
   // ==========================================
