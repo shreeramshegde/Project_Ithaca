@@ -173,17 +173,20 @@ function QuestionTextRenderer({ text }) {
           const altText = imgMatch[1] || 'Question illustration';
           const srcUrl = imgMatch[2];
           renderedElements.push(
-            <div key={index} style={{ textAlign: 'center', margin: '14px 0' }}>
+            <div key={index} style={{ textAlign: 'center', margin: '18px 0' }}>
               <img
                 src={srcUrl}
                 alt={altText}
                 style={{
                   maxWidth: '100%',
-                  maxHeight: '320px',
+                  width: 'auto',
+                  maxHeight: '450px',
                   borderRadius: '12px',
-                  border: '1.5px solid rgba(198, 165, 106, 0.4)',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
-                  objectFit: 'contain'
+                  border: '1.5px solid rgba(198, 165, 106, 0.5)',
+                  boxShadow: '0 8px 28px rgba(0, 0, 0, 0.7)',
+                  objectFit: 'contain',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  padding: '8px'
                 }}
               />
             </div>
