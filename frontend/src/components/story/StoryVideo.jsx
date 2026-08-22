@@ -30,8 +30,9 @@ function StoryVideo({
       if (!el) return;
 
       if (idx === currentVideoIndex) {
-        // Apply user sound preference
-        el.muted = isMuted;
+        // Specifically mute the second video (index 1 / Journey Home), keep audio enabled for all other videos
+        const shouldMuteThisTrack = isMuted || idx === 1;
+        el.muted = shouldMuteThisTrack;
         el.currentTime = 0;
         const playPromise = el.play();
         if (playPromise !== undefined) {
