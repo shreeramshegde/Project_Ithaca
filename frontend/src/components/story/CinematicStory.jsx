@@ -25,6 +25,22 @@ function CinematicStory({ onComplete }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isStoryComplete, setIsStoryComplete] = useState(false);
+  const [isMuted, setIsMuted] = useState(() => {
+    const saved = localStorage.getItem('ithaca_story_muted');
+    return saved === 'true'; // Defaults to false (unmuted audio)
+  });
+
+  const handleToggleMute = useCallback(() => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      localStorage.setItem('ithaca_story_muted', String(next));
+      return next;
+    });
+  }, []);
+
+  const handleAutoplayBlocked = useCallback(() => {
+    setIsMuted(true);
+  }, []);
 
   const currentVideo = STORY_VIDEOS[currentVideoIndex];
 
@@ -99,6 +115,8 @@ function CinematicStory({ onComplete }) {
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleVideoEnded}
         isTransitioning={isTransitioning}
+        isMuted={isMuted}
+        onAutoplayBlocked={handleAutoplayBlocked}
       />
 
       {/* Cinematic Scene Title Overlay */}
@@ -107,9 +125,11 @@ function CinematicStory({ onComplete }) {
       {/* Synchronized Narrative Captions at Safe-Zone Bottom */}
       <StoryCaption caption={activeScene?.caption || ''} />
 
-      {/* HUD Controls (Skip Story) */}
+      {/* HUD Controls (Sound Toggle + Skip Story) */}
       <StoryControls
         onSkip={handleSkip}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
       />
 
       {/* Subtle Bronze Timeline Progress */}

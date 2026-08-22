@@ -50,13 +50,13 @@ export const STORY_TIMELINE = [
   {
     videoIndex: 0,
     start: 0.0,
-    end: 4.8,
+    end: 5.2,
     title: 'THE FALL OF TROY',
     caption: 'After ten long years of war, the great city of Troy had fallen.',
   },
   {
     videoIndex: 0,
-    start: 4.8,
+    start: 5.2,
     end: 10.0,
     title: "THE KING'S CALL",
     caption: 'Victory was won, but the true journey was only beginning.',
@@ -68,13 +68,13 @@ export const STORY_TIMELINE = [
   {
     videoIndex: 1,
     start: 0.0,
-    end: 4.8,
+    end: 5.0,
     title: 'THE JOURNEY HOME',
     caption: 'Odysseus commanded the fleet toward home — to the shores of Ithaca.',
   },
   {
     videoIndex: 1,
-    start: 4.8,
+    start: 5.0,
     end: 10.0,
     title: 'THE OPEN AEGEAN',
     caption: 'Yet the gods of the sea held other plans for the weary crew.',
@@ -86,13 +86,13 @@ export const STORY_TIMELINE = [
   {
     videoIndex: 2,
     start: 0.0,
-    end: 4.8,
+    end: 4.5,
     title: 'THE STORM',
     caption: 'A furious tempest shattered the fleet and swept them into unknown waters.',
   },
   {
     videoIndex: 2,
-    start: 4.8,
+    start: 4.5,
     end: 10.0,
     title: 'THE FORBIDDEN SEAS',
     caption: 'Four perilous trials now stood between Odysseus and his kingdom.',
@@ -136,13 +136,13 @@ export const STORY_TIMELINE = [
   {
     videoIndex: 4,
     start: 0.0,
-    end: 3.8,
+    end: 4.0,
     title: 'PROJECT ITHACA',
     caption: 'Every trial demands knowledge, courage, and precision.',
   },
   {
     videoIndex: 4,
-    start: 3.8,
+    start: 4.0,
     end: 7.2,
     title: 'THE TECH ODYSSEY',
     caption: 'Four trials. One journey home. The voyage is now yours.',

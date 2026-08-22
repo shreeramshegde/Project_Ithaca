@@ -1,15 +1,19 @@
 import React from 'react';
 
-/**
- * StoryControls
- *
- * Renders unobtrusive cinematic HUD controls:
- * - "SKIP STORY →" on top-right to jump straight to the call to adventure
- */
-function StoryControls({ onSkip }) {
+function StoryControls({ onSkip, isMuted, onToggleMute }) {
   return (
     <div className="story-controls-overlay">
-      <div />
+      {/* Sound Toggle */}
+      <button
+        type="button"
+        className="story-mute-button cinematic-button"
+        onClick={onToggleMute}
+        title={isMuted ? 'Unmute Audio (Sound is Off)' : 'Mute Audio (Sound is On)'}
+      >
+        <span className="story-ctrl-icon">{isMuted ? '🔇' : '🔊'}</span>
+        <span>{isMuted ? 'UNMUTE AUDIO' : 'SOUND ON'}</span>
+      </button>
+
       {/* Skip Story */}
       <button
         type="button"

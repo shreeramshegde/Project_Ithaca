@@ -38,11 +38,13 @@ function CirceTerminal({ question, onSubmit, loading }) {
   const [incantation, setIncantation] = useState('');
   const [showLightbox, setShowLightbox] = useState(false);
 
-  const bottomRef = useRef(null);
+  const terminalBodyRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (terminalBodyRef.current) {
+      terminalBodyRef.current.scrollTop = terminalBodyRef.current.scrollHeight;
+    }
   }, [history]);
 
   const getCurrentDirName = () => {
@@ -472,7 +474,7 @@ function CirceTerminal({ question, onSubmit, loading }) {
             </div>
           </div>
 
-          <div className="terminal-body">
+          <div ref={terminalBodyRef} className="terminal-body">
             {history.map((line, idx) => {
               if (line.type === 'prompt') return (
                 <div key={idx} className="terminal-row terminal-row--input">
@@ -517,7 +519,6 @@ function CirceTerminal({ question, onSubmit, loading }) {
               </span>
               <input ref={inputRef} type="text" className="terminal-native-input" value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} autoFocus spellCheck="false" autoComplete="off" aria-label="Circe Terminal Input" />
             </form>
-            <div ref={bottomRef} />
           </div>
         </div>
 
