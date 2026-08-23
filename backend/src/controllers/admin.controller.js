@@ -2,16 +2,37 @@ const pool = require('../config/database');
 
 const getLeaderboard = async (req, res) => {
   try {
-    // Rank by lowest remaining years, then shortest duration (if finished), then most hints left
+    // Winner & Leaderboard Ranking Hierarchy:
+    // 1. is_completed DESC: Teams who reached Ithaca rank highest.
+    // 2. current_island DESC: Teams that progressed further through the islands rank higher.
+    // 3. solved_questions DESC: Teams that solved more questions rank higher.
+    // 4. remaining_years ASC: Teams with the lowest remaining voyage years rank higher.
+    // 5. duration_seconds ASC: Teams with shorter elapsed duration rank higher.
+    // 6. standard_hints_left DESC: Teams with more unused Oracle hints rank higher.
     const result = await pool.query(`
       SELECT 
-        id, team_name, remaining_years, current_island, standard_hints_left, is_completed,
-        EXTRACT(EPOCH FROM (COALESCE(end_time, CURRENT_TIMESTAMP) - start_time)) AS duration_seconds
-      FROM teams 
-      ORDER BY 
-        remaining_years ASC,
-        duration_seconds ASC,
-        standard_hints_left DESC
+        t.id, 
+        t.team_name, 
+        t.remaining_years, 
+        t.current_island, 
+        t.standard_hints_left, 
+        t.is_completed,
+        EXTRACT(EPOCH FROM (COALESCE(t.end_time, CURRENT_TIMESTAMP) - t.start_time)) AS duration_seconds,
+        COUNT(tp.id) FILTER (WHERE tp.status = 'CORRECT') AS solved_questions,
+        COUNT(tp.id) AS total_attempts,
+        ROW_NUMBER() OVER (
+          ORDER BY 
+            t.is_completed DESC,
+            t.current_island DESC,
+            COUNT(tp.id) FILTER (WHERE tp.status = 'CORRECT') DESC,
+            t.remaining_years ASC,
+            EXTRACT(EPOCH FROM (COALESCE(t.end_time, CURRENT_TIMESTAMP) - t.start_time)) ASC,
+            t.standard_hints_left DESC
+        ) AS rank
+      FROM teams t
+      LEFT JOIN team_progress tp ON t.id = tp.team_id
+      GROUP BY t.id
+      ORDER BY rank ASC
     `);
     
     return res.status(200).json({
