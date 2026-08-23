@@ -32,6 +32,7 @@ function RunicSudoku({ onSolve, isSolved = false }) {
   ];
 
   const [grid, setGrid] = useState(INITIAL_GRID);
+  const [selectedCell, setSelectedCell] = useState([0, 1]); // default to first editable cell
   const [errorMsg, setErrorMsg] = useState(null);
 
   const GLYPH_MAP = {
@@ -45,16 +46,48 @@ function RunicSudoku({ onSolve, isSolved = false }) {
   };
 
   const handleCellClick = (r, c) => {
-    if (FIXED_CELLS[r][c] || isSolved) return;
+    setSelectedCell([r, c]);
+    setErrorMsg(null);
+  };
 
+  const setCellValue = (r, c, num) => {
+    if (FIXED_CELLS[r][c] || isSolved) return;
     setErrorMsg(null);
     const newGrid = grid.map(row => [...row]);
-    // Cycle 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 1
-    newGrid[r][c] = (newGrid[r][c] + 1) % 7;
-    if (newGrid[r][c] === 0) newGrid[r][c] = 1;
-
+    newGrid[r][c] = num;
     setGrid(newGrid);
   };
+
+  // Keyboard navigation & direct 1-6 entry
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (isSolved || !selectedCell) return;
+      const [r, c] = selectedCell;
+
+      if (['1', '2', '3', '4', '5', '6'].includes(e.key)) {
+        e.preventDefault();
+        setCellValue(r, c, parseInt(e.key, 10));
+      } else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') {
+        e.preventDefault();
+        setCellValue(r, c, 0);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedCell([Math.max(0, r - 1), c]);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedCell([Math.min(5, r + 1), c]);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setSelectedCell([r, Math.max(0, c - 1)]);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setSelectedCell([r, Math.min(5, c + 1)]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedCell, grid, isSolved]);
 
   const handleVerify = () => {
     let isValid = true;
@@ -94,9 +127,10 @@ function RunicSudoku({ onSolve, isSolved = false }) {
         </h4>
       </div>
       <p style={{ color: 'rgba(231, 229, 221, 0.75)', fontSize: '0.88rem', margin: '0 0 16px 0' }}>
-        Click empty cells to cycle runes (α, β, γ, δ, ε, ζ / 1–6) such that every row, column, and 2x3 quadrant contains each rune exactly once.
+        Select any cell and press <strong>1–6</strong> on your keyboard (or use the number bar below). Use Arrow keys to navigate.
       </p>
 
+      {/* Grid */}
       <div
         style={{
           display: 'grid',
@@ -114,6 +148,7 @@ function RunicSudoku({ onSolve, isSolved = false }) {
         {grid.map((row, r) =>
           row.map((val, c) => {
             const isFixed = FIXED_CELLS[r][c];
+            const isSelected = selectedCell && selectedCell[0] === r && selectedCell[1] === c;
             const borderRight = (c === 2) ? '2px solid #c084fc' : '1px solid rgba(168, 85, 247, 0.2)';
             const borderBottom = (r === 1 || r === 3) ? '2px solid #c084fc' : '1px solid rgba(168, 85, 247, 0.2)';
 
@@ -123,11 +158,13 @@ function RunicSudoku({ onSolve, isSolved = false }) {
                 onClick={() => handleCellClick(r, c)}
                 style={{
                   aspectRatio: '1',
-                  background: isFixed 
-                    ? 'rgba(168, 85, 247, 0.18)' 
-                    : val !== 0 
-                      ? 'linear-gradient(135deg, rgba(192, 132, 252, 0.3) 0%, rgba(10, 5, 20, 0.9) 100%)' 
-                      : 'rgba(255, 255, 255, 0.04)',
+                  background: isSelected
+                    ? 'rgba(168, 85, 247, 0.45)'
+                    : isFixed 
+                      ? 'rgba(168, 85, 247, 0.18)' 
+                      : val !== 0 
+                        ? 'linear-gradient(135deg, rgba(192, 132, 252, 0.3) 0%, rgba(10, 5, 20, 0.9) 100%)' 
+                        : 'rgba(255, 255, 255, 0.04)',
                   borderRight,
                   borderBottom,
                   borderTop: '1px solid rgba(168, 85, 247, 0.2)',
@@ -142,6 +179,8 @@ function RunicSudoku({ onSolve, isSolved = false }) {
                   color: isFixed ? '#c084fc' : (val !== 0 ? 'var(--gold)' : 'rgba(255,255,255,0.2)'),
                   cursor: isFixed || isSolved ? 'default' : 'pointer',
                   userSelect: 'none',
+                  outline: isSelected ? '2px solid var(--gold)' : 'none',
+                  boxShadow: isSelected ? '0 0 12px rgba(234, 179, 8, 0.6)' : 'none',
                   transition: 'all 0.15s ease'
                 }}
               >
@@ -151,6 +190,61 @@ function RunicSudoku({ onSolve, isSolved = false }) {
           })
         )}
       </div>
+
+      {/* Number Input Keypad Bar */}
+      {!solved && (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '8px',
+          maxWidth: '380px',
+          margin: '0 auto 16px auto',
+          flexWrap: 'wrap'
+        }}>
+          {[1, 2, 3, 4, 5, 6].map((num) => (
+            <button
+              key={num}
+              type="button"
+              onClick={() => {
+                if (selectedCell) setCellValue(selectedCell[0], selectedCell[1], num);
+              }}
+              style={{
+                flex: '1 1 45px',
+                minWidth: '45px',
+                padding: '8px 0',
+                background: 'rgba(168, 85, 247, 0.2)',
+                border: '1px solid rgba(168, 85, 247, 0.5)',
+                color: 'var(--gold)',
+                borderRadius: '8px',
+                fontFamily: 'var(--display)',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '0.95rem'
+              }}
+            >
+              {num}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              if (selectedCell) setCellValue(selectedCell[0], selectedCell[1], 0);
+            }}
+            style={{
+              padding: '8px 12px',
+              background: 'rgba(239, 68, 68, 0.2)',
+              border: '1px solid rgba(239, 68, 68, 0.5)',
+              color: '#f87171',
+              borderRadius: '8px',
+              fontFamily: 'var(--display)',
+              cursor: 'pointer',
+              fontSize: '0.85rem'
+            }}
+          >
+            Clear (⌫)
+          </button>
+        </div>
+      )}
 
       {errorMsg && (
         <div style={{ color: '#f87171', fontSize: '0.85rem', marginBottom: '14px' }}>

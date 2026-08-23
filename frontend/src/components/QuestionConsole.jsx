@@ -452,17 +452,17 @@ function QuestionConsole({
                   boxShadow: '0 0 20px rgba(239, 68, 68, 0.2)'
                 }}>
                   <p style={{ color: '#f87171', fontWeight: 'bold', margin: '0 0 0.5rem 0', fontSize: '1.05rem' }}>
-                    ⚠️ CIRCE'S CURSE TRIGGERED ⚠️
+                    ⚠️ SCYLLA'S GRASP TRIGGERED ⚠️
                   </p>
                   <p style={{ color: 'var(--cloud-white)', fontSize: '0.92rem', marginBottom: '1rem', lineHeight: '1.5' }}>
-                    An incorrect answer has provoked Circe! One of your crew members has been transformed into a beast and must sit out this challenge.
+                    Scylla has lunged from the jagged cliffs and grabbed one of your teammates! To break Scylla's grasp and get them back, your team must endure the sit-out and solve the 6x6 Runic Sudoku.
                   </p>
                   <button 
                     onClick={onSitOutAcknowledge} 
                     className="hero-action-btn"
                     style={{ width: '100%', borderColor: '#ef4444', color: '#f87171', justifyContent: 'center' }}
                   >
-                    Acknowledge Sit-Out
+                    Acknowledge Teammate Sit-Out
                   </button>
                 </div>
               )}
@@ -554,10 +554,10 @@ function QuestionConsole({
                     textAlign: 'center'
                   }}>
                     <h4 style={{ color: '#c084fc', margin: '0 0 6px 0', fontFamily: 'var(--display)', fontSize: '1.15rem' }}>
-                      ✦ THE WITCH'S TRANSMUTATION WARD ✦
+                      ✦ SCYLLA'S RUNIC RELEASE WARD ✦
                     </h4>
                     <p style={{ color: 'rgba(245, 242, 232, 0.9)', fontSize: '0.92rem', margin: 0, lineHeight: '1.5' }}>
-                      Your fleet has navigated the safe waters, but Odysseus's crew remains bewitched as swine! Solve Circe's 6x6 Runic Matrix below to brew the counter-potion and restore your crew to human form before accessing the Archive Terminal.
+                      Scylla has grabbed one of your teammates! To break the monster's grasp and get your teammate back, solve this 6x6 Runic Sudoku before accessing the Archive Terminal.
                     </p>
                   </div>
                   <RunicSudoku onSolve={onSolvePuzzle} isSolved={isPuzzleSolved} />

@@ -98,7 +98,7 @@ An inscription on the chamber wall explains:
 A second inscription suddenly appears:
 "The chamber responds only to the one who dares to activate the switch."
 Odysseus presses S.
-Which lamps will be ON? (Format: List of active lamps separated by ''and'', e.g. LampX and LampY):', 
+Which lamps will be ON? (Format: List of active lamps separated by ''and'', e.g. A and B):', 
 'Evaluate each lamp sequentially with S active: determine the binary state of A and B first, then use those states to resolve C, and finally evaluate the exclusive condition for D.', 
 'A and D', 0.25, 1.0, 1, 2);
 
@@ -315,11 +315,11 @@ C(next) = B
 For the first sheep: A = 1, B = 0, C = 1.
 Three sheep pass through the cave in sequence.
 
-After determining the output for all three sheep, decode the following message by shifting each letter 3 positions backward in the alphabet:
+After determining the output for all three sheep, decode the encrypted cave inscription:
 Q  R  E  R  G  B
 
 What is the decoded hidden message? (Format: Single English word):', 
-'Simulate the feedback logic cycle for Sheep 1, Sheep 2, and Sheep 3 to check if the pass condition Y=1 is met. Then shift each character of the ciphertext backward by 3 positions in the alphabet.', 
+'Simulate the feedback logic cycle for Sheep 1, Sheep 2, and Sheep 3 to check the pass condition. Use the shift key derived from Polyphemus''s ritual to decrypt the ciphertext word.', 
 'NOBODY', 0.5, 0.75, 2, 3);
 
 

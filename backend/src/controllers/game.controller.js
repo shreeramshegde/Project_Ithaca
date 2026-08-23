@@ -251,16 +251,25 @@ const submitAnswer = async (req, res) => {
       if (normExp === 'logicalerror' && (normIn === 'infiniteloop' || normIn === 'infinitelooperror' || normIn === 'logical' || normIn === 'logicalerror')) return true;
       if (normExp === 'capacitor' && (normIn === 'capacitor' || normIn === 'capacitors')) return true;
       if (normExp === 'd68' && (normIn === 'd68' || normIn === 'd68' || normIn === 'dand68')) return true;
-      // Island 1 synonyms & normalized matches (handles both single line and entire code editor submission)
+      // Island 1 synonyms & normalized matches (strictly validates repaired code vs buggy initial code)
       if (normExp === 'returnsearchamid1lastitem') {
-        if (normIn.includes('searchamid1lastitem') || normIn.includes('searchamid1last') || normIn.includes('searchamid1')) return true;
-        if (normIn.includes('mid1last') && normIn.includes('startmid1')) return true;
-        if (normIn === 'returnsearchamid1lastitem' || normIn === 'searchamid1lastitem') return true;
+        // If single line statement submitted:
+        if (normIn === 'returnsearchamid1lastitem' || normIn === 'searchamid1lastitem' || normIn === 'returnsearchamid1last' || normIn === 'searchamid1last') return true;
+        // If full C function submitted: must contain 'search(a, mid + 1, last, item)' and must NOT have 'start, mid + 1'
+        const hasRightFix = normIn.includes('searchamid1lastitem') || normIn.includes('searchamid1last') || (normIn.includes('amid1last') && !normIn.includes('astartmid1'));
+        const hasLeftBoundary = normIn.includes('searchastartmid1item') || normIn.includes('startmid1item') || normIn.includes('astartmid1');
+        if (hasRightFix && hasLeftBoundary) return true;
+        return false;
       }
+      if (normExp === 'or' && (normIn === 'or' || normIn === 'orgate' || normIn === 'or logic gate')) return true;
       if (normExp === 'leftnumber10') {
-        if (normIn.includes('leftnumber10') || normIn.includes('leftnum10') || normIn.includes('number10') || normIn.includes('num10')) return true;
-        if (normIn.includes('numbermod10') || normIn.includes('leftnumbermod10')) return true;
-        if (normIn === 'leftnumber10' || normIn === 'number10') return true;
+        // If single line statement submitted:
+        if (normIn === 'leftnumber10' || normIn === 'number10' || normIn === 'leftnum10' || normIn === 'numbermod10' || normIn === 'leftnumbermod10') return true;
+        // If full C function submitted: must contain '%' and NOT simply be the buggy '/'
+        const hasModulo = normIn.includes('leftnumber10') || normIn.includes('leftnum10') || normIn.includes('number10');
+        const hasBuggyDivisionOnly = normIn.includes('leftnumber10') && !normIn.includes('reverse') ? false : (normIn.includes('leftnumber10') && !hasModulo);
+        if (hasModulo && !hasBuggyDivisionOnly) return true;
+        return false;
       }
       if (normExp === 'ifnumber20' && (normIn === 'ifnumber20' || normIn === 'number20' || normIn === 'number2' || normIn === 'numbermod20' || normIn === 'ifnumber2' || normIn === 'mod2' || normIn === '20')) return true;
       if (normExp === 'zerocurrent' && (normIn === 'zerocurrent' || normIn === 'zero' || normIn === '0' || normIn === '0a' || normIn === '0amperes' || normIn === 'zeroa' || normIn === '0current')) return true;
