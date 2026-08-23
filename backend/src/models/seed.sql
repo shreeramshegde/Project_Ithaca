@@ -168,8 +168,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 'The navigation console directs Odysseus to the island''s next checkpoint.
 A digital lock blocks his path, displaying a corrupted palindrome verification program.
 
-Correct the digit extraction logic directly in the interactive code editor below, test run the verification, and submit the repaired program to unlock the checkpoint.', 
-'To isolate the units (last) digit of a decimal integer in programming, use the remainder (modulo) operator "%" with divisor 10 instead of division "/".', 
+Correct the three corrupted lines inside the while loop directly in the interactive code editor below, test run the verification, and submit the repaired program to unlock the checkpoint.', 
+'Inspect all operations inside the while loop: extract the units digit with modulo (%) 10, accumulate into the reverse sum (rev * 10 + left), and reduce the number using integer division (/ 10).', 
 'left = number % 10;', 0.0, 1.0, 1, 7);
 
 -- Penalty Question 4: Chariot Brake Safety System

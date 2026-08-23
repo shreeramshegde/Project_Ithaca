@@ -255,20 +255,24 @@ const submitAnswer = async (req, res) => {
       if (normExp === 'returnsearchamid1lastitem') {
         // If single line statement submitted:
         if (normIn === 'returnsearchamid1lastitem' || normIn === 'searchamid1lastitem' || normIn === 'returnsearchamid1last' || normIn === 'searchamid1last') return true;
-        // If full C function submitted: must contain 'search(a, mid + 1, last, item)' and must NOT have 'start, mid + 1'
+        // If full C function submitted: both recursive branches must be corrected
         const hasRightFix = normIn.includes('searchamid1lastitem') || normIn.includes('searchamid1last') || (normIn.includes('amid1last') && !normIn.includes('astartmid1'));
-        const hasLeftBoundary = normIn.includes('searchastartmid1item') || normIn.includes('startmid1item') || normIn.includes('astartmid1');
-        if (hasRightFix && hasLeftBoundary) return true;
+        const hasLeftFix = normIn.includes('searchastartmid1item') || normIn.includes('astartmid1item') || (normIn.includes('astartmid1') && !normIn.includes('amid1lastitem'));
+        const hasBuggyRight = normIn.includes('searchastartmid1item') || normIn.includes('searchastartmid1');
+        const hasBuggyLeft = normIn.includes('searchamid1lastitem') && normIn.includes('else') && normIn.includes('searchamid1last');
+        if (hasRightFix && hasLeftFix && !hasBuggyRight) return true;
         return false;
       }
       if (normExp === 'or' && (normIn === 'or' || normIn === 'orgate' || normIn === 'or logic gate')) return true;
       if (normExp === 'leftnumber10') {
         // If single line statement submitted:
         if (normIn === 'leftnumber10' || normIn === 'number10' || normIn === 'leftnum10' || normIn === 'numbermod10' || normIn === 'leftnumbermod10') return true;
-        // If full C function submitted: must contain '%' and NOT simply be the buggy '/'
-        const hasModulo = normIn.includes('leftnumber10') || normIn.includes('leftnum10') || normIn.includes('number10');
-        const hasBuggyDivisionOnly = normIn.includes('leftnumber10') && !normIn.includes('reverse') ? false : (normIn.includes('leftnumber10') && !hasModulo);
-        if (hasModulo && !hasBuggyDivisionOnly) return true;
+        // If full C function submitted: must contain modulo extraction, rev * 10 + left, and division reduction
+        const hasModulo = normIn.includes('leftnumber10') || normIn.includes('leftnum10');
+        const hasAccumulator = normIn.includes('revrev10left') || normIn.includes('rev10revleft') || normIn.includes('rev10left');
+        const hasDivision = normIn.includes('numbernumber10') || normIn.includes('number10');
+        const hasBuggyNumberModulo = normIn.includes('numbernumber10') && normIn.includes('while');
+        if (hasModulo && hasAccumulator && hasDivision && !hasBuggyNumberModulo) return true;
         return false;
       }
       if (normExp === 'ifnumber20' && (normIn === 'ifnumber20' || normIn === 'number20' || normIn === 'number2' || normIn === 'numbermod20' || normIn === 'ifnumber2' || normIn === 'mod2' || normIn === '20')) return true;

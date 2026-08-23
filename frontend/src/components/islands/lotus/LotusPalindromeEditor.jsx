@@ -1,25 +1,20 @@
 import React, { useState } from 'react';
 
-const INITIAL_CODE = `#include <stdio.h>
-
-int isPalindrome(int number) {
-    int original = number;
-    int reverse = 0;
-    int left;
-
-    while (number > 0) {
-        // [CORRUPTED LINE] Extract last digit of number
+const INITIAL_CODE = `void palindrome(int number)
+{
+    int rev = 0, store, n1, left;
+    n1 = number;
+    store = number;
+    while (number > 0)
+    {
         left = number / 10;
-        
-        reverse = reverse * 10 + left;
-        number = number / 10;
+        rev = rev + 10 * left;
+        number = number % 10;
     }
-
-    if (original == reverse) {
-        return 1;
-    } else {
-        return 0;
-    }
+    if (n1 == rev)
+        printf("Number %d is Palindrome number", n1);
+    else
+        printf("it is not a Palindrome number");
 }`;
 
 export default function LotusPalindromeEditor({ onSubmit, loading, isCorrect, isIncorrect }) {
@@ -33,23 +28,24 @@ export default function LotusPalindromeEditor({ onSubmit, loading, isCorrect, is
 
   const handleTestRun = () => {
     const clean = code.replace(/\s+/g, '').toLowerCase();
-    const hasModuloExtraction = clean.includes('left=number%10') || clean.includes('left=num%10') || clean.includes('number%10');
-    const hasCorrectDivision = clean.includes('number=number/10') || clean.includes('number/=10');
+    const hasModuloDigit = clean.includes('left=number%10') || clean.includes('left=num%10');
+    const hasAccumulator = clean.includes('rev=rev*10+left') || clean.includes('rev=(rev*10)+left') || clean.includes('rev=10*rev+left');
+    const hasReduction = clean.includes('number=number/10') || clean.includes('number/=10');
 
-    if (hasModuloExtraction && hasCorrectDivision) {
+    if (hasModuloDigit && hasAccumulator && hasReduction) {
       setTestOutput({
         success: true,
         message: '✓ Simulation Passed: Palindrome verification passed all test numbers (121 -> Palindrome, 12321 -> Palindrome, 1234 -> Not Palindrome).'
       });
-    } else if (!hasModuloExtraction) {
-      setTestOutput({
-        success: false,
-        message: '⚠ Simulation Failed: Digit extraction bug detected inside while loop. Integer division truncated the digit instead of extracting the units remainder.'
-      });
     } else {
+      const errors = [];
+      if (!hasModuloDigit) errors.push('Digit extraction is dividing instead of extracting remainder with modulo (left = number % 10)');
+      if (!hasAccumulator) errors.push('Reversal accumulator formula is incorrect (rev = rev * 10 + left)');
+      if (!hasReduction) errors.push('Number reduction is taking modulo instead of integer division (number = number / 10)');
+
       setTestOutput({
         success: false,
-        message: '⚠ Simulation Failed: Number truncation step is corrupted or missing inside while loop.'
+        message: `⚠ Simulation Failed: ${errors.join('; ')}.`
       });
     }
   };
