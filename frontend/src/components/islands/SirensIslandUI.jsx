@@ -83,8 +83,18 @@ function SirensIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuesti
               <h4 style={{ fontFamily: 'var(--display)', color: !isUnlocked ? 'rgba(231,229,221,0.5)' : 'var(--cloud-white)', margin: '0 0 4px 0', fontSize: '0.92rem' }}>
                 Song {index + 1}
               </h4>
-              <span style={{ fontSize: '0.72rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
-                {!isUnlocked ? 'Locked' : '-0.75y'}
+              <span style={{ 
+                fontSize: '0.75rem', 
+                color: !isUnlocked ? '#555' : isCompleted ? 'var(--success)' : isFailed ? '#f87171' : 'var(--gold)',
+                fontWeight: isCompleted || isFailed ? 'bold' : 'normal'
+              }}>
+                {!isUnlocked 
+                  ? 'Locked' 
+                  : isCompleted 
+                    ? `-${q.reward_years || 0.75}y` 
+                    : isFailed 
+                      ? `+${q.penalty_years || 0.5}y` 
+                      : `-${q.reward_years || 0.75}y`}
               </span>
             </div>
           );

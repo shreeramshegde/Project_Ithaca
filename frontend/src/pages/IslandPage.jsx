@@ -30,8 +30,24 @@ function IslandPage() {
   const [revealedHints, setRevealedHints] = useState({});
   const [previousYears, setPreviousYears] = useState(team?.remaining_years ?? null);
   const [sirensPuzzleSolved, setSirensPuzzleSolved] = useState(false);
-  const [witchSudokuSolved, setWitchSudokuSolved] = useState(false);
+  const [witchSudokuSolved, setWitchSudokuSolved] = useState(() => {
+    try {
+      const stored = localStorage.getItem(`ithaca_sudoku_${team?.id || 'team'}`);
+      return stored === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [terminalPasswordFound, setTerminalPasswordFound] = useState('');
+
+  const handleSetWitchSudokuSolved = (val) => {
+    setWitchSudokuSolved(val);
+    try {
+      localStorage.setItem(`ithaca_sudoku_${team?.id || 'team'}`, val ? 'true' : 'false');
+    } catch (e) {
+      console.warn('Could not persist sudoku state to localStorage', e);
+    }
+  };
 
   const isPuzzlePending = false;
 
@@ -353,8 +369,8 @@ function IslandPage() {
                     onSelectQuestion={setSelectedQuestionId}
                     hasBlessing={stateQuery.data?.data?.inventory?.some(i => i.reward_type === 'THE_BLESSING' && !i.is_used)}
                     onBlessingClick={() => handleRewardClick('THE_BLESSING')}
-                    isPuzzleSolved={witchSudokuSolved}
-                    onSolvePuzzle={() => setWitchSudokuSolved(true)}
+                    isPuzzleSolved={witchSudokuSolved || mainQuestions.find(q => q.sequence_number === 2)?.progress_status !== null}
+                    onSolvePuzzle={() => handleSetWitchSudokuSolved(true)}
                   />
                 )}
                 {island.slug === 'ithaca' && (
@@ -383,8 +399,8 @@ function IslandPage() {
                 sitOutRequired={sitOutRequired}
                 onSitOutAcknowledge={() => setSitOutRequired(false)}
                 autoFillAnswer={activeMainQuestion?.sequence_number === 2 && island.slug === 'cyclops' ? terminalPasswordFound : ''}
-                isPuzzleSolved={witchSudokuSolved}
-                onSolvePuzzle={() => setWitchSudokuSolved(true)}
+                isPuzzleSolved={witchSudokuSolved || mainQuestions.find(q => q.sequence_number === 2)?.progress_status !== null}
+                onSolvePuzzle={() => handleSetWitchSudokuSolved(true)}
               />
             </div>
           )}

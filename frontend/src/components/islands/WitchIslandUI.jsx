@@ -89,8 +89,17 @@ function WitchIslandUI({ mainQuestions = [], activeMainQuestion, onSelectQuestio
               <h4 className="altar-title">
                 {index === 0 ? '1. Decision Tree' : '2. Terminal'}
               </h4>
-              <span className="altar-reward-tag">
-                {!isUnlocked ? 'Locked' : '-1.0y'}
+              <span className="altar-reward-tag" style={{
+                color: !isUnlocked ? '#555' : isCompleted ? 'var(--success)' : isFailed ? '#f87171' : undefined,
+                fontWeight: isCompleted || isFailed ? 'bold' : 'normal'
+              }}>
+                {!isUnlocked 
+                  ? 'Locked' 
+                  : isCompleted 
+                    ? `-${q.reward_years || 1.0}y` 
+                    : isFailed 
+                      ? `+${q.penalty_years || 0.25}y` 
+                      : `-${q.reward_years || 1.0}y`}
               </span>
             </div>
           );
