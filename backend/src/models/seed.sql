@@ -128,7 +128,7 @@ Identify the missing logic gate (?):',
 'OR', 0.25, 1.0, 1, 4);
 
 -- ----------------------------------------------------------------------------
--- ISLAND 1: PENALTY QUESTIONS (Spawned on wrong answers)
+-- ISLAND 1: PENALTY QUESTIONS (10 Total Penalty Inscriptions)
 -- ----------------------------------------------------------------------------
 
 -- Penalty Question 1: Assignment in if-statement
@@ -183,7 +183,7 @@ Identify this 3-letter safety system (Format: 3-letter acronym):',
 'Think of the standard automotive safety acronym designed to prevent wheel lockup during emergency deceleration.', 
 'ABS', 0.0, 1.0, 1, 8);
 
--- Backup Penalty 1: Sequence Tablet Pattern
+-- Penalty Question 5: Sequence Tablet Pattern
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
 'A sequence is carved into an ancient Lotus tablet. One of its values has faded away. Find the missing number:
@@ -197,7 +197,7 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 'Observe how the product of the first two numbers in each row compares with the third value.', 
 '24', 0.0, 1.0, 1, 9);
 
--- Backup Penalty 2: C Relational & Logical Expression
+-- Penalty Question 6: C Relational & Logical Expression
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
 'As Odysseus continues his journey through Lotus Island, a communication device suddenly activates and displays the following code:
@@ -209,7 +209,7 @@ What will be displayed? (Format: Single integer):',
 'Evaluate both relational comparisons: (5 > 2) and (5 < 10). In C, what integer represents a true logical expression?', 
 '1', 0.0, 1.0, 1, 10);
 
--- Backup Penalty 3: XOR-NOT Gate Circuit
+-- Penalty Question 7: XOR-NOT Gate Circuit
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
 'As Odysseus continues his journey through Lotus Island, he encounters a Lotus gate controlled by the following circuit:
@@ -220,7 +220,7 @@ If A = 1 and B = 1, what is Y? (Format: Binary 0 or 1):',
 'First find the output of the XOR gate when both inputs are identical (1 and 1), then invert that intermediate result with the NOT gate.', 
 '1', 0.0, 1.0, 1, 11);
 
--- Backup Penalty 4: Consecutive Product Sequence
+-- Penalty Question 8: Consecutive Product Sequence
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
 'As Odysseus explores Lotus Island, he finds an ancient sequence carved into a stone tablet. Each number follows a hidden rule:
@@ -231,7 +231,7 @@ Complete the sequence to uncover the next inscription (Format: Single integer nu
 'Look at the multipliers between consecutive terms: 1*2=2, 2*3=6, 6*4=24, 24*5=120. Apply the next factor in the progression.', 
 '720', 0.0, 1.0, 1, 12);
 
--- Backup Penalty 5: Infinite While Loop Analysis
+-- Penalty Question 9: Infinite While Loop Analysis
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
 'Night falls as Odysseus takes a narrow path through Lotus Island. A counter begins running on a small device beside the trail. What will happen when the following program is executed?
@@ -245,7 +245,7 @@ Predict the exact error classification (Format: Error type):',
 'The program compiles and runs without syntax issues, but the loop never terminates because the condition variable remains unchanged. Classify this type of software bug.', 
 'Logical error', 0.0, 1.0, 1, 13);
 
--- Backup Penalty 6: Energy Storage Component Riddle
+-- Penalty Question 10: Energy Storage Component Riddle
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
 'As Odysseus crosses a dark stretch of Lotus Island, a small device beside the path suddenly loses power. A component inside it releases the energy it had stored earlier, allowing the circuit to continue functioning.
@@ -254,68 +254,6 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 Who am I? (Format: Component name):', 
 'Recall passive electrical components that store energy in an electric field rather than chemically, whose standard unit of measure is the Farad.', 
 'Capacitor', 0.0, 1.0, 1, 14);
-
--- Backup Penalty 7: ASCII Character Shift
-INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(1, 'MAIN', 'NON_MCQ', 
-'Odysseus reaches a clearing where a strange device displays a single letter. As he interacts with it, the letter is shifted according to its character value.
-What will the device display?
-
-char petal = ''B'';
-printf("%c %d", petal + 2, petal + 2);
-
-(Format: [Character] [Number], e.g. X 90):', 
-'The ASCII code for ''B'' is 66. Adding 2 advances the ASCII value and shifts the character forward in the alphabet by 2 places.', 
-'D 68', 0.0, 1.0, 1, 15);
-
--- Backup Penalty 8: Coordinate Navigation Pattern
-INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(1, 'MAIN', 'NON_MCQ', 
-'Odysseus reaches a crossroads where a navigation console displays a pattern of numbers. The final coordinate is missing, and the console requires the correct value before revealing the route ahead.
-Find the missing number:
-
-3     5    18
-4     7    32
-6     9    60
-8    11     ?
-
-(Format: Single integer number):', 
-'Examine how the third number in each row relates to the second column multiplied by a function of the first column.', 
-'99', 0.0, 1.0, 1, 16);
-
--- Backup Penalty 9: Steady-State Capacitor Current
-INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(1, 'MAIN', 'NON_MCQ', 
-'Odysseus reaches a section of Lotus Island where an electronic device has been running on a DC supply for some time. Inside the device, a capacitor has already become fully charged.
-
-In the ideal steady-state condition, what is the current flowing through the capacitor? (Format: Word or numerical value):', 
-'Recall how a fully charged ideal capacitor behaves in a continuous direct-current (DC) circuit once equilibrium is reached.', 
-'Zero current', 0.0, 1.0, 1, 17);
-
--- Backup Penalty 10: Periodic Signal Frequency
-INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(1, 'MAIN', 'NON_MCQ', 
-'While crossing Lotus Island, Odysseus discovers a communication device transmitting a periodic electrical signal. The device records the time taken for one complete cycle as 5 ms.
-
-What is the frequency of the signal? (Format: Value with unit, e.g. 50 Hz):', 
-'Recall the fundamental relationship between frequency and time period: f = 1 / T. Convert 5 ms into seconds before dividing.', 
-'200 Hz', 0.0, 1.0, 1, 18);
-
--- Backup Penalty 11: Even/Odd Logic Operator Bug
-INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
-(1, 'MAIN', 'NON_MCQ', 
-'A navigation device used by Odysseus is supposed to print whether a number is even or odd, but it gives the wrong result. Find and correct the error in the condition:
-
-int number = 7;
-if(number / 2 == 0)
-    printf("Even");
-else
-    printf("Odd");
-
-What should the corrected if-condition be?
-(Format: Exact C if-condition statement):', 
-'Integer division truncation causes "number / 2 == 0" to fail for odd numbers greater than 1. Replace the arithmetic operator with the one that computes the division remainder.', 
-'if(number % 2 == 0)', 0.0, 1.0, 1, 19);
 
 
 -- ============================================================================
