@@ -6,6 +6,7 @@ import StoryTitle from './StoryTitle.jsx';
 import StoryControls from './StoryControls.jsx';
 import StoryProgress from './StoryProgress.jsx';
 import StoryBridge from './StoryBridge.jsx';
+import brandingLogo from '../../assets/WhatsApp Image 2026-08-19 at 22.15.07.jpeg';
 import './CinematicStory.css';
 
 /**
@@ -124,6 +125,15 @@ function CinematicStory({ onComplete }) {
 
       {/* Synchronized Narrative Captions at Safe-Zone Bottom */}
       <StoryCaption caption={activeScene?.caption || ''} />
+
+      {/* Fixed NISB Branding Overlay (Centered at X=1165, Y=600 in 1280x720) */}
+      <div className="story-watermark-overlay" aria-hidden="true" title="NISB Branding">
+        <img
+          src={brandingLogo}
+          alt="NISB"
+          className="story-watermark-logo"
+        />
+      </div>
 
       {/* HUD Controls (Sound Toggle + Skip Story) */}
       <StoryControls

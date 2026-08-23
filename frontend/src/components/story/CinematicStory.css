@@ -42,22 +42,44 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transform: scale(1.04); /* Subtle crop to guarantee edge watermarks stay hidden */
+  transform: scale(1.03);
   transform-origin: center center;
   will-change: opacity, transform;
 }
 
 .story-video-element.active-track {
   opacity: 1;
+  z-index: 4;
+  transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.story-video-element.outgoing-track {
+  opacity: 0;
   z-index: 3;
-  transition: opacity 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .story-video-element.inactive-track {
   opacity: 0;
   z-index: 1;
   pointer-events: none;
-  transition: opacity 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: opacity 0.5s ease-out;
+}
+
+.story-cinematic-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+  mix-blend-mode: screen;
+  z-index: 5;
+  opacity: 0.5;
+  animation: atmosphericBreathe 6s infinite alternate ease-in-out;
+}
+
+@keyframes atmosphericBreathe {
+  0% { opacity: 0.3; transform: scale(1); }
+  100% { opacity: 0.65; transform: scale(1.04); }
 }
 
 .story-video-vignette {
@@ -66,7 +88,7 @@
   pointer-events: none;
   background: radial-gradient(ellipse at center, rgba(3, 8, 17, 0) 45%, rgba(3, 8, 17, 0.65) 100%),
               linear-gradient(to bottom, rgba(3, 8, 17, 0.4) 0%, transparent 20%, transparent 75%, rgba(3, 8, 17, 0.7) 100%);
-  z-index: 4;
+  z-index: 6;
 }
 
 /* =========================================================
@@ -207,6 +229,46 @@
 
 .story-ctrl-icon {
   font-size: 1rem;
+}
+
+/* =========================================================
+   4.5. FIXED BRANDING OVERLAY (LOWER-RIGHT 1180px, 615px)
+   Exact 60x60px overlay region centered at X=1180, Y=615 in 1280x720
+   ========================================================= */
+
+.story-watermark-overlay {
+  position: absolute;
+  left: calc((1180 / 1280) * 100%);
+  top: calc((615 / 720) * 100%);
+  transform: translate(-50%, -50%);
+  width: clamp(52px, calc(60 / 1280 * 100vw), 65px);
+  height: clamp(52px, calc(60 / 1280 * 100vw), 65px);
+  z-index: 15;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+.story-watermark-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.85));
+}
+
+@media (max-width: 768px) {
+  .story-watermark-overlay {
+    width: clamp(44px, 12vw, 54px);
+    height: clamp(44px, 12vw, 54px);
+  }
 }
 
 /* =========================================================
