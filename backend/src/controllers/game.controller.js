@@ -251,28 +251,30 @@ const submitAnswer = async (req, res) => {
       if (normExp === 'logicalerror' && (normIn === 'infiniteloop' || normIn === 'infinitelooperror' || normIn === 'logical' || normIn === 'logicalerror')) return true;
       if (normExp === 'capacitor' && (normIn === 'capacitor' || normIn === 'capacitors')) return true;
       if (normExp === 'd68' && (normIn === 'd68' || normIn === 'd68' || normIn === 'dand68')) return true;
-      // Island 1 synonyms & normalized matches (strictly validates repaired code vs buggy initial code)
+      // Island 1: Binary Search Code Challenge
       if (normExp === 'returnsearchamid1lastitem') {
+        const rawClean = (input || '').replace(/\s+/g, '').toLowerCase();
         // If single line statement submitted:
         if (normIn === 'returnsearchamid1lastitem' || normIn === 'searchamid1lastitem' || normIn === 'returnsearchamid1last' || normIn === 'searchamid1last') return true;
-        // If full C function submitted: both recursive branches must be corrected
-        const hasRightFix = normIn.includes('searchamid1lastitem') || normIn.includes('searchamid1last') || (normIn.includes('amid1last') && !normIn.includes('astartmid1'));
-        const hasLeftFix = normIn.includes('searchastartmid1item') || normIn.includes('astartmid1item') || (normIn.includes('astartmid1') && !normIn.includes('amid1lastitem'));
-        const hasBuggyRight = normIn.includes('searchastartmid1item') || normIn.includes('searchastartmid1');
-        const hasBuggyLeft = normIn.includes('searchamid1lastitem') && normIn.includes('else') && normIn.includes('searchamid1last');
-        if (hasRightFix && hasLeftFix && !hasBuggyRight) return true;
+        // Exact mirror of frontend handleTestRun verification:
+        const hasRightSearch = rawClean.includes('search(a,mid+1,last,item)') || rawClean.includes('search(a,mid+1,last,item);');
+        const hasLeftSearch = rawClean.includes('search(a,start,mid-1,item)') || rawClean.includes('search(a,start,mid-1,item);');
+        if (hasRightSearch && hasLeftSearch) return true;
         return false;
       }
       if (normExp === 'or' && (normIn === 'or' || normIn === 'orgate' || normIn === 'or logic gate')) return true;
+      // Island 1: Palindrome Code Challenge
       if (normExp === 'leftnumber10') {
+        const rawClean = (input || '').replace(/\s+/g, '').toLowerCase();
         // If single line statement submitted:
         if (normIn === 'leftnumber10' || normIn === 'number10' || normIn === 'leftnum10' || normIn === 'numbermod10' || normIn === 'leftnumbermod10') return true;
-        // If full C function submitted: must contain modulo extraction, rev * 10 + left, and division reduction
-        const hasModulo = normIn.includes('leftnumber10') || normIn.includes('leftnum10');
-        const hasAccumulator = normIn.includes('revrev10left') || normIn.includes('rev10revleft') || normIn.includes('rev10left');
-        const hasDivision = normIn.includes('numbernumber10') || normIn.includes('number10');
-        const hasBuggyNumberModulo = normIn.includes('numbernumber10') && normIn.includes('while');
-        if (hasModulo && hasAccumulator && hasDivision && !hasBuggyNumberModulo) return true;
+        // Exact mirror of frontend handleTestRun verification:
+        const hasModuloDigit = rawClean.includes('left=number%10') || rawClean.includes('left=num%10');
+        const hasAccumulator = rawClean.includes('rev=rev*10+left') || rawClean.includes('rev=(rev*10)+left') || rawClean.includes('rev=10*rev+left') || rawClean.includes('rev=rev*10+number') || rawClean.includes('rev=rev*10+left;');
+        const hasReduction = rawClean.includes('number=number/10') || rawClean.includes('number/=10');
+        if (hasModuloDigit && hasAccumulator && hasReduction) return true;
+        // Also allow if user just fixes the modulo extraction line and reduction line in custom formatted code
+        if (hasModuloDigit && hasReduction) return true;
         return false;
       }
       if (normExp === 'ifnumber20' && (normIn === 'ifnumber20' || normIn === 'number20' || normIn === 'number2' || normIn === 'numbermod20' || normIn === 'ifnumber2' || normIn === 'mod2' || normIn === '20')) return true;
