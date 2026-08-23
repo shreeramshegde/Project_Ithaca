@@ -81,8 +81,16 @@ function LotusIslandUI({
               <span className="node-label">
                 {isPenalty ? `Penalty ${q.sequence_number - 4}` : `Trial ${q.sequence_number || index + 1}`}
               </span>
-              <span className="node-reward-tag">
-                {isPenalty ? '+1.0y' : '-0.25y'}
+              <span className="node-reward-tag" style={{
+                color: isCompleted ? 'var(--success)' : isFailed ? '#f87171' : undefined
+              }}>
+                {isCompleted 
+                  ? `-${q.reward_years || (isPenalty ? 0 : 0.25)}y` 
+                  : isFailed 
+                    ? `+${q.penalty_years || (isPenalty ? 1.0 : 1.0)}y` 
+                    : isPenalty 
+                      ? `+${q.penalty_years || 1.0}y` 
+                      : `-${q.reward_years || 0.25}y`}
               </span>
             </div>
           );

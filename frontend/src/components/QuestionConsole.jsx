@@ -452,17 +452,17 @@ function QuestionConsole({
                   boxShadow: '0 0 20px rgba(239, 68, 68, 0.2)'
                 }}>
                   <p style={{ color: '#f87171', fontWeight: 'bold', margin: '0 0 0.5rem 0', fontSize: '1.05rem' }}>
-                    ⚠️ SCYLLA'S GRASP TRIGGERED ⚠️
+                    ⚠️ SCYLLA'S AMBUSH TRIGGERED ⚠️
                   </p>
                   <p style={{ color: 'var(--cloud-white)', fontSize: '0.92rem', marginBottom: '1rem', lineHeight: '1.5' }}>
-                    Scylla has lunged from the jagged cliffs and grabbed one of your teammates! To break Scylla's grasp and get them back, your team must endure the sit-out and solve the 6x6 Runic Sudoku.
+                    Scylla is trying to grab your ship! To break free from the sea monster's grasp and escape, your team must solve the 6x6 Runic Sudoku.
                   </p>
                   <button 
                     onClick={onSitOutAcknowledge} 
                     className="hero-action-btn"
                     style={{ width: '100%', borderColor: '#ef4444', color: '#f87171', justifyContent: 'center' }}
                   >
-                    Acknowledge Teammate Sit-Out
+                    Acknowledge & Prepare Defense
                   </button>
                 </div>
               )}

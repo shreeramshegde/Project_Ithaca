@@ -79,8 +79,18 @@ function CyclopsIslandUI({ mainQuestions = [], activeMainQuestion, hasCyclopsEye
               <span style={{ fontFamily: 'var(--display)', fontSize: '0.88rem', color: !isUnlocked ? 'rgba(231,229,221,0.5)' : 'var(--cloud-white)', fontWeight: 'bold' }}>
                 Step {index + 1}
               </span>
-              <span style={{ fontSize: '0.7rem', color: !isUnlocked ? '#555' : 'var(--gold)' }}>
-                {!isUnlocked ? 'Locked' : '-0.5y'}
+              <span style={{ 
+                fontSize: '0.75rem', 
+                color: !isUnlocked ? '#555' : isCompleted ? 'var(--success)' : isFailed ? '#f87171' : 'var(--gold)',
+                fontWeight: isCompleted || isFailed ? 'bold' : 'normal'
+              }}>
+                {!isUnlocked 
+                  ? 'Locked' 
+                  : isCompleted 
+                    ? `-${q.reward_years || 0.5}y` 
+                    : isFailed 
+                      ? `+${q.penalty_years || 0.75}y` 
+                      : `-${q.reward_years || 0.5}y`}
               </span>
             </div>
           );
