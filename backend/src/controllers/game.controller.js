@@ -251,8 +251,12 @@ const submitAnswer = async (req, res) => {
       if (normExp === 'logicalerror' && (normIn === 'infiniteloop' || normIn === 'infinitelooperror' || normIn === 'logical' || normIn === 'logicalerror')) return true;
       if (normExp === 'capacitor' && (normIn === 'capacitor' || normIn === 'capacitors')) return true;
       if (normExp === 'd68' && (normIn === 'd68' || normIn === 'd68' || normIn === 'dand68')) return true;
-      // Island 1 synonyms & normalized matches
-      if (normExp === 'returnsearchamid1lastitem' && (normIn === 'returnsearchamid1lastitem' || normIn === 'searchamid1lastitem' || normIn === 'searchamid1last' || normIn === 'mid1last' || normIn === 'searchamid1')) return true;
+      // Island 1 synonyms & normalized matches (handles both single line and entire code editor submission)
+      if (normExp === 'returnsearchamid1lastitem') {
+        if (normIn.includes('searchamid1lastitem') || normIn.includes('searchamid1last') || normIn.includes('searchamid1')) return true;
+        if (normIn.includes('mid1last') && normIn.includes('startmid1')) return true;
+        if (normIn === 'returnsearchamid1lastitem' || normIn === 'searchamid1lastitem') return true;
+      }
       if (normExp === 'or' && (normIn === 'or' || normIn === 'orgate' || normIn === 'or logic gate')) return true;
       if (normExp === 'leftnumber10' && (normIn === 'leftnumber10' || normIn === 'number10' || normIn === 'leftnumber' || normIn === 'num10' || normIn === 'numbermod10')) return true;
       if (normExp === 'ifnumber20' && (normIn === 'ifnumber20' || normIn === 'number20' || normIn === 'number2' || normIn === 'numbermod20' || normIn === 'ifnumber2' || normIn === 'mod2' || normIn === '20')) return true;

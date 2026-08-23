@@ -102,19 +102,13 @@ Which lamps will be ON? (Format: List of active lamps separated by ''and'', e.g.
 'Evaluate each lamp sequentially with S active: determine the binary state of A and B first, then use those states to resolve C, and finally evaluate the exclusive condition for D.', 
 'A and D', 0.25, 1.0, 1, 2);
 
--- Base Question 3: Damaged Binary Search Mechanism
+-- Base Question 3: Damaged Binary Search Mechanism (Interactive Code Editor)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
-'Odysseus enters the navigation chamber. The chamber appears to have once controlled the paths through Lotus Island. At its centre is an ancient console containing a program designed to search for a location inside the island.
+'Odysseus enters the navigation chamber. The chamber appears to have once controlled the paths through Lotus Island. At its centre is an ancient console containing a corrupted program designed to search for a location inside the island.
 
-However, the program has been damaged.
-Restore the search mechanism before the chamber seals itself:
-
-![Damaged Binary Search](/assets/lotus/image1.png)
-
-Which recursive call should be used when a[mid] < item?
-(Format: Exact C function call statement):', 
-'When the target item is greater than the middle element in binary search, narrow the search range to the right subarray by shifting the lower boundary.', 
+Restore the binary search mechanism directly inside the interactive code editor below. Correct the recursive search traversal boundaries and submit the repaired program to open the path.', 
+'When the target item is greater than the middle element in binary search, narrow the search range to the right subarray by shifting the lower boundary (mid + 1). Conversely, when searching left, adjust the upper boundary (mid - 1).', 
 'return Search(a, mid+1, last, item);', 0.25, 1.0, 1, 3);
 
 -- Base Question 4: Missing Logic Gate
