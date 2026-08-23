@@ -22,12 +22,8 @@ As Odysseus approaches Athena''s temple, the Oracle places 4 memory stones into 
 
 The urn follows the Law of the Stack: only the topmost stone can ever be removed at a time. Odysseus removes 2 stones from the top, inserts a new stone labeled "Hope", and then removes 1 more stone.
 
-Which stone did he remove last? (Type the exact name):', 
-'Trace each step carefully:
-1. Urn contains bottom-to-top: [Troy, Storm, Lotus, Ithaca]
-2. Remove 2 from top: "Ithaca" and "Lotus" come out. Remaining: [Troy, Storm]
-3. Insert "Hope" on top: [Troy, Storm, Hope]
-4. Remove 1 from top. What stone is removed?', 
+Which stone did he remove last? (Format: Stone Name):', 
+'Track the stack from bottom to top. Identify which stones remain after popping two, what sits on top after pushing "Hope", and what is subsequently popped.', 
 'Hope', 0, 0, 1, 0);
 
 -- Island 2: Cyclops Island Pre-Round (Reward: Cyclops Eye)
@@ -36,15 +32,15 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 'Story line: "Nobody" trick
 Odysseus names himself "Nobody," so when Polyphemus screams for help, his cry carries no valid identity and other Cyclopes ignore it.
 
-In a communication / electrical system, what happens to an incoming request packet that arrives with a missing or unverified Source ID / authorization signal? (Type what the receiving system does):', 
+In a communication / electrical system, what happens to an incoming request packet that arrives with a missing or unverified Source ID / authorization signal? (Format: Single action verb, e.g. Accepted / Rejected / Ignored):', 
 'Consider standard security verification in communication networks when the sender cannot be identified.', 
 'Rejected', 0, 0, 1, 0);
 
 -- Island 3: Sirens Island Pre-Round (Reward: Hermes'' Sandals / Trap: +1.0 year)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, hidden_wrong_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (3, 'PRE_ROUND', 'NON_MCQ', 
-'I''m a two-digit number. My tens digit is three times my units digit, and if you subtract 18 from me, my digits reverse. What number am I?', 
-'Subtracting 18 and getting the digits to reverse relates to how far apart the two digits are — swapping digits changes the value by 9 times the difference between the digits.', 
+'I''m a two-digit number. My tens digit is three times my units digit, and if you subtract 18 from me, my digits reverse. What number am I? (Format: Two-digit integer):', 
+'Let the number be 10t + u with t = 3u. Set up the equation (10t + u) - 18 = 10u + t and solve for u.', 
 '31', '93', 0, 0, 2, 0);
 
 -- Island 4: The Scylla Island Pre-Round (Reward: The Blessing / 10x10 Snake & Cyclops Grid)
@@ -63,7 +59,7 @@ Movement Rules:
 Tasks:
 1. Find the minimum-cost route from S to T.
 2. Write the route using directions (U / D / L / R).
-3. Calculate its total cost.', 
+3. Calculate its total cost (Format: Total integer cost):', 
 'Trace the optimal path avoiding the snake walls while factoring in the double-move penalty of SEA terrain.', 
 '31', 0, 0, 3, 0);
 
@@ -83,15 +79,8 @@ Two scouts start at stone 1 simultaneously:
 • Scout A takes 1 step at a time (1 -> 2 -> 3...)
 • Scout B takes 2 steps at a time (1 -> 3 -> 5...)
 
-After how many total moves will both scouts land on the EXACT SAME stone simultaneously? (Type only the integer number):', 
-'Trace step-by-step from stone 1 (circle length = 6):
-Move 0: Scout A at 1, Scout B at 1
-Move 1: Scout A at 2, Scout B at 3
-Move 2: Scout A at 3, Scout B at 5
-Move 3: Scout A at 4, Scout B at 1 (5+2 on circle)
-Move 4: Scout A at 5, Scout B at 3
-Move 5: Scout A at 6, Scout B at 5
-Move 6: Scout A at 1, Scout B at 1.', 
+After how many total moves will both scouts land on the EXACT SAME stone simultaneously? (Format: Single integer number):', 
+'Scout A moves at speed 1 step/move and Scout B at 2 steps/move on a modular cycle of length 6. Find when (1 + k) mod 6 = (1 + 2k) mod 6 for k > 0.', 
 '6', 0.25, 1.0, 1, 1);
 
 -- Base Question 2: The Logic Switch Mechanism & Enchanted Lamps
@@ -109,11 +98,8 @@ An inscription on the chamber wall explains:
 A second inscription suddenly appears:
 "The chamber responds only to the one who dares to activate the switch."
 Odysseus presses S.
-Which lamps will be ON? (e.g. A and D):', 
-'Evaluate lamp by lamp when switch S is pressed:
-1. S is pressed -> A is ON, B is OFF.
-2. C is ON only if both A and B are ON -> C is OFF.
-3. D is ON when exactly one of A or C is ON -> since A is ON and C is OFF, D is ON.', 
+Which lamps will be ON? (Format: List of active lamps separated by ''and'', e.g. LampX and LampY):', 
+'Evaluate each lamp sequentially with S active: determine the binary state of A and B first, then use those states to resolve C, and finally evaluate the exclusive condition for D.', 
 'A and D', 0.25, 1.0, 1, 2);
 
 -- Base Question 3: Damaged Binary Search Mechanism
@@ -127,8 +113,8 @@ Restore the search mechanism before the chamber seals itself:
 ![Damaged Binary Search](/assets/lotus/image1.png)
 
 Which recursive call should be used when a[mid] < item?
-(Type the corrected function call line, e.g. return Search(a, mid+1, last, item);):', 
-'Look at the binary search recurrence: when searching the right half (a[mid] < item), the new starting index is mid + 1 up to last.', 
+(Format: Exact C function call statement):', 
+'When the target item is greater than the middle element in binary search, narrow the search range to the right subarray by shifting the lower boundary.', 
 'return Search(a, mid+1, last, item);', 0.25, 1.0, 1, 3);
 
 -- Base Question 4: Missing Logic Gate
@@ -144,7 +130,7 @@ Given Boolean expression:
 F1 = A + B D'' + B'' C + B'' D
 
 Identify the missing logic gate (?):', 
-'Analyze inputs to T1 (B'' C) and A, and how they combine into T3 to yield the terms of F1.', 
+'Examine how signal A and the output of the first AND gate (B'' C) must combine at node T3 so that the final output gate can produce all required sum terms.', 
 'OR', 0.25, 1.0, 1, 4);
 
 -- ----------------------------------------------------------------------------
@@ -162,8 +148,10 @@ int lotus = 10;
 if (lotus = 5)
     printf("YES");
 else
-    printf("NO");', 
-'In C, the single equals operator "=" is an assignment, not a comparison. An assignment evaluates to the assigned value (5), which is non-zero (true).', 
+    printf("NO");
+
+(Format: Exact printed output):', 
+'In C, the single "=" operator performs assignment rather than comparison. Recall how non-zero integer expression values evaluate in conditional tests.', 
 'YES', 0.0, 1.0, 1, 5);
 
 -- Penalty Question 2: Navigation Pattern
@@ -174,8 +162,10 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 2    3     7
 4    5    21
 6    7    43
-8    9     ?', 
-'Look at the rule: (second_number)^2 + first_number = third_number (i.e. b^2 + a = c).', 
+8    9     ?
+
+(Format: Single integer number):', 
+'Analyze the algebraic relationship between the first column (a), second column (b), and third column (c). Notice how powers of the middle term relate to the result.', 
 '73', 0.0, 1.0, 1, 6);
 
 -- Penalty Question 3: Corrupted Palindrome Program
@@ -188,8 +178,8 @@ Correct the code to unlock the checkpoint:
 ![Corrupted Palindrome Code](/assets/lotus/image4.png)
 
 Which line extracts the last digit of the number inside the while loop?
-(Type the corrected line, e.g. left = number % 10;):', 
-'To extract the last digit of a number in base 10, use the modulo remainder operator "%".', 
+(Format: Exact C assignment statement):', 
+'To isolate the units (last) digit of a decimal integer in programming, use the remainder operator with divisor 10.', 
 'left = number % 10;', 0.0, 1.0, 1, 7);
 
 -- Penalty Question 4: Chariot Brake Safety System
@@ -199,8 +189,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 
 A safety system automatically modulates brake pressure to prevent the wheels from locking up, allowing the driver to maintain steering control.
 
-Identify this 3-letter safety system:', 
-'It is a standard 3-letter automotive abbreviation (Anti-lock Braking System).', 
+Identify this 3-letter safety system (Format: 3-letter acronym):', 
+'Think of the standard automotive safety acronym designed to prevent wheel lockup during emergency deceleration.', 
 'ABS', 0.0, 1.0, 1, 8);
 
 -- Backup Penalty 1: Sequence Tablet Pattern
@@ -211,8 +201,10 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 2     5    12
 3     7     ?
 4     9    40
-5    11    60', 
-'Pattern: P * Q + R or related linear combination.', 
+5    11    60
+
+(Format: Single integer number):', 
+'Observe how the product of the first two numbers in each row compares with the third value.', 
 '24', 0.0, 1.0, 1, 9);
 
 -- Backup Penalty 2: C Relational & Logical Expression
@@ -223,8 +215,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 int a = 5;
 printf("%d", a > 2 && a < 10);
 
-What will be displayed?', 
-'Remember how C evaluates Boolean true/false comparisons into integer values.', 
+What will be displayed? (Format: Single integer):', 
+'Evaluate both relational comparisons: (5 > 2) and (5 < 10). In C, what integer represents a true logical expression?', 
 '1', 0.0, 1.0, 1, 10);
 
 -- Backup Penalty 3: XOR-NOT Gate Circuit
@@ -234,8 +226,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 
 ![XOR NOT Circuit](/assets/lotus/image6.png)
 
-If A = 1 and B = 1, what is Y?', 
-'1 XOR 1 = 0. Passing 0 through a NOT inverter gives what output?', 
+If A = 1 and B = 1, what is Y? (Format: Binary 0 or 1):', 
+'First find the output of the XOR gate when both inputs are identical (1 and 1), then invert that intermediate result with the NOT gate.', 
 '1', 0.0, 1.0, 1, 11);
 
 -- Backup Penalty 4: Consecutive Product Sequence
@@ -245,8 +237,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 
 1,  2,  6,  24,  120,  ?
 
-Complete the sequence to uncover the next inscription (Type the integer number):', 
-'Each number is multiplied by the next consecutive integer (factorial series).', 
+Complete the sequence to uncover the next inscription (Format: Single integer number):', 
+'Look at the multipliers between consecutive terms: 1*2=2, 2*3=6, 6*4=24, 24*5=120. Apply the next factor in the progression.', 
 '720', 0.0, 1.0, 1, 12);
 
 -- Backup Penalty 5: Infinite While Loop Analysis
@@ -259,8 +251,8 @@ while(petal <= 5) {
     printf("%d ", petal);
 }
 
-Predict the exact error type:', 
-'Notice that the loop variable "petal" is never updated, causing an infinite loop. What type of error is this?', 
+Predict the exact error classification (Format: Error type):', 
+'The program compiles and runs without syntax issues, but the loop never terminates because the condition variable remains unchanged. Classify this type of software bug.', 
 'Logical error', 0.0, 1.0, 1, 13);
 
 -- Backup Penalty 6: Energy Storage Component Riddle
@@ -269,8 +261,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 'As Odysseus crosses a dark stretch of Lotus Island, a small device beside the path suddenly loses power. A component inside it releases the energy it had stored earlier, allowing the circuit to continue functioning.
 
 "I store energy, but not in a chemical form. I release it when the circuit needs it."
-Who am I?', 
-'Its SI unit of capacitance is the Farad.', 
+Who am I? (Format: Component name):', 
+'Recall passive electrical components that store energy in an electric field rather than chemically, whose standard unit of measure is the Farad.', 
 'Capacitor', 0.0, 1.0, 1, 14);
 
 -- Backup Penalty 7: ASCII Character Shift
@@ -280,8 +272,10 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 What will the device display?
 
 char petal = ''B'';
-printf("%c %d", petal + 2, petal + 2);', 
-'ASCII value of ''B'' is 66. 66 + 2 = 68, which corresponds to character ''D''. Format: [Character] [Number]', 
+printf("%c %d", petal + 2, petal + 2);
+
+(Format: [Character] [Number], e.g. X 90):', 
+'The ASCII code for ''B'' is 66. Adding 2 advances the ASCII value and shifts the character forward in the alphabet by 2 places.', 
 'D 68', 0.0, 1.0, 1, 15);
 
 -- Backup Penalty 8: Coordinate Navigation Pattern
@@ -293,8 +287,10 @@ Find the missing number:
 3     5    18
 4     7    32
 6     9    60
-8    11     ?', 
-'Look at the relationship: b * (a + 1) = x. For row 4: 11 * (8 + 1) = 99.', 
+8    11     ?
+
+(Format: Single integer number):', 
+'Examine how the third number in each row relates to the second column multiplied by a function of the first column.', 
 '99', 0.0, 1.0, 1, 16);
 
 -- Backup Penalty 9: Steady-State Capacitor Current
@@ -302,8 +298,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 (1, 'MAIN', 'NON_MCQ', 
 'Odysseus reaches a section of Lotus Island where an electronic device has been running on a DC supply for some time. Inside the device, a capacitor has already become fully charged.
 
-In the ideal steady-state condition, what is the current flowing through the capacitor? (Type the description or number):', 
-'In steady-state DC circuits, a charged capacitor blocks DC and acts like an open circuit.', 
+In the ideal steady-state condition, what is the current flowing through the capacitor? (Format: Word or numerical value):', 
+'Recall how a fully charged ideal capacitor behaves in a continuous direct-current (DC) circuit once equilibrium is reached.', 
 'Zero current', 0.0, 1.0, 1, 17);
 
 -- Backup Penalty 10: Periodic Signal Frequency
@@ -311,8 +307,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 (1, 'MAIN', 'NON_MCQ', 
 'While crossing Lotus Island, Odysseus discovers a communication device transmitting a periodic electrical signal. The device records the time taken for one complete cycle as 5 ms.
 
-What is the frequency of the signal? (e.g. 200 Hz):', 
-'Frequency f = 1 / T. With T = 5 ms = 0.005 s, calculate 1 / 0.005.', 
+What is the frequency of the signal? (Format: Value with unit, e.g. 50 Hz):', 
+'Recall the fundamental relationship between frequency and time period: f = 1 / T. Convert 5 ms into seconds before dividing.', 
 '200 Hz', 0.0, 1.0, 1, 18);
 
 -- Backup Penalty 11: Even/Odd Logic Operator Bug
@@ -327,8 +323,8 @@ else
     printf("Odd");
 
 What should the corrected if-condition be?
-(Type the corrected condition line, e.g. if(number % 2 == 0)):', 
-'To check whether an integer is divisible by 2, use the remainder (modulo) operator "%" instead of division "/".', 
+(Format: Exact C if-condition statement):', 
+'Integer division truncation causes "number / 2 == 0" to fail for odd numbers greater than 1. Replace the arithmetic operator with the one that computes the division remainder.', 
 'if(number % 2 == 0)', 0.0, 1.0, 1, 19);
 
 
@@ -351,8 +347,8 @@ for i in range(1, 10):
 print(total)
 
 The warning, scrambled, reads: QEOMBQ
-Each letter of the warning was shifted forward in the alphabet by the ritual''s number. Shift each letter back by that same amount to reveal the true word. What does Polyphemus really say?', 
-'Walk i = 1 to 9. Divisible by 3: add to total; otherwise subtract 1. Total shift = 12. Shift QEOMBQ backward by 12 letters in the alphabet.', 
+Each letter of the warning was shifted forward in the alphabet by the ritual''s number. Shift each letter back by that same amount to reveal the true word. What does Polyphemus really say? (Format: Single English word):', 
+'Walk through i = 1 to 9 step-by-step: add numbers divisible by 3 (3, 6, 9) and subtract 1 for all other iterations. Use the resulting total shift to reverse-shift each letter in the alphabet.', 
 'ESCAPE', 0.5, 0.75, 2, 1);
 
 -- Main Question 2: The Echoing Cave (Binary XOR Secret)
@@ -365,8 +361,8 @@ He tests it twice:
 • He shouts 5, the echo replies 9.
 • He shouts 9, the echo replies 5.
 
-What is the cave''s secret number? And what will the echo reply if Odysseus shouts 15?', 
-'Write 5 and 9 in 4-bit binary, find the XOR pattern to deduce the cave''s secret number, then calculate the response for shout 15.', 
+What is the cave''s secret number? And what will the echo reply if Odysseus shouts 15? (Format: [Secret Number], [Reply Number], e.g. 10, 4):', 
+'Convert 5 and 9 to 4-bit binary. Since A XOR K = B implies K = A XOR B, compute 5 XOR 9 to find the cave''s key K. Then compute 15 XOR K in decimal.', 
 '12, 3', 0.5, 0.75, 2, 2);
 
 -- Main Question 3: Hiding, Escape & Logic Circuit Decode
@@ -394,8 +390,8 @@ Three sheep pass through the cave in sequence.
 After determining the output for all three sheep, decode the following message by shifting each letter 3 positions backward in the alphabet:
 Q  R  E  R  G  B
 
-What is the decoded hidden message?', 
-'Trace Sheep 1 (Y=0), Sheep 2 (Y=0), Sheep 3 (Y=1, passes). Then shift Q R E R G B backward by 3: Q->N, R->O, E->B, R->O, G->D, B->Y.', 
+What is the decoded hidden message? (Format: Single English word):', 
+'Simulate the feedback logic cycle for Sheep 1, Sheep 2, and Sheep 3 to check if the pass condition Y=1 is met. Then shift each character of the ciphertext backward by 3 positions in the alphabet.', 
 'NOBODY', 0.5, 0.75, 2, 3);
 
 
@@ -409,8 +405,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 (3, 'MAIN', 'NON_MCQ', 
 'As the ship drifts closer to the island, the crew''s minds begin to blur under the first faint notes of the Sirens'' song, so Odysseus rigs a small warning bell to trip before anyone can be fully entranced. He builds a simple voltage divider off the ship''s 12 V battery, running a 4 kΩ resistor (R1) in series with a 2 kΩ resistor (R2), and taps the bell''s trigger wire across R2.
 
-In one word (a single number, in volts), what voltage appears across R2 — the exact point that will sound the alarm while there''s still time to plug the crew''s ears?', 
-'This is a series voltage divider — the voltage across any resistor is the supply voltage multiplied by that resistor''s share of the total resistance: Vout = Vsupply * (R2 / (R1 + R2)).', 
+In one word (a single number, in volts), what voltage appears across R2 — the exact point that will sound the alarm while there''s still time to plug the crew''s ears? (Format: Number with unit, e.g. 5V):', 
+'Use the series voltage divider formula: Vout = Vsupply * (R2 / (R1 + R2)). Substitute the given resistor values and supply voltage.', 
 '4V', 0.75, 0.5, 3, 1);
 
 -- Question 2: Music Player Recently Played (Data Structures)
@@ -418,8 +414,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 (3, 'MAIN', 'NON_MCQ', 
 'You are building a music player''s "Recently Played" list (maximum 50 songs). When a new song is played, it should appear at the top, and the oldest song should be removed if the list is full.
 
-Which linear data structure is best suited to efficiently insert at the front and remove from the rear?', 
-'Think about which end of the list each operation touches: new songs enter at one end, old songs exit from the opposite end. You need a double-ended structure.', 
+Which linear data structure is best suited to efficiently insert at the front and remove from the rear? (Format: Data structure name):', 
+'Consider standard linear data structures that provide O(1) time complexity for insertion at the head and deletion from the tail.', 
 'Deque', 0.75, 0.5, 3, 2);
 
 -- Question 3: Harmonics & Beat Frequency (Physics / Acoustics)
@@ -427,8 +423,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 (3, 'MAIN', 'NON_MCQ', 
 'As the ship draws nearer, the Sirens'' voices blend together in the air, each singing at a pitch just slightly off from the others, creating an eerie pulsing throb meant to lull the crew into a trance. Odysseus notices two of the loudest voices ring out at 440 Hz and 446 Hz, and realises that counting the throbs per second in the combined sound could tell his men how close they''re getting without looking toward the island.
 
-What beat frequency (in Hz) — the rate at which the loudness rises and falls — will the crew hear from these two overlapping voices?', 
-'Beat frequency depends on how far apart the two frequencies are: |f1 - f2|.', 
+What beat frequency (in Hz) — the rate at which the loudness rises and falls — will the crew hear from these two overlapping voices? (Format: Value with unit, e.g. 10 Hz):', 
+'The beat frequency produced by two interfering acoustic waves equals the absolute difference between their respective frequencies: f_beat = |f1 - f2|.', 
 '6 Hz', 0.75, 0.5, 3, 3);
 
 -- Question 4: Castaway Rail Sequence (Number Patterns)
@@ -438,8 +434,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 
 3,  6,  11,  18,  27,  ?
 
-Certain that the next number marks exactly how many heartbeats remain before they clear the rocks, the crew must find it fast. What is the missing number in the sequence?', 
-'Look at the gaps between consecutive numbers: 6-3=3, 11-6=5, 18-11=7, 27-18=9. What is the next gap?', 
+Certain that the next number marks exactly how many heartbeats remain before they clear the rocks, the crew must find it fast. What is the missing number in the sequence? (Format: Single integer number):', 
+'Examine the second-order differences by observing how the step gap between successive terms increases in an arithmetic progression of odd numbers.', 
 '38', 0.75, 0.5, 3, 4);
 
 -- Question 5: Conical Voice Conch Geometry (Mensuration)
@@ -447,8 +443,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 (3, 'MAIN', 'NON_MCQ', 
 'Washed up on the black rocks lies a conch-like horn the Sirens once used to throw their voices far out over the water. Odysseus measures it: its curved (lateral) surface area is 550 cm² and its slant height is 25 cm. To judge whether the horn is small enough to smash silently underfoot, he needs its radius.
 
-Using π = 22/7, what is the radius (r) of the horn''s conical mouth (in cm)?', 
-'Curved surface area of a cone is CSA = π * r * l. Rearrange to find r = CSA / (π * l).', 
+Using π = 22/7, what is the radius (r) of the horn''s conical mouth (in cm)? (Format: Value with unit, e.g. 10 cm):', 
+'Apply the conical lateral surface area relation CSA = π * r * l. Rearrange algebraically to isolate the radius r = CSA / (π * l).', 
 '7 cm', 0.75, 0.5, 3, 5);
 
 -- Question 6: Six-Chambered Honeycomb Ring (Figure & Opposite-Square Pattern)
@@ -458,10 +454,9 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 
 ![Six-chambered Honeycomb Rock Carving](/assets/sirens/honeycomb_puzzle.png)
 
-What number belongs in place of the ''?'' opposite 8?', 
-'Don''t read the six chambers straight around the ring — check pairs of numbers directly OPPOSITE each other across the centre. Try squaring one number in a pair and compare with the number sitting across from it.', 
+What number belongs in place of the ''?'' opposite 8? (Format: Single integer number):', 
+'Examine the diametrically opposite chamber pairs across the ring. Compare each smaller number with the value across from it by testing a power relation with a constant offset.', 
 '66', 0.75, 0.5, 3, 6);
-
 
 -- ============================================================================
 -- ISLAND 4: THE SCYLLA ISLAND (Reward: -1.0, Penalty: +0.25)
@@ -474,8 +469,8 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 
 Reconstruct the correct decision tree using the Witch''s rules. Pass each of the eight ships (A through H) through the tree to determine whether each ship reaches SAFE or DANGER. Discard the hidden numbers belonging to DANGER ships. Read the remaining hidden numbers in ship order (A → H) to form the final escape code.
 
-Final Clue: "Only those who find the safe waters may carry the key."', 
-'Trace each ship from A to H through the branch rules. Collect the hidden numerical digits only from the ships that reach SAFE.', 
+Final Clue: "Only those who find the safe waters may carry the key." (Format: 6-digit numeric code):', 
+'Rebuild the conditional branching hierarchy from root to leaves. Evaluate each ship''s attributes against the split conditions to isolate only the SAFE vessels.', 
 '729586', 1.0, 0.25, 4, 1);
 
 -- Main Question 2: Circe''s Enchanted Domain (Interactive Linux Shell Terminal)
@@ -485,5 +480,5 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 
 The god Hermes has granted you a vision of the island''s structure and the divine commands (unzip, tar, unrar) needed to break her magic. Navigate the island in the interactive terminal, unseal the three spell fragments from hidden archives, and speak the final incantation using Hermes''s formula:
 [Fragment 1]_[Fragment 2]_[Fragment 3]', 
-'Folders look empty? Use ls -a to reveal hidden files that start with a dot (.spell_alpha.zip in Potions_Lab, .spell_beta.tar.gz in Mud_Pits, .spell_gamma.rar in Stag_Clearing). Extract them and concatenate the words with underscores.', 
+'Use terminal commands to navigate directories. Check for hidden archives starting with a dot, extract their contents using appropriate archive utilities, and concatenate the discovered words.', 
 'MOLY_SWINE_OATH', 1.0, 0.25, 4, 2);
