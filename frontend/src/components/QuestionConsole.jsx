@@ -4,6 +4,7 @@ import WitchDecisionTree from './islands/witch/WitchDecisionTree.jsx';
 import CirceTerminal from './islands/witch/CirceTerminal.jsx';
 import RunicSudoku from './games/RunicSudoku.jsx';
 import LotusBinarySearchEditor from './islands/lotus/LotusBinarySearchEditor.jsx';
+import LotusPalindromeEditor from './islands/lotus/LotusPalindromeEditor.jsx';
 
 function CodeBlockWithCopy({ code }) {
   const [copied, setCopied] = useState(false);
@@ -493,6 +494,41 @@ function QuestionConsole({
                     </div>
                   )}
                   <LotusBinarySearchEditor
+                    onSubmit={(editedCode) => {
+                      onSubmitAnswer({ question_id: mainQuestion.id, answer_string: editedCode });
+                    }}
+                    loading={loading}
+                    isCorrect={isMainCorrect}
+                    isIncorrect={isMainIncorrect}
+                  />
+                </>
+              ) : (island?.slug === 'lotus' || island?.id === 1) && mainQuestion?.sequence_number === 7 && !isMainCorrect && !isMainIncorrect ? (
+                <>
+                  <QuestionTextRenderer text={mainQuestion?.question_text} />
+                  {revealedHint && (
+                    <div style={{
+                      margin: '16px 0',
+                      padding: '16px 20px',
+                      background: 'linear-gradient(135deg, rgba(198, 165, 106, 0.18) 0%, rgba(7, 21, 38, 0.95) 100%)',
+                      border: '1.5px solid var(--gold)',
+                      borderRadius: '12px',
+                      boxShadow: '0 0 25px rgba(198, 165, 106, 0.25)',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px'
+                    }}>
+                      <span style={{ fontSize: '1.8rem' }}>🔮</span>
+                      <div>
+                        <strong style={{ color: 'var(--gold)', display: 'block', fontSize: '0.95rem', marginBottom: '4px' }}>
+                          Oracle's Revealed Clue:
+                        </strong>
+                        <span style={{ color: 'rgba(245, 242, 232, 0.95)', fontSize: '0.95rem', fontStyle: 'italic', lineHeight: '1.5' }}>
+                          "{revealedHint}"
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  <LotusPalindromeEditor
                     onSubmit={(editedCode) => {
                       onSubmitAnswer({ question_id: mainQuestion.id, answer_string: editedCode });
                     }}

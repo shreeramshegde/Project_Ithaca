@@ -162,18 +162,14 @@ INSERT INTO questions (island_id, type, format, question_text, hint_text, correc
 'Analyze the algebraic relationship between the first column (a), second column (b), and third column (c). Notice how powers of the middle term relate to the result.', 
 '73', 0.0, 1.0, 1, 6);
 
--- Penalty Question 3: Corrupted Palindrome Program
+-- Penalty Question 3: Corrupted Palindrome Program (Interactive Code Editor)
 INSERT INTO questions (island_id, type, format, question_text, hint_text, correct_answer, reward_years, penalty_years, difficulty_level, sequence_number) VALUES
 (1, 'MAIN', 'NON_MCQ', 
 'The navigation console directs Odysseus to the island''s next checkpoint.
-A digital lock blocks his path, displaying a corrupted palindrome program.
-Correct the code to unlock the checkpoint:
+A digital lock blocks his path, displaying a corrupted palindrome verification program.
 
-![Corrupted Palindrome Code](/assets/lotus/image4.png)
-
-Which line extracts the last digit of the number inside the while loop?
-(Format: Exact C assignment statement):', 
-'To isolate the units (last) digit of a decimal integer in programming, use the remainder operator with divisor 10.', 
+Correct the digit extraction logic directly in the interactive code editor below, test run the verification, and submit the repaired program to unlock the checkpoint.', 
+'To isolate the units (last) digit of a decimal integer in programming, use the remainder (modulo) operator "%" with divisor 10 instead of division "/".', 
 'left = number % 10;', 0.0, 1.0, 1, 7);
 
 -- Penalty Question 4: Chariot Brake Safety System

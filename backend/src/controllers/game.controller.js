@@ -257,8 +257,11 @@ const submitAnswer = async (req, res) => {
         if (normIn.includes('mid1last') && normIn.includes('startmid1')) return true;
         if (normIn === 'returnsearchamid1lastitem' || normIn === 'searchamid1lastitem') return true;
       }
-      if (normExp === 'or' && (normIn === 'or' || normIn === 'orgate' || normIn === 'or logic gate')) return true;
-      if (normExp === 'leftnumber10' && (normIn === 'leftnumber10' || normIn === 'number10' || normIn === 'leftnumber' || normIn === 'num10' || normIn === 'numbermod10')) return true;
+      if (normExp === 'leftnumber10') {
+        if (normIn.includes('leftnumber10') || normIn.includes('leftnum10') || normIn.includes('number10') || normIn.includes('num10')) return true;
+        if (normIn.includes('numbermod10') || normIn.includes('leftnumbermod10')) return true;
+        if (normIn === 'leftnumber10' || normIn === 'number10') return true;
+      }
       if (normExp === 'ifnumber20' && (normIn === 'ifnumber20' || normIn === 'number20' || normIn === 'number2' || normIn === 'numbermod20' || normIn === 'ifnumber2' || normIn === 'mod2' || normIn === '20')) return true;
       if (normExp === 'zerocurrent' && (normIn === 'zerocurrent' || normIn === 'zero' || normIn === '0' || normIn === '0a' || normIn === '0amperes' || normIn === 'zeroa' || normIn === '0current')) return true;
       if (normExp === '200hz' && (normIn === '200hz' || normIn === '200' || normIn === '200hertz')) return true;
