@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { animateMapCamera } from '../animations/mapAnimations.js';
 import { getGameState } from '../api/game.js';
@@ -8,7 +8,8 @@ import MapHud from '../components/MapHud.jsx';
 import OceanMap from '../components/OceanMap.jsx';
 import VictoryCelebrationModal from '../components/VictoryCelebrationModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import '../journey-map.css'; // Import map styles
+import { ISLANDS } from '../data/islands.js';
+import '../journey-map.css';
 
 function JourneyPage() {
   const navigate = useNavigate();
@@ -17,15 +18,37 @@ function JourneyPage() {
   const [previousYears, setPreviousYears] = useState(team?.remaining_years ?? null);
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [hasDismissedVictory, setHasDismissedVictory] = useState(false);
-  const traveledFrom = location.state?.traveledFrom;
 
   const stateQuery = useQuery({
     queryKey: ['game-state', token],
     queryFn: () => getGameState(token),
+    enabled: Boolean(token),
     refetchInterval: 10000,
   });
 
   const isCompleted = Boolean(stateQuery.data?.data?.team?.is_completed);
+  const currentIsland = stateQuery.data?.data?.team?.is_completed
+    ? 5
+    : stateQuery.data?.data?.team?.current_island || 1;
+
+  // Extract voyage state passed from IslandPage
+  const voyageState = location.state?.voyage;
+  const traveledFrom = location.state?.traveledFrom;
+
+  const voyage = React.useMemo(() => {
+    if (voyageState && voyageState.fromId && voyageState.toId) {
+      return voyageState;
+    }
+    if (traveledFrom && traveledFrom !== currentIsland) {
+      const destIsland = ISLANDS.find((i) => i.id === currentIsland) || ISLANDS[0];
+      return {
+        fromId: traveledFrom,
+        toId: currentIsland,
+        toSlug: destIsland.slug,
+      };
+    }
+    return null;
+  }, [voyageState, traveledFrom, currentIsland]);
 
   useEffect(() => {
     if (isCompleted && !hasDismissedVictory) {
@@ -48,10 +71,30 @@ function JourneyPage() {
 
   const handleIslandClick = (slug) => {
     animateMapCamera(slug);
-    // Allow the 0.5s camera pan and water transition to complete smoothly
     setTimeout(() => {
       navigate(`/journey/${slug}`);
-    }, 500);
+    }, 450);
+  };
+
+  // Called when the ship reaches the destination island
+  const handleVoyageArrival = () => {
+    if (voyage?.toSlug) {
+      const destinationSlug = voyage.toSlug;
+      
+      // Clear location state
+      try {
+        if (window.history.replaceState) {
+          window.history.replaceState({}, document.title);
+        }
+      } catch {
+        // Ignore history errors
+      }
+
+      // Savor arrival for 1.1s with newly unlocked island, then seamlessly transition
+      setTimeout(() => {
+        handleIslandClick(destinationSlug);
+      }, 1100);
+    }
   };
 
   return (
@@ -107,8 +150,9 @@ function JourneyPage() {
       )}
 
       <OceanMap 
-        currentIsland={stateQuery.data?.data?.team?.is_completed ? 5 : stateQuery.data?.data?.team?.current_island} 
-        traveledFrom={traveledFrom}
+        currentIsland={currentIsland}
+        voyage={voyage}
+        onVoyageArrival={handleVoyageArrival}
         onIslandClick={handleIslandClick}
       />
     </main>

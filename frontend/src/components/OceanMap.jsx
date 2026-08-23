@@ -1,34 +1,51 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ISLANDS } from '../data/islands.js';
 import IslandLandmark from './IslandLandmark.jsx';
 import IslandTooltip from './IslandTooltip.jsx';
 import JourneyPath from './JourneyPath.jsx';
 import PlayerShip from './PlayerShip.jsx';
 
-// Extended island metadata for cinematic scrollable map
+// Island coordinates for cinematic scrollable map
 export const MAP_POSITIONS = {
   1: { x: 25, y: 89 }, // Lotus (Start / South)
   2: { x: 72, y: 71 }, // Cyclops
   3: { x: 28, y: 52 }, // Sirens
   4: { x: 74, y: 34 }, // Witch
-  5: { x: 50, y: 16 }, // Ithaca (Destination / North - with abundant top sky space)
+  5: { x: 50, y: 16 }, // Ithaca (Destination / North)
 };
 
-export function getStateForIsland(islandId, currentIsland) {
-  if (!currentIsland) return 'locked';
-  if (islandId < currentIsland) return 'completed';
-  if (islandId === currentIsland) return 'active';
+export function getStateForIsland(islandId, activeIsland) {
+  if (!activeIsland) return 'locked';
+  if (islandId < activeIsland) return 'completed';
+  if (islandId === activeIsland) return 'active';
   return 'locked';
 }
 
-function OceanMap({ currentIsland, traveledFrom, onIslandClick }) {
+function OceanMap({ currentIsland, voyage = null, onVoyageArrival = null, onIslandClick }) {
   const containerRef = useRef(null);
+
+  // During voyage, keep origin island active until arrival
+  const [displayedActiveIsland, setDisplayedActiveIsland] = useState(() => {
+    if (voyage && voyage.fromId) {
+      return voyage.fromId;
+    }
+    return currentIsland || 1;
+  });
+
+  const handleArrival = () => {
+    if (voyage?.toId) {
+      setDisplayedActiveIsland(voyage.toId);
+    }
+    if (typeof onVoyageArrival === 'function') {
+      onVoyageArrival();
+    }
+  };
 
   // Build the list of nodes for the path and rendering
   const nodes = ISLANDS.map((island) => ({
     ...island,
     pos: MAP_POSITIONS[island.id],
-    state: getStateForIsland(island.id, currentIsland),
+    state: getStateForIsland(island.id, displayedActiveIsland),
   }));
 
   // Smoothly scroll to target island
@@ -50,15 +67,19 @@ function OceanMap({ currentIsland, traveledFrom, onIslandClick }) {
     }
   };
 
-  // Auto-scroll on initial load or island progression
+  // Initial camera setup
   useEffect(() => {
-    const activeIslandId = currentIsland || 1;
-    const timer = setTimeout(() => {
-      scrollToIsland(activeIslandId, true);
-    }, 250);
-
-    return () => clearTimeout(timer);
-  }, [currentIsland]);
+    if (voyage && voyage.fromId) {
+      // Instantly frame the departure island so player sees their boat at origin
+      scrollToIsland(voyage.fromId, false);
+    } else {
+      const activeId = currentIsland || 1;
+      const timer = setTimeout(() => {
+        scrollToIsland(activeId, true);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [voyage, currentIsland]);
 
   return (
     <div className="ocean-map-container" ref={containerRef}>
@@ -83,7 +104,7 @@ function OceanMap({ currentIsland, traveledFrom, onIslandClick }) {
       </div>
 
       <div className="ocean-map-world">
-        <JourneyPath nodes={nodes} currentIsland={currentIsland} />
+        <JourneyPath nodes={nodes} currentIsland={displayedActiveIsland} />
 
         {nodes.map((node) => (
           <IslandLandmark
@@ -97,7 +118,12 @@ function OceanMap({ currentIsland, traveledFrom, onIslandClick }) {
           />
         ))}
 
-        <PlayerShip nodes={nodes} currentIsland={currentIsland} traveledFrom={traveledFrom} />
+        <PlayerShip
+          nodes={nodes}
+          currentIsland={currentIsland}
+          voyage={voyage}
+          onVoyageArrival={handleArrival}
+        />
       </div>
 
       {/* Floating Side Voyage Navigator for quick vertical jumping */}
@@ -106,12 +132,11 @@ function OceanMap({ currentIsland, traveledFrom, onIslandClick }) {
           <span className="nav-title">VOYAGE</span>
         </div>
         <div className="nav-nodes">
-          {/* Display from top (Ithaca) to bottom (Lotus) */}
           {[...nodes].reverse().map((node) => (
             <button
               key={node.id}
               onClick={() => scrollToIsland(node.id)}
-              className={`nav-node-btn state-${node.state} ${node.id === currentIsland ? 'is-active-btn' : ''}`}
+              className={`nav-node-btn state-${node.state} ${node.id === displayedActiveIsland ? 'is-active-btn' : ''}`}
               title={`Jump to ${node.name} (${node.state})`}
               aria-label={`Jump to ${node.name}`}
             >

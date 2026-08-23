@@ -433,11 +433,32 @@
 .player-ship-container {
   position: absolute;
   transform: translate(-50%, -50%);
-  z-index: 3;
+  z-index: 10;
   width: 76px;
   height: 76px;
   pointer-events: none;
-  animation: shipBobbing 3s ease-in-out infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-ship-container.is-docked {
+  animation: shipBobbing 3.2s ease-in-out infinite;
+}
+
+.player-ship-container.is-sailing {
+  animation: none;
+  filter: drop-shadow(0 12px 25px rgba(212, 175, 55, 0.45));
+}
+
+.player-ship-avatar {
+  width: 68px;
+  height: 68px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .player-ship-image {
@@ -446,13 +467,46 @@
   object-fit: contain;
   border-radius: 50%;
   mix-blend-mode: screen;
-  box-shadow: 0 0 45px 18px rgba(198, 165, 106, 0.65);
-  filter: drop-shadow(0 8px 15px rgba(0,0,0,0.7));
+  box-shadow: 0 0 35px 12px rgba(198, 165, 106, 0.7);
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.8));
+}
+
+.ship-ocean-wake {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 2px solid rgba(198, 165, 106, 0.35);
+  background: radial-gradient(circle, rgba(198, 165, 106, 0.2) 0%, transparent 70%);
+  animation: shipWakePulse 1.2s ease-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes shipWakePulse {
+  0% { transform: scale(0.7); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.player-ship-label {
+  position: absolute;
+  bottom: -16px;
+  background: rgba(3, 8, 17, 0.85);
+  border: 1px solid rgba(198, 165, 106, 0.4);
+  color: var(--gold, #d4af37);
+  font-family: var(--display, 'Cinzel', serif);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 1px 6px;
+  border-radius: 10px;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
 }
 
 @keyframes shipBobbing {
   0%, 100% { transform: translate(-50%, -50%) translateY(0) rotate(0deg); }
-  50% { transform: translate(-50%, -50%) translateY(-6px) rotate(2deg); }
+  50% { transform: translate(-50%, -50%) translateY(-5px) rotate(1.5deg); }
 }
 
 /* =========================================================

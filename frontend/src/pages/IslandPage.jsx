@@ -8,7 +8,7 @@ import QuestionConsole from '../components/QuestionConsole.jsx';
 import RewardPanel from '../components/RewardPanel.jsx';
 import RulesModal from '../components/RulesModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { findIslandBySlug } from '../data/islands.js';
+import { findIslandBySlug, ISLANDS } from '../data/islands.js';
 import { animateIslandEntry } from '../animations/mapAnimations.js';
 import LotusIslandUI from '../components/islands/LotusIslandUI.jsx';
 import CyclopsIslandUI from '../components/islands/CyclopsIslandUI.jsx';
@@ -88,10 +88,23 @@ function IslandPage() {
         title: 'Voyage Continues',
         message: payload?.message || 'Setting sail to the next island!',
       });
+      const departureId = island.id;
+      const currentIndex = ISLANDS.findIndex(isl => isl.id === departureId);
+      const destinationIsland = ISLANDS[currentIndex + 1] || ISLANDS[ISLANDS.length - 1];
+
       refreshState();
+
       setTimeout(() => {
-        navigate('/journey', { state: { traveledFrom: currentIsland } });
-      }, 1500);
+        navigate('/journey', {
+          state: {
+            voyage: {
+              fromId: departureId,
+              toId: destinationIsland.id,
+              toSlug: destinationIsland.slug,
+            },
+          },
+        });
+      }, 400);
     },
     onError: (error) => setFeedback({ kind: 'error', title: 'Failed to progress', message: error.message }),
   });
