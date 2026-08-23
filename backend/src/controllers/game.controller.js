@@ -251,11 +251,17 @@ const submitAnswer = async (req, res) => {
       if (normExp === 'logicalerror' && (normIn === 'infiniteloop' || normIn === 'infinitelooperror' || normIn === 'logical' || normIn === 'logicalerror')) return true;
       if (normExp === 'capacitor' && (normIn === 'capacitor' || normIn === 'capacitors')) return true;
       if (normExp === 'd68' && (normIn === 'd68' || normIn === 'd68' || normIn === 'dand68')) return true;
-      if (normExp === '96' && normIn === '96') return true;
-      if (normExp === 'circeolympus42' && (normIn === 'circeolympus42' || normIn === 'circe42' || normIn === 'olympus42')) return true;
-      if (normExp === 'nobodycyclops42' && (normIn === 'nobodycyclops42' || normIn === 'nobody42')) return true;
+      // Island 1 synonyms & normalized matches
+      if (normExp === 'returnsearchamid1lastitem' && (normIn === 'returnsearchamid1lastitem' || normIn === 'searchamid1lastitem' || normIn === 'searchamid1last' || normIn === 'mid1last' || normIn === 'searchamid1')) return true;
+      if (normExp === 'or' && (normIn === 'or' || normIn === 'orgate' || normIn === 'or logic gate')) return true;
+      if (normExp === 'leftnumber10' && (normIn === 'leftnumber10' || normIn === 'number10' || normIn === 'leftnumber' || normIn === 'num10' || normIn === 'numbermod10')) return true;
+      if (normExp === 'ifnumber20' && (normIn === 'ifnumber20' || normIn === 'number20' || normIn === 'number2' || normIn === 'numbermod20' || normIn === 'ifnumber2' || normIn === 'mod2' || normIn === '20')) return true;
+      if (normExp === 'zerocurrent' && (normIn === 'zerocurrent' || normIn === 'zero' || normIn === '0' || normIn === '0a' || normIn === '0amperes' || normIn === 'zeroa' || normIn === '0current')) return true;
+      if (normExp === '200hz' && (normIn === '200hz' || normIn === '200' || normIn === '200hertz')) return true;
+      if (normExp === '99' && normIn === '99') return true;
+      if (normExp === '6' && normIn === '6') return true;
       if (normExp === 'hope' && normIn === 'hope') return true;
-      if (normExp === '4khz8cycles' && (normIn === '4khz8cycles' || normIn === '48' || normIn === '4khz8' || normIn === '48cycles')) return true;
+      if (normExp === 'ithaka' && (normIn === 'ithaka' || normIn === 'ithaca' || normIn === 'hope')) return true;
 
       return false;
     };
